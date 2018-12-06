@@ -1,0 +1,467 @@
+﻿<Window x:Class="ArrayDisplay.UI.DisPlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ni="http://schemas.ni.com/controls/2009/xaml/presentation"
+        xmlns:net="clr-namespace:ArrayDisplay.net"
+        Height="1080" Width="1920"
+        WindowState="Maximized"
+        WindowStyle="None"
+        FontSize="20"
+        Topmost="False"
+        Title="水声信号分析系统 - 调试中心"
+        Background="#FFE5E5E5">
+    <Window.Resources>
+
+    </Window.Resources>
+    <Viewbox>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="292*" />
+                <RowDefinition Height="793*" />
+            </Grid.RowDefinitions>
+            <!--            状态面板-->
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="10" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="337" />
+                    <ColumnDefinition Width="543*" />
+                    <ColumnDefinition Width="992*" />
+                </Grid.ColumnDefinitions>
+                <!--                系统状态-->
+                <Grid Grid.Row="0" Grid.Column="0" Background="#FFE5E5E5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Content="系统状态" HorizontalAlignment="Center"
+                           VerticalAlignment="Top" Height="40"
+                           FontWeight="Bold" FontSize="24" />
+                    <Grid VerticalAlignment="Center" Grid.Row="1" Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="50" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Row="0" Grid.Column="0" Content="设备类型：" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="statetype"
+                                   TextWrapping="Wrap" Text="" IsEnabled="False" Background="White"
+                                   MinWidth="200" Margin="0,0,0,10" />
+                        <Label Grid.Row="1" Grid.Column="0" Content="设 备 I D ：" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="stateId"
+                                   MinWidth="200" Background="White" Margin="0,0,0,10"
+                                   TextWrapping="Wrap" Text="" IsEnabled="False" />
+                        <Label Grid.Row="2" Grid.Column="0" Content="设备MAC：" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="stateMac"
+                                   MinWidth="200" Background="White" Margin="0,0,0,10"
+                                   TextWrapping="Wrap" Text="" IsEnabled="False" />
+                        <Label Grid.Row="3" Grid.Column="0" Content="ADC _Err：" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" MinWidth="200" x:Name="stateAdcerr"
+                                   TextWrapping="Wrap" Text="" IsEnabled="False" Background="White" Margin="0,0,0,10" />
+                        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Bottom"
+                                Content="读取状态" Click='GetState_OnClick' />
+                    </Grid>
+                </Grid>
+                <!--                参数设置-->
+                <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" Background="#FFE5E5E5"
+                      VerticalAlignment="Center"
+                      Grid.RowSpan="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="21*" />
+                        <RowDefinition Height="25*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="25*" />
+                        <RowDefinition Height="25*" />
+                        <RowDefinition Height="25*" />
+                        <RowDefinition Height="0*" />
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Content="参数设置" HorizontalAlignment="Center" VerticalAlignment="Center"
+                           FontWeight="Bold" FontSize="24" />
+
+                    <Grid Grid.Row="1" Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="脉冲周期：" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" x:Name="sysConf" HorizontalAlignment="Left" MinWidth="100"
+                                 TextWrapping="Wrap" Text="" VerticalAlignment="Center"
+                                 TextChanged="InputIntegerOnly" />
+                        <Label Grid.Column="2" Content="ns" HorizontalAlignment="Left" VerticalAlignment="Center" />
+
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="5" HorizontalAlignment="Right">
+                            <Button Content="读" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                            <Button Content="写" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                            <Button Content="存" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="2" Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="脉冲延时：" HorizontalAlignment="Left" />
+                        <TextBox Grid.Column="1" x:Name="settingTypeCopy1" HorizontalAlignment="Left" MinWidth="100"
+                                 TextWrapping="Wrap" Text="" VerticalAlignment="Center"
+                                 TextChanged="InputIntegerOnly" />
+                        <Label Content="ns" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="5" HorizontalAlignment="Right">
+                            <Button Content="读" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                            <Button Content="写" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                            <Button Content="存" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="3" Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Content="脉冲宽度 : " Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" x:Name="settingTypeCopy2" HorizontalAlignment="Left" MinWidth="100"
+                                 TextWrapping="Wrap" VerticalAlignment="Center"
+                                 TextChanged="InputIntegerOnly" />
+                        <Label Grid.Column="2" Content="ns" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                            <Button Content="读" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                            <Button Content="写" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                            <Button Content="存" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="4" Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="0.2*" />
+                            <ColumnDefinition Width="0.3*" />
+                            <ColumnDefinition Width="0.5*" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="ADC偏移：" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" x:Name="settingTypeCopy3" HorizontalAlignment="Left"
+                                 TextWrapping="Wrap" Text="" VerticalAlignment="Center" MinWidth="100"
+                                 TextChanged="InputIntegerOnly" />
+                        <Label Grid.Column="2" Content="V" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               MinWidth="50" />
+                        <Label Grid.Column="3" Content="ADC：" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="4" x:Name="settingTypeCopy4" HorizontalAlignment="Left"
+                                 TextWrapping="Wrap" Text="" VerticalAlignment="Center" MinWidth="100"
+                                 TextChanged="InputIntegerOnly" />
+
+                        <StackPanel Grid.Column="5" Orientation="Horizontal" Margin="5" HorizontalAlignment="Right">
+                            <Button Content="读" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                            <Button Content="写" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                            <Button Content="存" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Grid.Row="5" Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="ADC禁用：" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <TextBox Grid.Column="1" x:Name="settingTypeCopy5" HorizontalAlignment="Left"
+                                 TextWrapping="Wrap" Text="" VerticalAlignment="Center" MinWidth="100"
+                                 TextChanged="InputIntegerOnly" />
+                        <Label Grid.Column="2" Content="1--&gt;8" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="5" HorizontalAlignment="Right">
+                            <Button Content="读" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                            <Button Content="写" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                            <Button Content="存" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                    Width="30" Height="30" />
+                        </StackPanel>
+                    </Grid>
+
+                </Grid>
+                <!--                听音设置-->
+                <Grid Grid.Row="0" Grid.Column="2">
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right"
+                                VerticalAlignment="Top">
+                        <Button x:Name="btnWindowMin" Content="" Width="36" Height="36"
+                                VerticalAlignment="Center" ToolTip="最小化" Cursor="Hand"
+                                Click="OnBtnWindowMinClick">
+                            <Button.Background>
+                                <ImageBrush ImageSource="../Resource/win_最小化_黑.png" />
+                            </Button.Background>
+                        </Button>
+                        <Button x:Name="btnWindowShutDown" Content="" HorizontalAlignment="Left" Width="36" Height="36"
+                                VerticalAlignment="Center" ToolTip="关闭系统" Cursor="Hand"
+                                Click="OnBtnWindowShutDownClick">
+                            <Button.Background>
+                                <ImageBrush ImageSource="../Resource/win_关闭_黑.png" />
+                            </Button.Background>
+                        </Button>
+                    </StackPanel>
+
+                </Grid>
+                <!--                 <margin面板-->
+                <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" />
+            </Grid>
+            <!--            图像面板-->
+            <Grid Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TabControl HorizontalAlignment="Left" Height="793" Margin="0,0,0,0" VerticalAlignment="Center"
+                            Width="1872">
+                    <TabItem Header="延时校准">
+                        <Grid Background="#FFE5E5E5">
+                            <StackPanel>
+                                <WrapPanel>
+                                    <Label Content="延时通道：" HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
+                                    <TextBox x:Name="sysConfCopy" HorizontalAlignment="Left" Height="23"
+                                             TextWrapping="Wrap" Text="" VerticalAlignment="Center" Width="108"
+                                             TextChanged="InputIntegerOnly" />
+                                    <Label Content="通道延时：" HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
+                                    <TextBox x:Name="sysConfCopy1" HorizontalAlignment="Left" Height="23"
+                                             TextWrapping="Wrap" Text="" VerticalAlignment="Center"
+                                             Width="106" TextChanged="InputIntegerOnly" />
+                                    <Label Content="ns" HorizontalAlignment="Left"
+                                           VerticalAlignment="Center" />
+                                    <WrapPanel Margin="0,0,20,0">
+                                        <Button Content="读" HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Width="24" />
+                                        <Button Content="写" HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Width="24" />
+                                        <Button Content="存" HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                Width="24" />
+                                    </WrapPanel>
+                                    <Button Content="开启" HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Width="44" Background="#FF66EE66" />
+                                </WrapPanel>
+                                <ni:WritableGraph Name="delay_graph" HorizontalAlignment="Left" Height="450"
+                                                  VerticalAlignment="Top" Width="782" Foreground="{x:Null}"
+                                                  Background="{x:Null}">
+                                    <ni:WritableGraph.Axes>
+                                        <ni:AxisDouble Range="0,200" Orientation="Horizontal"
+                                                       MinorDivisions="{x:Null}" Adjuster="None" InteractionMode="None" />
+                                        <ni:AxisDouble Range="-1,1" Orientation="Vertical"
+                                                       Adjuster="None"
+                                                       InteractionMode="None">
+                                            <ni:AxisDouble.MinorDivisions>
+                                                    <ni:RangeDivisions TickBrush="Red" TickSize="2, 2.5" />
+                                            </ni:AxisDouble.MinorDivisions>
+                                            <ni:AxisDouble.MajorDivisions>
+                                                <ni:RangeLabeledDivisions />
+                                            </ni:AxisDouble.MajorDivisions>
+                                            <ni:AxisDouble.MajorGridLines>
+                                                <ni:GridLines />
+                                            </ni:AxisDouble.MajorGridLines>
+                                        </ni:AxisDouble>
+                                    </ni:WritableGraph.Axes>
+                                    <ni:WritableGraph.Plots>
+                                        <ni:Plot>
+                                            <ni:Plot.Renderer>
+                                                <ni:LinePlotRenderer Stroke="Green" />
+                                            </ni:Plot.Renderer>
+                                        </ni:Plot>
+                                    </ni:WritableGraph.Plots>
+                                </ni:WritableGraph>
+                                <Button Width="100" Height="40" Name="delaystatBtn" Click="DelayDataStart_OnClick">开始</Button>
+                            </StackPanel>
+
+
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="原始数据">
+                        <StackPanel Background="#FFE5E5E5">
+
+                            <ni:WritableGraph Name="orige_graph" HorizontalAlignment="Left" Height="450"
+                                              VerticalAlignment="Top" Width="782" Foreground="{x:Null}"
+                                              Background="{x:Null}">
+                                <ni:WritableGraph.Axes>
+                                    <ni:AxisDouble Range="0,58" Orientation="Horizontal"
+                                                   MinorDivisions="{x:Null}" Adjuster="None" InteractionMode="None" />
+                                    <ni:AxisDouble Range="-1,1" Orientation="Vertical"
+                                                   MinorDivisions="{x:Null}" Adjuster="None"
+                                                   InteractionMode="None">
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions />
+                                        </ni:AxisDouble.MajorDivisions>
+                                        <ni:AxisDouble.MajorGridLines>
+                                            <ni:GridLines />
+                                        </ni:AxisDouble.MajorGridLines>
+                                    </ni:AxisDouble>
+                                </ni:WritableGraph.Axes>
+                                <ni:WritableGraph.Plots>
+                                    <ni:Plot>
+                                        <ni:Plot.Renderer>
+                                            <ni:LinePlotRenderer Stroke="Green" />
+                                        </ni:Plot.Renderer>
+                                    </ni:Plot>
+                                </ni:WritableGraph.Plots>
+                            </ni:WritableGraph>
+                            <Button Width="100" Height="40" Name="origStartBtn" Click="OrigDataStart_OnClick">开始</Button>
+                        </StackPanel>
+
+                    </TabItem>
+                    <TabItem Header="正常工作" MouseDoubleClick="NormalWave_OnMouseDoubleClick">
+                        <Grid Background="#FFE5E5E5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="129*" />
+                                    <ColumnDefinition Width="802*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,31">
+                                    <WrapPanel Margin="10" HorizontalAlignment="Center">
+                                        <Label Content="通道" FontSize="16" Margin="0,0,0,0" Width="68"
+                                               VerticalAlignment="Center"
+                                               VerticalContentAlignment="Center" HorizontalAlignment="Right" />
+                                        <TextBox x:Name="tbChNum" Text="1" FontSize="16" Margin="0,0,0,0"
+                                                 Width="98" Height="31"
+                                                 VerticalAlignment="Center" TextAlignment="Center"
+                                                 KeyDown="TextBox_KeyDown_1"
+                                                 VerticalContentAlignment="Center" HorizontalAlignment="Right" />
+                                    </WrapPanel>
+                                    <ni:LED x:Name="led_normaldata" FalseContent="Off" HorizontalAlignment="Left"
+                                            Height="23" Margin="879,18,0,0" TrueContent="On" VerticalAlignment="Top"
+                                            Width="23" RenderTransformOrigin="13.337,-0.177" />
+
+                                </Grid>
+                                <ni:WritableGraph Name="work_graph" HorizontalAlignment="Left" Height="450"
+                                                  VerticalAlignment="Top" Width="782" Foreground="{x:Null}"
+                                                  Background="{x:Null}" Grid.ColumnSpan="2" Margin="5,56,0,0"
+                                                  Grid.RowSpan="2">
+                                    <ni:WritableGraph.Axes>
+                                        <ni:AxisDouble x:Name="xScale" Range="0,500" Orientation="Horizontal"
+                                                       MinorDivisions="{x:Null}" Adjuster="None" InteractionMode="None" />
+                                        <ni:AxisDouble x:Name="yScale" Range="-2,2" Orientation="Vertical"
+                                                       MinorDivisions="{x:Null}" Adjuster="FitVisibleLoosely "
+                                                       InteractionMode="None">
+                                            <ni:AxisDouble.MajorDivisions>
+                                                <ni:RangeLabeledDivisions />
+                                            </ni:AxisDouble.MajorDivisions>
+                                            <ni:AxisDouble.MajorGridLines>
+                                                <ni:GridLines />
+                                            </ni:AxisDouble.MajorGridLines>
+                                        </ni:AxisDouble>
+                                    </ni:WritableGraph.Axes>
+                                    <ni:WritableGraph.Plots>
+                                        <ni:Plot>
+                                            <ni:Plot.Renderer>
+                                                <ni:LinePlotRenderer Stroke="Green" />
+                                            </ni:Plot.Renderer>
+                                        </ni:Plot>
+
+                                    </ni:WritableGraph.Plots>
+                                </ni:WritableGraph>
+
+                            </Grid>
+
+                            <Grid Grid.Column="1">
+                                <Grid Background="#FFE5E5E5">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <WrapPanel Grid.Row="0" VerticalAlignment="Center">
+                                            <Button x:Name="btnudp" Content="连接" HorizontalAlignment="Left"
+                                                    Margin="10,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Width="66" FontSize="16" Click="WorkDataStart_OnClick" />
+                                            <Button x:Name="btnsnd" Content="开始听音" HorizontalAlignment="Left"
+                                                    Margin="5,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    Width="75" FontSize="16" Click="OnSound" />
+                                            <Button Content="保存数据" Margin="10,0,0,0" FontSize="16"
+                                                    Click="Button_Click_SaveData" />
+                                            <Button Content="多通道界面" Margin="10,0,0,0" FontSize="16"
+                                                    Click="OnBtnShowStateWindow" />
+                                        </WrapPanel>
+
+                                        <WrapPanel Grid.Row="2">
+                                            <Label Content="音量" FontSize="16" Margin="10,0,0,0" Height="32" />
+                                            <Slider x:Name="slSoundValue" HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center"
+                                                    Width="499"
+                                                    Margin="30,0,0,0" Height="23" Maximum="100" Value="50"
+                                                    ValueChanged="SoundValueChanged" />
+                                            <TextBlock x:Name="tbSoundValue" Width="82" Height="19" Margin="20,0,0,0"
+                                                       Text="50"
+                                                       VerticalAlignment="Center" TextAlignment="Center" FontSize="16" />
+                                            <CheckBox x:Name="checkBoxSaveFile" Width="89" Content="保存数据" FontSize="16"
+                                                      Height="24"
+                                                      IsChecked="False"
+                                                      Click="OnCheckBox" />
+                                        </WrapPanel>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="自动标定">
+                        <Grid Background="#FFE5E5E5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100*" />
+                                <ColumnDefinition Width="831*" />
+                            </Grid.ColumnDefinitions>
+
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="多通道显示">
+                        <Grid Background="#FFE5E5E5" />
+                    </TabItem>
+                </TabControl>
+            </Grid>
+        </Grid>
+    </Viewbox>
+
+</Window>

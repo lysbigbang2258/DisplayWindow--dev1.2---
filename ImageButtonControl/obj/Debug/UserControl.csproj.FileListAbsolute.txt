@@ -1,0 +1,322 @@
+F:\代码\个人代码\ArrayEnergyDemo\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\代码\个人代码\ArrayEnergyDemo\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\代码\个人代码\ArrayEnergyDemo\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\代码\个人代码\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\代码\个人代码\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\代码\个人代码\ArrayEnergyDemo\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\代码\个人代码\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\代码\个人代码\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\代码\个人代码\ArrayEnergyDemo\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\代码\个人代码\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\代码\个人代码\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\Themes\Style.baml
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+D:\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\代码\个人代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\Themes\Style.baml
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+I:\显控台\程序代码\jieshou\ArrayEnergyDemo\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+I:\显控台\程序代码\DisplayWindow\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+I:\显控台\程序代码\DisplayWindow\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+I:\显控台\程序代码\DisplayWindow\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+I:\显控台\程序代码\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+I:\显控台\程序代码\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+I:\显控台\程序代码\DisplayWindow\ImageButtonControl\obj\Debug\Themes\Style.baml
+I:\显控台\程序代码\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+I:\显控台\程序代码\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+I:\显控台\程序代码\DisplayWindow\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+I:\显控台\程序代码\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+I:\显控台\程序代码\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\DisplayWindow（liang 2018年6月12日）\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\DisplayWindow（liang 2018年6月12日）\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\DisplayWindow（liang 2018年6月12日）\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\DisplayWindow（liang 2018年6月12日）\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\DisplayWindow（liang 2018年6月12日）\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\DisplayWindow（liang 2018年6月12日）\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\DisplayWindow（liang 2018年6月12日）\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\DisplayWindow（liang 2018年6月12日）\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\DisplayWindow（liang 2018年6月12日）\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\DisplayWindow（liang 2018年6月12日）\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\DisplayWindow（liang 2018年6月12日）\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\DisplayWindow（liang 2018年6月14日）\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\DisplayWindow\DisplayWindow（liang 2018年6月29日)\ImageButtonControl\obj\Debug\UserControl.csproj.CoreCompileInputs.cache
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.cache
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\DisplayWindow\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+D:\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+D:\Display\lys\DisplayWindow（liang 2018年7月4日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月9日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月10日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月11日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月13日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月13日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月16日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月16日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月17日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月17日) - 副本\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月18日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月19日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月20日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年7月23日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年11月19日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb

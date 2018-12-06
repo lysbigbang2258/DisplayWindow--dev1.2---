@@ -1,0 +1,313 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{77C14530-C873-4836-B79C-B4F8350266D7}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ArrayDisplay</RootNamespace>
+    <AssemblyName>ArrayDisplay</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>dll\debug\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="NationalInstruments.Analysis.Enterprise, Version=15.0.45.49153, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.Common, Version=15.0.40.49154, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.Controls, Version=15.0.45.3898, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.Controls.Booleans, Version=15.0.45.3898, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
+    <Reference Include="NationalInstruments.Controls.Graphs, Version=15.0.45.3898, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
+    <Reference Include="SlimDX">
+      <HintPath>dll\debug\SlimDX.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WriteableBitmapEx.Wpf">
+      <HintPath>dll\debug\WriteableBitmapEx.Wpf.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="File\DataFile.cs" />
+    <Compile Include="MyUserControl\ArrayEnergy\ArrayEnergyControl.xaml.cs">
+      <DependentUpon>ArrayEnergyControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MyUserControl\Axis.cs" />
+    <Compile Include="MyUserControl\AxisPoint.cs" />
+    <Compile Include="MyUserControl\CutData.cs" />
+    <Compile Include="MyUserControl\DataWave\ArrayDataWaveControl.xaml.cs">
+      <DependentUpon>ArrayDataWaveControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MyUserControl\DataWave\CordAxis.cs" />
+    <Compile Include="MyUserControl\FrequencyWave\ArrayFrequencyWaveControl.xaml.cs">
+      <DependentUpon>ArrayFrequencyWaveControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MyUserControl\FrequencyWave\CordAxis.cs" />
+    <Compile Include="MyUserControl\FrequencyWave\DynamicAxis2.cs" />
+    <Compile Include="File\RelativeDirectory.cs" />
+    <Compile Include="net\ComData.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="net\Dataproc.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="net\DefinedUdpArg.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="net\FFT_TransForm.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="net\NewFFT.cs" />
+    <Compile Include="net\OnSelectdInfo.cs" />
+    <Compile Include="net\SystemInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="net\UdpWaveData.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="net\UdpCommand.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="sound\DXPlaySound.cs" />
+    <Compile Include="UI\DisPlayWindow.xaml.cs">
+      <DependentUpon>DisPlayWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="File\DefineConst.cs" />
+    <Compile Include="UI\StateWindow.xaml.cs">
+      <DependentUpon>StateWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="MyUserControl\ArrayEnergy\ArrayEnergyControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MyUserControl\DataWave\ArrayDataWaveControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MyUserControl\DataWave\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MyUserControl\FrequencyWave\ArrayFrequencyWaveControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MyUserControl\FrequencyWave\Styles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\DisPlayWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\StateWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Icon\Thumbs.db" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\cong_黑.png" />
+    <Resource Include="Resource\win_关闭_黑.png" />
+    <Resource Include="Resource\win_最小化_黑.png" />
+    <Resource Include="Resource\zoom-in_黑.png" />
+    <Resource Include="Resource\zoom-out_黑.png" />
+    <Resource Include="Resource\上一页_黑.png" />
+    <Resource Include="Resource\下一页_黑.png" />
+    <Resource Include="Resource\串口_黑.png" />
+    <Resource Include="Resource\主_黑.png" />
+    <Resource Include="Resource\主页_黑.png" />
+    <Resource Include="Resource\保存_黑.png" />
+    <Resource Include="Resource\信息_黑.png" />
+    <Resource Include="Resource\刷新_黑.png" />
+    <Resource Include="Resource\前进_黑.png" />
+    <Resource Include="Resource\历史记录_黑.png" />
+    <Resource Include="Resource\后退_黑.png" />
+    <Resource Include="Resource\声音_开启_黑.png" />
+    <Resource Include="Resource\声音_静音_黑.png" />
+    <Resource Include="Resource\抓.cur" />
+    <Resource Include="Resource\拖动.cur" />
+    <Resource Include="Resource\拖动_黑.png" />
+    <Resource Include="Resource\摄像头_黑.png" />
+    <Resource Include="Resource\收起_黑.png" />
+    <Resource Include="Resource\放大.cur" />
+    <Resource Include="Resource\放大2.cur" />
+    <Resource Include="Resource\文件_黑.png" />
+    <Resource Include="Resource\显示_黑.png" />
+    <Resource Include="Resource\水_黑.png" />
+    <Resource Include="Resource\活动回放_黑.png" />
+    <Resource Include="Resource\系统_关闭_黑.png" />
+    <Resource Include="Resource\系统控制台20_黑.png" />
+    <Resource Include="Resource\缩小.cur" />
+    <Resource Include="Resource\缩小2.cur" />
+    <Resource Include="Resource\网络3_黑.png" />
+    <Resource Include="Resource\网络_黑.png" />
+    <Resource Include="Resource\网络连接_黑.png" />
+    <Resource Include="Resource\脉冲_黑.png" />
+    <Resource Include="Resource\设置_黑.png" />
+    <Resource Include="Resource\调试_黑.png" />
+    <Resource Include="Resource\轨迹_黑.png" />
+    <Resource Include="Resource\通道_黑.png" />
+    <Resource Include="Resource\阵列回放_黑.png" />
+    <Resource Include="Resource\隐藏_黑.png" />
+    <Resource Include="Resource\频谱_黑.png" />
+    <Resource Include="Resource\鼠标_黑.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icon\cong.png" />
+    <Resource Include="Icon\win_最小化.png" />
+    <Resource Include="Icon\zoom-in.png" />
+    <Resource Include="Icon\zoom-out.png" />
+    <Resource Include="Icon\上一页.png" />
+    <Resource Include="Icon\下一页.png" />
+    <Resource Include="Icon\串口.png" />
+    <Resource Include="Icon\主.png" />
+    <Resource Include="Icon\主页.png" />
+    <Resource Include="Icon\保存.png" />
+    <Resource Include="Icon\信息.png" />
+    <Resource Include="Icon\关闭.png" />
+    <Resource Include="Icon\刷新.png" />
+    <Resource Include="Icon\前进.png" />
+    <Resource Include="Icon\历史记录.png" />
+    <Resource Include="Icon\后退.png" />
+    <Resource Include="Icon\听声.png" />
+    <Resource Include="Icon\抓.cur" />
+    <Resource Include="Icon\拖动.cur" />
+    <Resource Include="Icon\拖动.png" />
+    <Resource Include="Icon\摄像头.png" />
+    <Resource Include="Icon\收起.png" />
+    <Resource Include="Icon\放大.cur" />
+    <Resource Include="Icon\放大2.cur" />
+    <Resource Include="Icon\文件.png" />
+    <Resource Include="Icon\显示.png" />
+    <Resource Include="Icon\水.png" />
+    <Resource Include="Icon\活动回放.png" />
+    <Resource Include="Icon\系统控制台20.png" />
+    <Resource Include="Icon\缩小.cur" />
+    <Resource Include="Icon\缩小2.cur" />
+    <Resource Include="Icon\网络.png" />
+    <Resource Include="Icon\网络3.png" />
+    <Resource Include="Icon\网络连接.png" />
+    <Resource Include="Icon\脉冲.png" />
+    <Resource Include="Icon\设置.png" />
+    <Resource Include="Icon\轨迹.png" />
+    <Resource Include="Icon\退出.png" />
+    <Resource Include="Icon\通道.png" />
+    <Resource Include="Icon\阵列回放.png" />
+    <Resource Include="Icon\隐藏.png" />
+    <Resource Include="Icon\静音.png" />
+    <Resource Include="Icon\频谱.png" />
+    <Resource Include="Icon\鼠标.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ImageButtonControl\UserControl.csproj">
+      <Project>{13ff71db-6bb2-4a25-a862-ba8ab2d0b97d}</Project>
+      <Name>UserControl</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
