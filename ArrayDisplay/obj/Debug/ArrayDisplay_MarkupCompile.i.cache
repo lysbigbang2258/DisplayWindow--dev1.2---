@@ -4,16 +4,16 @@
 exe
 C#
 .cs
-F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ArrayDisplay\obj\Debug\
+F:\MyProject\DisplayWindow\ArrayDisplay\obj\Debug\
 ArrayDisplay
 none
 false
 DEBUG;TRACE
-F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ArrayDisplay\App.xaml
+F:\MyProject\DisplayWindow\ArrayDisplay\App.xaml
 7-402801127
 
 33-2135893601
-172009198532
+17-1692105628
 MyUserControl\ArrayEnergy\ArrayEnergyControl.xaml;MyUserControl\DataWave\ArrayDataWaveControl.xaml;MyUserControl\DataWave\Styles.xaml;MyUserControl\FrequencyWave\ArrayFrequencyWaveControl.xaml;MyUserControl\FrequencyWave\Styles.xaml;UI\DisPlayWindow.xaml;UI\StateWindow.xaml;
 
 True
