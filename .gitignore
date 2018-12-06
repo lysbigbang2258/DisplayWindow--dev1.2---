@@ -32,3 +32,4 @@ _ReSharper*/
 packages/
 *.dll
 
+/ArrayDisplay.v11.suo
