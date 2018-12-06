@@ -320,3 +320,15 @@ F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\D
 F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
 F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\ImageButtonControl.dll
 F:\Display\lys\DisplayWindow（liang 2018年11月20日)\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
+F:\MyProject\DisplayWindow\ImageButtonControl\bin\Debug\ImageButtonControl.dll
+F:\MyProject\DisplayWindow\ImageButtonControl\bin\Debug\ImageButtonControl.pdb
+F:\MyProject\DisplayWindow\ImageButtonControl\obj\Debug\UserControl.csprojResolveAssemblyReference.cache
+F:\MyProject\DisplayWindow\ImageButtonControl\obj\Debug\GeneratedInternalTypeHelper.g.cs
+F:\MyProject\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.cache
+F:\MyProject\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl_MarkupCompile.lref
+F:\MyProject\DisplayWindow\ImageButtonControl\obj\Debug\Themes\Style.baml
+F:\MyProject\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl.g.resources
+F:\MyProject\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl.Properties.Resources.resources
+F:\MyProject\DisplayWindow\ImageButtonControl\obj\Debug\UserControl.csproj.GenerateResource.Cache
+F:\MyProject\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl.dll
+F:\MyProject\DisplayWindow\ImageButtonControl\obj\Debug\ImageButtonControl.pdb
