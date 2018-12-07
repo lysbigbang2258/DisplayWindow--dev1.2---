@@ -45,13 +45,14 @@ namespace ArrayDisplay.net {
             }
 
 
-            int channels = ConstUdpArg.DELAY_FRAME_CHANNELS;
-            int dlength = ConstUdpArg.DELAY_FRAME_LENGTH;
-            DelayWaveBytes = new byte[channels][];
-            DelayWaveFloats = new float[channels][];
-            for(int i = 0; i < channels; i++) {
-                DelayWaveBytes[i] = new byte[channels * dlength];
-                DelayWaveFloats[i] = new float[channels * dlength / 2];
+            int dchannels = ConstUdpArg.DELAY_FRAME_CHANNELS;
+            int dframeLen = ConstUdpArg.DELAY_FRAME_LENGTH;
+            int dframeNum = ConstUdpArg.DELAY_FRAME_NUMS;
+            DelayWaveBytes = new byte[dchannels][];
+            DelayWaveFloats = new float[dchannels][];
+            for(int i = 0; i < dchannels; i++) {
+                DelayWaveBytes[i] = new byte[dframeLen * dframeNum];
+                DelayWaveFloats[i] = new float[dframeLen * dframeNum / 2];
             }
 
             FreqWaveEvent = new AutoResetEvent(false);
