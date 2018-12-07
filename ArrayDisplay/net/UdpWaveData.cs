@@ -157,7 +157,7 @@ namespace ArrayDisplay.net {
                                 PutWorkData(rcvBuf, index++);
                                 break;
                             case ConstUdpArg.WaveType.Orig:
-                                PutOrigData(rcvBuf, index++);
+                                PutOrigData(rcvBuf);
                                 break;
                             case ConstUdpArg.WaveType.Delay:
                                 PutDelayData(rcvBuf);
@@ -209,18 +209,17 @@ namespace ArrayDisplay.net {
             channelOffsets[channel] += temp.Length;
         }
 
-        void PutOrigData(byte[] buf, int index) {
-            var temp = new byte[32];
+        void PutOrigData(byte[] buf) {
             var head = new byte[2];
             int offset = 0;
             if (!Equals(Ip, ConstUdpArg.Src_OrigWaveIp)) return;
             Array.Copy(buf, 0, head, 0, head.Length);
-            wavaDataproc.OrigChannnel = head[1];
+            var channel = head[0];
+            var timdiv = head[1];
+
             offset += head.Length;
-            for(int i = 0; i < 8; i++) {
-                Array.Copy(buf, offset + i * 32, temp, 0, temp.Length);
-                Array.Copy(temp, 0, wavaDataproc.OrigWaveBytes[i], index * temp.Length, temp.Length);
-            }
+
+            Array.Copy(buf, offset, wavaDataproc.OrigWaveBytes[channel * 8 + timdiv], 0, buf.Length-2);
         }
 
         /// <summary>

@@ -30,16 +30,16 @@ namespace ArrayDisplay.net {
             ListenCoefficent = (float) Math.Pow(10, 50 / 20.0F) * 100; //31622.78; //听音强度
 
 
-            int oNums = ConstUdpArg.ORIG_TIME_NUMS; //时分长度
+            int oNums = ConstUdpArg.ORIG_DETECT_LENGTH; //时分长度
             OrigWaveBytes = new byte[oNums][];
             OrigWaveFloats = new float[oNums][];
             OrigChannnel = 0;
             OrigTimeDiv = 0;
             int oFrime = ConstUdpArg.ORIG_FRAME_NUMS; //原始数据帧数
             Origdata = new byte[oFrime * arryNum];
-            int oriTimes = ConstUdpArg.ORIG_TIME_NUMS; //每帧时分数
-            int olength = ConstUdpArg.ORIG_TIME_LENGTH; //每个时分长度
-            for(int i = 0; i < oriTimes; i++) {
+            int olength = ConstUdpArg.ORIG_FRAME_LENGTH; //每帧长度
+            for (int i = 0; i < oNums; i++)
+            {
                 OrigWaveBytes[i] = new byte[olength * oFrime];
                 OrigWaveFloats[i] = new float[olength / 2 * oFrime];
             }
@@ -98,31 +98,32 @@ namespace ArrayDisplay.net {
         void ThreadOrigWaveStart() {
             while(true) {
                 OrigBytesEvent.WaitOne();
-                var r = new byte[2];
-                var sh = new short[OrigWaveBytes.Length][];
-                for(int i = 0; i < sh.Length; i++) {
-                    sh[i] = new short[OrigWaveBytes[0].Length / 2];
-                }
-                for(int i = 0; i < 8; i++) {
-                    for(int j = 0; j < (OrigWaveBytes[0].Length / 2); j++) {
-                        r[0] = OrigWaveBytes[i][j * 2 + 1];
-                        r[1] = OrigWaveBytes[i][j * 2 + 0];
-                        short a = BitConverter.ToInt16(r, 0);
-                        OrigWaveFloats[i][j] = a / 8192.0f;
-                        sh[i][j] = a;
+                var r = new byte[4];
+                for (int i = 0; i < ConstUdpArg.ORIG_DETECT_LENGTH; i++)
+                {
+                    for(int j = 0; j <WorkWaveBytes[0].Length; j++) {
+                        r[0] = WorkWaveBytes[i][j * 4 + 3];
+                        r[1] = WorkWaveBytes[i][j * 4 + 2];
+                        r[2] = WorkWaveBytes[i][j * 4 + 1];
+                        r[3] = WorkWaveBytes[i][j * 4];
+                        int a = BitConverter.ToInt32(r, 0);
+                        WorkWaveFloats[i][j] = a / 1048576.0f;
+
+                        //听音数据处理
+                        float f = WorkWaveFloats[i][j] * ListenCoefficent;
+                        short sh;
+                        if (f > 32767) {
+                            sh = 32767;
+                        }
+                        else if (f <= -32767) {
+                            sh = -32767;
+                        }
+                        else {
+                            sh = (short) f;
+                        }
+                        var x = BitConverter.GetBytes(sh);
+                        Array.Copy(x, 0, PlayWaveBytes[i], j * 2, 2);
                     }
-                }
-//                //求初始相位
-//                double[] phaseDoubles = Task<double[]>.Factory.StartNew(GetInitPhase).Result;
-//                foreach(double phaseDouble in phaseDoubles) {
-//                    Console.WriteLine(phaseDouble);
-//                }
-                var temp = new short[sh[0].Length];
-                sh[0].CopyTo(temp, 0);
-//                Console.WriteLine((temp.Max() - temp.Min())* 8192.0f);
-                Console.WriteLine(temp.Max() + temp.Min());
-                if (OrigGraphEventHandler != null) {
-                    OrigGraphEventHandler.Invoke(null, OrigWaveFloats[0]);
                 }
             }
         }
@@ -157,7 +158,7 @@ namespace ArrayDisplay.net {
             while(true) {
                 WorkBytesEvent.WaitOne();
                 var r = new byte[4];
-                for(int i = 0; i < 256; i++) {
+                for(int i = 0; i < ConstUdpArg.ARRAY_NUM; i++) {
                     for(int j = 0; j < ConstUdpArg.WORK_FRAME_NUMS; j++) {
                         r[0] = WorkWaveBytes[i][j * 4 + 3];
                         r[1] = WorkWaveBytes[i][j * 4 + 2];
@@ -407,8 +408,11 @@ namespace ArrayDisplay.net {
             get;
             set;
         }
-
-
+         public int OrigTimeDiv
+        {
+            get;
+            set;
+        }
         public byte[][] DelayWaveBytes {
             get;
             set;
@@ -447,10 +451,7 @@ namespace ArrayDisplay.net {
             set;
         }
 
-        int OrigTimeDiv {
-            get;
-            set;
-        }
+        
 
         FFT_TransForm TransFormFft {
             get;

@@ -360,7 +360,7 @@ namespace ArrayDisplay.net {
         #region 常量定义
 
         //阵元数
-        public const int ARRAY_NUM = 64; //阵元数
+        public const int ARRAY_NUM = 256; //阵元数
         //Buffer设置
 //        public const int WORK_FRAME_NUMS = 31250; //正常工作波形同时显示帧数
         public const int WORK_FRAME_NUMS = 1024 * 16 * 2; //正常工作波形同时显示帧数
@@ -370,10 +370,11 @@ namespace ArrayDisplay.net {
         public const int MIN_ENERGY_PIXELS_LENGTH = 0;
         public const int DEAFULT_ENERGY_PIXELS_LENGTH = 30;
 
-        public const int ORIG_FRAME_NUMS = 8000; //原始工作波形同时显示帧数
-        public const int ORIG_FRAME_LENGTH = 258; //原始工作波形帧长
-        public const int ORIG_TIME_LENGTH = 32; // 
+        public const int ORIG_FRAME_NUMS = 200; //原始工作波形同时显示帧数
+        public const int ORIG_FRAME_LENGTH = 1282; //原始工作波形帧长
+        public const int ORIG_DETECT_LENGTH = 64;  
         public const int ORIG_TIME_NUMS = 8;
+        public const int ORIG_CANNEL_NUMS = 8;
 
         public const int DELAY_FRAME_CHANNELS = 8;
         public const int DELAY_FRAME_NUMS = 320;
