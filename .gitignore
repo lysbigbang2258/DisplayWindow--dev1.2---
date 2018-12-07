@@ -36,3 +36,4 @@ packages/
 *.lref
 
 obj/
+*.user
