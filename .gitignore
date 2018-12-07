@@ -33,5 +33,6 @@ packages/
 *.dll
 
 /ArrayDisplay.v11.suo
+*.lref
 
-
+obj/
