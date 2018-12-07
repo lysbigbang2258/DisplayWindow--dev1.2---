@@ -18,7 +18,7 @@ namespace ArrayDisplay.net {
         public static bool isReceived;
         public static int frameNums;
         public static ConstUdpArg.WaveType waveType;
-        public int[] channelOffsets = new int[32];
+        public int[] channelOffsets = new int[8];
         public byte[][] detesBytes;
         byte[] rcvBuf;
         readonly Socket waveSocket;
@@ -175,8 +175,8 @@ namespace ArrayDisplay.net {
                             wavaDataproc.OrigBytesEvent.Set();
                             break;
                         case ConstUdpArg.WaveType.Delay:
+                            channelOffsets = new int[8];
                             wavaDataproc.DelayBytesEvent.Set();
-                            channelOffsets = new int[32];
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
