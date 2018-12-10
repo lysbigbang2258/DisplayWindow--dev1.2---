@@ -309,7 +309,6 @@ namespace ArrayDisplay.net {
         ///     获取状态指令
         /// </summary>
         static readonly byte[] device_Type = {0, 0, 8, 5, 0, 0};
-
         static readonly byte[] adc_Err = {0, 0, 3, 0, 0, 61};
         static readonly byte[] device_Id = {0, 0, 8, 5, 0, 8};
         static readonly byte[] device_Mac = {0, 0, 6, 4, 0, 26};
@@ -355,6 +354,7 @@ namespace ArrayDisplay.net {
         static readonly byte[] delayChannel_Write = {1, 0, 2, 0, 0, 10};
         static readonly byte[] delayChannel_Save = {1, 0, 2, 0, 0, 74};
 
+
         #endregion
 
         #region 常量定义
@@ -374,7 +374,7 @@ namespace ArrayDisplay.net {
         public const int ORIG_FRAME_LENGTH = 1282; //原始工作波形帧长
         public const int ORIG_DETECT_LENGTH = 64;  
         public const int ORIG_TIME_NUMS = 8;
-        public const int ORIG_CANNEL_NUMS = 8;
+        public const int ORIG_CHANNEL_NUMS = 8;
 
         public const int DELAY_FRAME_CHANNELS = 8;
         public const int DELAY_FRAME_NUMS = 10;

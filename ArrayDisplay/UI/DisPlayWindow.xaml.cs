@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -188,197 +189,7 @@ namespace ArrayDisplay.UI {
         }
         #endregion
 
-        #region 控件响应函数
-        /// <summary>
-        ///     ///文本框只允许输入数字
-        ///     /// 脉冲周期/脉冲延时/脉冲宽度///
-        /// </summary>
-        void InputIntegerOnly(object sender, TextCompositionEventArgs e)
-        {
-            //throw new NotImplementedException();
-            Regex re = new Regex("[^0-9.-]+");
-            if (e != null)
-            {
-                e.Handled = re.IsMatch(e.Text);
-            }
-        }
-
-        /// <summary>
-        ///     可调整值的TextBox上滚轮动作响应(整数)
-        ///     脉冲周期/脉冲延时/脉冲宽度
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void TextboxOnMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            // e.Delta > 0,向上滚动滚轮,文本框数字+1,最大65535
-            // e.Delta < 0,向下滚动滚轮,文本框数字-1,最小0
-            TextboxMouseWheel(sender, true, e.Delta > 0);
-        }
-
-        /// <summary>
-        ///     可调整值的TextBox上滚轮动作响应(小数)
-        ///     ADC偏移
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void TextboxOnMouseWheel2(object sender, MouseWheelEventArgs e)
-        {
-            // e.Delta > 0,向上滚动滚轮,文本框数字+0.01,最大1
-            // e.Delta < 0,向下滚动滚轮,文本框数字-0.01,最小0
-            TextboxMouseWheel(sender, false, e.Delta > 0);
-        }
-
-        /// <summary>
-        ///     TextBox值发生变化
-        /// </summary>
-        /// <param name="sender">TextBox</param>
-        /// <param name="isInt">文本框中是否是整数</param>
-        /// <param name="isUp">是否向上变化</param>
-        void TextboxMouseWheel(object sender, bool isInt, bool isUp)
-        {
-            TextBox tb = sender as TextBox;
-            string str = tb.Text;
-            if (string.IsNullOrEmpty(str))
-            {
-                return;
-            }
-            if (isInt)
-            {
-                decimal d = decimal.Parse(str);
-                if (isUp)
-                {
-                    if ((d + 1) > 65535)
-                    {
-                        return;
-                    }
-                    tb.Text = (d + 1).ToString();
-                }
-                else
-                {
-                    if ((d - 1) < 0)
-                    {
-                        return;
-                    }
-                    tb.Text = (d - 1).ToString();
-                }
-            }
-            else
-            {
-                float d = float.Parse(str);
-                if (isUp)
-                {
-                    if ((d + 0.01) > 1)
-                    {
-                        return;
-                    }
-                    tb.Text = (d + 0.01).ToString("G2");
-                }
-                else
-                {
-                    if ((d - 0.01) < 0)
-                    {
-                        return;
-                    }
-                    tb.Text = (d - 0.01).ToString("G2");
-                }
-            }
-        }
-
-        /// <summary>
-        ///     按钮事件响应：调试窗口最小化
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void OnBtnWindowMinClick(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
-        }
-
-        /// <summary>
-        ///     按钮事件响应：调试窗口关闭
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void OnBtnWindowShutDownClick(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-        /// <summary>
-        ///     听音相关
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void OnSound_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (dxplaysnd == null)
-            {
-                dxplaysnd = new DxPlaySound(31250);
-                var buffer = new byte[31250 * 2];
-                dxplaysnd.WriteOneTimData(buffer);
-                dxplaysnd.WriteOneTimData(buffer);
-                dxplaysnd.WriteOneTimData(buffer);
-                Dataproc.SoundEventHandler += OnSndData;
-                btnlisten.Content = "停止听音";
-            }
-            else
-            {
-                if (Dataproc.SoundEventHandler != null)
-                {
-                    Dataproc.SoundEventHandler -= OnSndData;
-                }
-                dxplaysnd.Close();
-                dxplaysnd = null;
-                btnlisten.Content = "开始听音";
-            }
-        }
-
-        //传输声音数据用于播放
-        void OnSndData(object sender, byte[] data)
-        {
-            if (dxplaysnd != null)
-            {
-                dxplaysnd.WriteOneTimData(data);
-            }
-        }
-
-        //传输数据用于显示
-
-        void TextBox_KeyDown_1(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                try
-                {
-                    SelectdInfo.WorkWaveChannel = int.Parse(tb_workChNum.Text.Trim());
-                    if (chNum < 1 || chNum > 256)
-                    {
-                        chNum = 1;
-                        tb_workChNum.Text = "1";
-                        SelectdInfo.WorkWaveChannel = 1;
-                    }
-                }
-                catch (Exception)
-                {
-                    // ignored
-                }
-            }
-        }
-
-        void SoundValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { }
-
-        /// <summary>
-        ///     打开多波形界面
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void ShowStateWindow_OnClick(object sender, RoutedEventArgs e)
-        {
-            StateWindow win = new StateWindow();
-            win.ShowDialog();
-        }
-
+        #region 点击响应函数
         /// <summary>
         ///     获取系统状态
         ///     一次发送9条指令,包含:设备类型,设备ID,设备MAC,ADC_Err,脉冲周期,脉冲延时,脉冲宽度,ADC偏移,ADC禁用
@@ -554,18 +365,6 @@ namespace ArrayDisplay.UI {
             }
         }
 
-        void Tb_deleyChannel_OnKeyDown(object sender, KeyEventArgs e)
-        {
-            int.TryParse(tb_deleyChannel.Text, out delayChannel);
-            delayChannel -= 1;
-        }
-
-        /// <summary>///计算B值 /// </summary>
-        void Btn_calBvalue_OnClick(object sender, RoutedEventArgs e) { }
-
-        //读取B值文件中的数据
-        void ReadBFile() { }
-
         void Btn_Path_OnClick(object sender, RoutedEventArgs e)
         {
             FolderBrowserDialog dialog = new FolderBrowserDialog();
@@ -602,6 +401,241 @@ namespace ArrayDisplay.UI {
                 }
             }
         }
+
+        /// <summary>///计算B值 /// </summary>
+        void Btn_calBvalue_OnClick(object sender, RoutedEventArgs e) { }
+
+        /// <summary>
+        ///     打开多波形界面
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void ShowStateWindow_OnClick(object sender, RoutedEventArgs e)
+        {
+            StateWindow win = new StateWindow();
+            win.ShowDialog();
+        }
+        #endregion
+
+        #region 控件响应函数
+
+        /// <summary>
+        ///     ///文本框只允许输入数字
+        ///     /// 脉冲周期/脉冲延时/脉冲宽度///
+        /// </summary>
+        void InputIntegerOnly(object sender, TextCompositionEventArgs e)
+        {
+            //throw new NotImplementedException();
+            Regex re = new Regex("[^0-9.-]+");
+            if (e != null)
+            {
+                e.Handled = re.IsMatch(e.Text);
+            }
+        }
+
+        /// <summary>
+        ///     可调整值的TextBox上滚轮动作响应(整数)
+        ///     脉冲周期/脉冲延时/脉冲宽度
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void TextboxOnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            // e.Delta > 0,向上滚动滚轮,文本框数字+1,最大65535
+            // e.Delta < 0,向下滚动滚轮,文本框数字-1,最小0
+            ChangeMouseWheel(sender, true, e.Delta > 0);
+        }
+
+        /// <summary>
+        ///     可调整值的TextBox上滚轮动作响应(小数)
+        ///     ADC偏移
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void TextboxOnMouseWheel2(object sender, MouseWheelEventArgs e)
+        {
+            // e.Delta > 0,向上滚动滚轮,文本框数字+0.01,最大1
+            // e.Delta < 0,向下滚动滚轮,文本框数字-0.01,最小0
+            ChangeMouseWheel(sender, false, e.Delta > 0);
+        }
+
+       
+
+        /// <summary>
+        ///     TextBox值发生变化
+        /// </summary>
+        /// <param name="sender">TextBox</param>
+        /// <param name="isInt">文本框中是否是整数</param>
+        /// <param name="isUp">是否向上变化</param>
+        void ChangeMouseWheel(object sender, bool isInt, bool isUp)
+        {
+            TextBox tb = sender as TextBox;
+            string str = tb.Text;
+            if (string.IsNullOrEmpty(str))
+            {
+                return;
+            }
+            if (isInt)
+            {
+                decimal d = decimal.Parse(str);
+                if (isUp)
+                {
+                    if ((d + 1) > 65535)
+                    {
+                        return;
+                    }
+                    tb.Text = (d + 1).ToString();
+                }
+                else
+                {
+                    if ((d - 1) < 0)
+                    {
+                        return;
+                    }
+                    tb.Text = (d - 1).ToString();
+                }
+            }
+            else
+            {
+                float d = float.Parse(str);
+                if (isUp)
+                {
+                    if ((d + 0.01) > 1)
+                    {
+                        return;
+                    }
+                    tb.Text = (d + 0.01).ToString("G2");
+                }
+                else
+                {
+                    if ((d - 0.01) < 0)
+                    {
+                        return;
+                    }
+                    tb.Text = (d - 0.01).ToString("G2");
+                }
+            }
+        }
+
+        /// <summary>
+        ///     按钮事件响应：调试窗口最小化
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnBtnWindowMinClick(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        /// <summary>
+        ///     按钮事件响应：调试窗口关闭
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnBtnWindowShutDownClick(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        /// <summary>
+        ///     听音相关
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnSound_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (dxplaysnd == null)
+            {
+                dxplaysnd = new DxPlaySound(31250);
+                var buffer = new byte[31250 * 2];
+                dxplaysnd.WriteOneTimData(buffer);
+                dxplaysnd.WriteOneTimData(buffer);
+                dxplaysnd.WriteOneTimData(buffer);
+                Dataproc.SoundEventHandler += OnSndData;
+                btnlisten.Content = "停止听音";
+            }
+            else
+            {
+                if (Dataproc.SoundEventHandler != null)
+                {
+                    Dataproc.SoundEventHandler -= OnSndData;
+                }
+                dxplaysnd.Close();
+                dxplaysnd = null;
+                btnlisten.Content = "开始听音";
+            }
+        }
+
+        //传输声音数据用于播放
+        void OnSndData(object sender, byte[] data)
+        {
+            if (dxplaysnd != null)
+            {
+                dxplaysnd.WriteOneTimData(data);
+            }
+        }
+
+        //传输数据用于显示
+
+        void TextBox_KeyDown_workChNum(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                try
+                {
+                    SelectdInfo.WorkWaveChannel = int.Parse(tb_workChNum.Text.Trim());
+                    if (chNum < 1 || chNum > 256)
+                    {
+                        chNum = 1;
+                        tb_workChNum.Text = "1";
+                        SelectdInfo.WorkWaveChannel = 1;
+                    }
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
+        }
+        /// <summary>
+        /// 原始通道数改变响应
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Tb_origChannel_OnKeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Enter)
+            {
+                try
+                {
+                    SelectdInfo.WorkWaveChannel = int.Parse(tb_workChNum.Text.Trim());
+                    if (chNum < 1 || chNum > ConstUdpArg.ORIG_CHANNEL_NUMS)
+                    {
+                        chNum = 1;
+                        tb_workChNum.Text = "1";
+                        SelectdInfo.WorkWaveChannel = 1;
+                    }
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
+        }
+
+        void SoundValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { }
+
+
+
+        void Tb_deleyChannel_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            int.TryParse(tb_deleyChannel.Text, out delayChannel);
+            delayChannel -= 1;
+        }
+
+        //读取B值文件中的数据
+        void ReadBFile() { }
+
+        
         #endregion
 
 
@@ -949,13 +983,7 @@ namespace ArrayDisplay.UI {
         }
 
         #endregion
-        /// <summary>
-        /// 输入原始数据的通道号 只能是数字只能小于通道个数
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void Tb_origChannel_OnMouseWheel(object sender, MouseWheelEventArgs e) {
-            
-        }
+
+        
     }
 }

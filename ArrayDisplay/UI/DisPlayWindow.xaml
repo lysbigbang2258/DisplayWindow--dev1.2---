@@ -164,7 +164,6 @@
                         <Label Grid.Column="0" Content="ADC偏移：" HorizontalAlignment="Left" VerticalAlignment="Center" />
                         <TextBox Grid.Column="1" x:Name="tb_setting_adc_offset" HorizontalAlignment="Left"
                                  TextWrapping="Wrap" Text="" VerticalAlignment="Center" MinWidth="100"
-                                 PreviewTextInput="InputIntegerOnly" MouseWheel="TextboxOnMouseWheel2"
                                  input:InputMethod.IsInputMethodEnabled="False" />
                         <Label Grid.Column="2" Content="V" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <Label Grid.Column="3" Content="ADC：" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -289,7 +288,7 @@
                                     <TextBox Width="100" Height="32" Name="tb_origFram" FontFamily="18" TextAlignment="Center" Text="20" />
                                     <Label Width="100" Height="40">测试通道：</Label>
                                     <TextBox Width="100" Height="32" Name="tb_origChannel" FontFamily="18" Margin="0,0,5,0"
-                                             TextAlignment="Center" Text="1" PreviewTextInput="InputIntegerOnly" MouseWheel="Tb_origChannel_OnMouseWheel"/>
+                                             TextAlignment="Center" Text="1" PreviewTextInput="InputIntegerOnly" KeyDown="Tb_origChannel_OnKeyDown"/>
                                     <Label Width="100" Height="40" Margin="0,0,5,0">测试时分：</Label>
                                     <TextBox Width="100" Height="32" Name="tb_orgiTdiv" FontFamily="18" Margin="0,0,5,0"
                                              TextAlignment="Center" Text="1" />
@@ -365,7 +364,7 @@
                                             <TextBox x:Name="tb_workChNum" Text="1" FontSize="16" Margin="0,0,0,0"
                                                      Width="98" Height="32"
                                                      VerticalAlignment="Center" TextAlignment="Center"
-                                                     KeyDown="TextBox_KeyDown_1"
+                                                     KeyDown="TextBox_KeyDown_workChNum"
                                                      VerticalContentAlignment="Center" HorizontalAlignment="Right" />
                                             <ni:LED x:Name="led_normaldata" FalseContent="Off"
                                                     HorizontalAlignment="Left"
