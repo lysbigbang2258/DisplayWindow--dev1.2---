@@ -59,7 +59,7 @@ namespace ArrayDisplay.UI {
             //启动时 切换到'正常工作'状态
             //UdpCommand.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
             //测试,关闭数据接收
-            udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+//            udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
             //isTabWorkGotFocus = true;
             //启动后等待0.5秒 自动加载一次系统状态参数
             //new Thread(LoadSystemInfo).Start();
