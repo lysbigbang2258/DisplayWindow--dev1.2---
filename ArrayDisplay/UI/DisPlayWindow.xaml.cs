@@ -67,7 +67,8 @@ namespace ArrayDisplay.UI {
             //UdpCommand.GetDeviceState();
         }
 
-        /// <summary>///控件读入能量图波形/// </summary>
+        #region 读取波形数据
+          /// <summary>///控件读入能量图波形/// </summary>
         void OnEnergyArrayGraph(object sender, float[] e) {
             var graphdata = new float[e.Length];
             Array.Copy(e, 0, graphdata, 0, e.Length);
@@ -131,12 +132,7 @@ namespace ArrayDisplay.UI {
                                                       graph1_energyFourth.DataSource = dataPoints4;
                                                   });
         }
-
-        void LoadSystemInfo() {
-            Thread.Sleep(500);
-            udpCommand.GetDeviceState();
-        }
-
+        
         /// <summary>///控件读入延迟波形/// </summary>
         void OnDelayWaveGraph(object sender, float[][] e) {
             if (e == null) {
@@ -170,7 +166,7 @@ namespace ArrayDisplay.UI {
                                                });
         }
 
-        /// <summary>///控件读入工作频率波形/// </summary>
+           /// <summary>///控件读入工作频率波形/// </summary>
         void OnFrapGraph(object sender, float[] e) {
             if (e == null) {
                 return;
@@ -181,21 +177,28 @@ namespace ArrayDisplay.UI {
                                                     });
         }
 
-        void OnFrapPointGraph(object sender, Point[] e) {
-            graph_normalFrequency.Dispatcher.Invoke(() => {
+        /// <summary>///控件读入工作频率波形/// </summary>
+        void OnFrapPointGraph(object sender, Point[] e)
+        {
+            graph_normalFrequency.Dispatcher.Invoke(() =>
+                                                    {
                                                         graph_normalFrequency.DataSource = 0;
                                                         graph_normalFrequency.DataSource = e;
                                                     });
         }
+        #endregion
 
+        #region 控件响应函数
         /// <summary>
         ///     ///文本框只允许输入数字
         ///     /// 脉冲周期/脉冲延时/脉冲宽度///
         /// </summary>
-        void InputIntegerOnly(object sender, TextCompositionEventArgs e) {
+        void InputIntegerOnly(object sender, TextCompositionEventArgs e)
+        {
             //throw new NotImplementedException();
             Regex re = new Regex("[^0-9.-]+");
-            if (e != null) {
+            if (e != null)
+            {
                 e.Handled = re.IsMatch(e.Text);
             }
         }
@@ -206,7 +209,8 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void TextboxOnMouseWheel(object sender, MouseWheelEventArgs e) {
+        void TextboxOnMouseWheel(object sender, MouseWheelEventArgs e)
+        {
             // e.Delta > 0,向上滚动滚轮,文本框数字+1,最大65535
             // e.Delta < 0,向下滚动滚轮,文本框数字-1,最小0
             TextboxMouseWheel(sender, true, e.Delta > 0);
@@ -218,7 +222,8 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void TextboxOnMouseWheel2(object sender, MouseWheelEventArgs e) {
+        void TextboxOnMouseWheel2(object sender, MouseWheelEventArgs e)
+        {
             // e.Delta > 0,向上滚动滚轮,文本框数字+0.01,最大1
             // e.Delta < 0,向下滚动滚轮,文本框数字-0.01,最小0
             TextboxMouseWheel(sender, false, e.Delta > 0);
@@ -230,37 +235,49 @@ namespace ArrayDisplay.UI {
         /// <param name="sender">TextBox</param>
         /// <param name="isInt">文本框中是否是整数</param>
         /// <param name="isUp">是否向上变化</param>
-        void TextboxMouseWheel(object sender, bool isInt, bool isUp) {
+        void TextboxMouseWheel(object sender, bool isInt, bool isUp)
+        {
             TextBox tb = sender as TextBox;
             string str = tb.Text;
-            if (string.IsNullOrEmpty(str)) {
+            if (string.IsNullOrEmpty(str))
+            {
                 return;
             }
-            if (isInt) {
+            if (isInt)
+            {
                 decimal d = decimal.Parse(str);
-                if (isUp) {
-                    if ((d + 1) > 65535) {
+                if (isUp)
+                {
+                    if ((d + 1) > 65535)
+                    {
                         return;
                     }
                     tb.Text = (d + 1).ToString();
                 }
-                else {
-                    if ((d - 1) < 0) {
+                else
+                {
+                    if ((d - 1) < 0)
+                    {
                         return;
                     }
                     tb.Text = (d - 1).ToString();
                 }
             }
-            else {
+            else
+            {
                 float d = float.Parse(str);
-                if (isUp) {
-                    if ((d + 0.01) > 1) {
+                if (isUp)
+                {
+                    if ((d + 0.01) > 1)
+                    {
                         return;
                     }
                     tb.Text = (d + 0.01).ToString("G2");
                 }
-                else {
-                    if ((d - 0.01) < 0) {
+                else
+                {
+                    if ((d - 0.01) < 0)
+                    {
                         return;
                     }
                     tb.Text = (d - 0.01).ToString("G2");
@@ -273,7 +290,8 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void OnBtnWindowMinClick(object sender, RoutedEventArgs e) {
+        void OnBtnWindowMinClick(object sender, RoutedEventArgs e)
+        {
             WindowState = WindowState.Minimized;
         }
 
@@ -282,7 +300,8 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void OnBtnWindowShutDownClick(object sender, RoutedEventArgs e) {
+        void OnBtnWindowShutDownClick(object sender, RoutedEventArgs e)
+        {
             Close();
         }
 
@@ -291,8 +310,10 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void OnSound_OnClick(object sender, RoutedEventArgs e) {
-            if (dxplaysnd == null) {
+        void OnSound_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (dxplaysnd == null)
+            {
                 dxplaysnd = new DxPlaySound(31250);
                 var buffer = new byte[31250 * 2];
                 dxplaysnd.WriteOneTimData(buffer);
@@ -301,8 +322,10 @@ namespace ArrayDisplay.UI {
                 Dataproc.SoundEventHandler += OnSndData;
                 btnlisten.Content = "停止听音";
             }
-            else {
-                if (Dataproc.SoundEventHandler != null) {
+            else
+            {
+                if (Dataproc.SoundEventHandler != null)
+                {
                     Dataproc.SoundEventHandler -= OnSndData;
                 }
                 dxplaysnd.Close();
@@ -312,25 +335,32 @@ namespace ArrayDisplay.UI {
         }
 
         //传输声音数据用于播放
-        void OnSndData(object sender, byte[] data) {
-            if (dxplaysnd != null) {
+        void OnSndData(object sender, byte[] data)
+        {
+            if (dxplaysnd != null)
+            {
                 dxplaysnd.WriteOneTimData(data);
             }
         }
 
         //传输数据用于显示
 
-        void TextBox_KeyDown_1(object sender, KeyEventArgs e) {
-            if (e.Key == Key.Enter) {
-                try {
+        void TextBox_KeyDown_1(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                try
+                {
                     SelectdInfo.WorkWaveChannel = int.Parse(tb_workChNum.Text.Trim());
-                    if (chNum < 1 || chNum > 256) {
+                    if (chNum < 1 || chNum > 256)
+                    {
                         chNum = 1;
                         tb_workChNum.Text = "1";
                         SelectdInfo.WorkWaveChannel = 1;
                     }
                 }
-                catch(Exception) {
+                catch (Exception)
+                {
                     // ignored
                 }
             }
@@ -343,7 +373,8 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ShowStateWindow_OnClick(object sender, RoutedEventArgs e) {
+        void ShowStateWindow_OnClick(object sender, RoutedEventArgs e)
+        {
             StateWindow win = new StateWindow();
             win.ShowDialog();
         }
@@ -354,7 +385,8 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void GetState_OnClick(object sender, RoutedEventArgs e) {
+        void GetState_OnClick(object sender, RoutedEventArgs e)
+        {
             //切换到系统设置状态
             //UdpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
 
@@ -367,15 +399,18 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void SaveData_OnClick(object sender, RoutedEventArgs e) {
+        void SaveData_OnClick(object sender, RoutedEventArgs e)
+        {
             isSaveFlag = !isSaveFlag;
-            if (isSaveFlag) {
+            if (isSaveFlag)
+            {
                 btnSave.Content = "开始保存";
                 dataFile.EnableSaveFile();
                 SelectdInfo.IsSaveData = true;
             }
 
-            else {
+            else
+            {
                 btnSave.Content = "保存数据";
                 dataFile.DisableSaveFile();
             }
@@ -386,10 +421,12 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void NormalWave_OnMouseDoubleClick(object sender, MouseButtonEventArgs e) {
-            Dispatcher.BeginInvoke(new Action(() => {
-                                                  WorkDataStart_OnClick(null, null);
-                                              }));
+        void NormalWave_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                WorkDataStart_OnClick(null, null);
+            }));
         }
 
         /// <summary>
@@ -397,19 +434,25 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void WorkDataStart_OnClick(object sender, RoutedEventArgs e) {
-            try {
+        void WorkDataStart_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
                 udpCommand.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
-                if (!UdpWaveData.isRunning) {
+                if (!UdpWaveData.isRunning)
+                {
                     capudp = new UdpWaveData(ConstUdpArg.SrcNorm_WaveIp);
                     btn_normalstart.Content = "停止";
                 }
-                else {
-                    if (UdpWaveData.isRunning && UdpWaveData.WaveType == ConstUdpArg.WaveType.Normal) {
+                else
+                {
+                    if (UdpWaveData.isRunning && UdpWaveData.WaveType == ConstUdpArg.WaveType.Normal)
+                    {
                         capudp.Close();
                         btn_normalstart.Content = "启动";
                     }
-                    else {
+                    else
+                    {
                         capudp.Close();
                         capudp = new UdpWaveData(ConstUdpArg.SrcNorm_WaveIp);
                         btn_normalstart.Content = "停止";
@@ -418,7 +461,8 @@ namespace ArrayDisplay.UI {
                     }
                 }
             }
-            catch {
+            catch
+            {
                 Console.WriteLine(@"网络地址错误...");
                 MessageBox.Show(@"网络地址错误...");
             }
@@ -429,23 +473,30 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void OrigDataStart_OnClick(object sender, RoutedEventArgs e) {
-            try {
+        void OrigDataStart_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
                 udpCommand.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
-                if (!UdpWaveData.isRunning) {
+                if (!UdpWaveData.isRunning)
+                {
                     capudp = new UdpWaveData(ConstUdpArg.Src_OrigWaveIp);
                     btn_origstart.Content = "停止";
                 }
-                else {
-                    if (UdpWaveData.isRunning && UdpWaveData.WaveType == ConstUdpArg.WaveType.Orig) {
+                else
+                {
+                    if (UdpWaveData.isRunning && UdpWaveData.WaveType == ConstUdpArg.WaveType.Orig)
+                    {
                         capudp.Close();
                         btn_normalstart.Content = "启动";
-                        orige_graph.Dispatcher.Invoke(() => {
-                                                          orige_graph.DataSource = 0;
-                                                      });
+                        orige_graph.Dispatcher.Invoke(() =>
+                        {
+                            orige_graph.DataSource = 0;
+                        });
                         orige_graph.Refresh();
                     }
-                    else {
+                    else
+                    {
                         capudp = new UdpWaveData(ConstUdpArg.Src_OrigWaveIp);
                         btn_origstart.Content = "停止";
                         btn_delaystart.Content = "启动";
@@ -453,7 +504,8 @@ namespace ArrayDisplay.UI {
                     }
                 }
             }
-            catch {
+            catch
+            {
                 Console.WriteLine(@"网络地址错误...");
                 MessageBox.Show(@"网络地址错误...");
             }
@@ -464,23 +516,30 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void DelayDataStart_OnClick(object sender, RoutedEventArgs e) {
-            try {
+        void DelayDataStart_OnClick(object sender, RoutedEventArgs e)
+        {
+            try
+            {
                 udpCommand.SwitchWindow(ConstUdpArg.SwicthToDeleyWindow);
-                if (!UdpWaveData.isRunning) {
+                if (!UdpWaveData.isRunning)
+                {
                     capudp = new UdpWaveData(ConstUdpArg.Src_DelayWaveIp);
                     btn_delaystart.Content = "停止";
                 }
-                else {
-                    if (UdpWaveData.isRunning && UdpWaveData.WaveType == ConstUdpArg.WaveType.Delay) {
+                else
+                {
+                    if (UdpWaveData.isRunning && UdpWaveData.WaveType == ConstUdpArg.WaveType.Delay)
+                    {
                         capudp.Close();
                         btn_delaystart.Content = "启动";
-                        delay_graph.Dispatcher.Invoke(() => {
-                                                          delay_graph.DataSource = 0;
-                                                      });
+                        delay_graph.Dispatcher.Invoke(() =>
+                        {
+                            delay_graph.DataSource = 0;
+                        });
                         delay_graph.Refresh();
                     }
-                    else {
+                    else
+                    {
                         capudp = new UdpWaveData(ConstUdpArg.Src_OrigWaveIp);
                         btn_delaystart.Content = "停止";
                         btn_normalstart.Content = "启动";
@@ -488,13 +547,15 @@ namespace ArrayDisplay.UI {
                     }
                 }
             }
-            catch {
+            catch
+            {
                 Console.WriteLine(@"网络地址错误...");
                 MessageBox.Show(@"网络地址错误...");
             }
         }
 
-        void Tb_deleyChannel_OnKeyDown(object sender, KeyEventArgs e) {
+        void Tb_deleyChannel_OnKeyDown(object sender, KeyEventArgs e)
+        {
             int.TryParse(tb_deleyChannel.Text, out delayChannel);
             delayChannel -= 1;
         }
@@ -505,7 +566,8 @@ namespace ArrayDisplay.UI {
         //读取B值文件中的数据
         void ReadBFile() { }
 
-        void Btn_Path_OnClick(object sender, RoutedEventArgs e) {
+        void Btn_Path_OnClick(object sender, RoutedEventArgs e)
+        {
             FolderBrowserDialog dialog = new FolderBrowserDialog();
             dialog.RootFolder = Environment.SpecialFolder.MyComputer;
             dialog.ShowNewFolderButton = true;
@@ -515,16 +577,20 @@ namespace ArrayDisplay.UI {
             tb_filePath.Text = dialog.SelectedPath;
         }
 
-        void SaveBvalue_OnClick(object sender, RoutedEventArgs e) {
+        void SaveBvalue_OnClick(object sender, RoutedEventArgs e)
+        {
             string filepath = tb_filePath.Text;
             string filename = "Test.txt";
             string filedata = filepath + "\\" + filename;
-            using(FileStream fs = new FileStream(filedata, FileMode.Open, FileAccess.Read)) {
-                using(StreamReader sr = new StreamReader(fs, Encoding.GetEncoding("gb2312"))) {
+            using (FileStream fs = new FileStream(filedata, FileMode.Open, FileAccess.Read))
+            {
+                using (StreamReader sr = new StreamReader(fs, Encoding.GetEncoding("gb2312")))
+                {
                     string line;
                     string pattern = @"[+-]?\d+[\.]?\d*"; //包括带小数点的数字和整数
 
-                    while((line = sr.ReadLine()) != null) {
+                    while ((line = sr.ReadLine()) != null)
+                    {
                         Console.WriteLine(line);
                         MatchCollection matchCollection = Regex.Matches(line, pattern);
                         Match newMatch = matchCollection[1];
@@ -536,6 +602,8 @@ namespace ArrayDisplay.UI {
                 }
             }
         }
+        #endregion
+
 
         #region Property
 
@@ -635,6 +703,12 @@ namespace ArrayDisplay.UI {
             }
         }
 
+        /// <summary>载入系统信息 </summary>
+        void LoadSystemInfo()
+        {
+            Thread.Sleep(500);
+            udpCommand.GetDeviceState();
+        }
         #endregion
 
         #region 系统信息,(读/写/存)按钮响应
@@ -875,5 +949,13 @@ namespace ArrayDisplay.UI {
         }
 
         #endregion
+        /// <summary>
+        /// 输入原始数据的通道号 只能是数字只能小于通道个数
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Tb_origChannel_OnMouseWheel(object sender, MouseWheelEventArgs e) {
+            
+        }
     }
 }
