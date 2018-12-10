@@ -158,6 +158,7 @@ namespace ArrayDisplay.net {
                                 break;
                             case ConstUdpArg.WaveType.Orig:
                                 PutOrigData(rcvBuf);
+                                index++;
                                 break;
                             case ConstUdpArg.WaveType.Delay:
                                 PutDelayData(rcvBuf);
@@ -167,8 +168,9 @@ namespace ArrayDisplay.net {
                                 throw new ArgumentOutOfRangeException();
                         }
                     }
-                    switch(WaveType) {
-                        case ConstUdpArg.WaveType.Normal:  
+                    switch (WaveType)
+                    {
+                        case ConstUdpArg.WaveType.Normal:
                             wavaDataproc.WorkBytesEvent.Set();
                             break;
                         case ConstUdpArg.WaveType.Orig:
@@ -181,9 +183,9 @@ namespace ArrayDisplay.net {
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
-
-                    watch.Stop();
 //                    Console.WriteLine(@"Receive frame time = {0:f3}", watch.ElapsedMilliseconds / 1000.0f);
+                    watch.Stop();
+
                 }
             }
             catch(ThreadAbortException) {

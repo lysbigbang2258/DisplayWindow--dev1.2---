@@ -101,29 +101,18 @@ namespace ArrayDisplay.net {
                 var r = new byte[4];
                 for (int i = 0; i < ConstUdpArg.ORIG_DETECT_LENGTH; i++)
                 {
-                    for(int j = 0; j <WorkWaveBytes[0].Length; j++) {
-                        r[0] = WorkWaveBytes[i][j * 4 + 3];
-                        r[1] = WorkWaveBytes[i][j * 4 + 2];
-                        r[2] = WorkWaveBytes[i][j * 4 + 1];
-                        r[3] = WorkWaveBytes[i][j * 4];
+                    for (int j = 0; j < OrigWaveBytes[0].Length / 4 - 1; j++)
+                    {
+                        r[0] = OrigWaveBytes[i][j * 4 + 3];
+                        r[1] = OrigWaveBytes[i][j * 4 + 2];
+                        r[2] = OrigWaveBytes[i][j * 4 + 1];
+                        r[3] = OrigWaveBytes[i][j * 4];
                         int a = BitConverter.ToInt32(r, 0);
-                        WorkWaveFloats[i][j] = a / 1048576.0f;
-
-                        //听音数据处理
-                        float f = WorkWaveFloats[i][j] * ListenCoefficent;
-                        short sh;
-                        if (f > 32767) {
-                            sh = 32767;
-                        }
-                        else if (f <= -32767) {
-                            sh = -32767;
-                        }
-                        else {
-                            sh = (short) f;
-                        }
-                        var x = BitConverter.GetBytes(sh);
-                        Array.Copy(x, 0, PlayWaveBytes[i], j * 2, 2);
+                        OrigWaveFloats[i][j] = a / 1048576.0f;
                     }
+                }
+                if (OrigGraphEventHandler !=null) {
+                    OrigGraphEventHandler.Invoke(null, OrigWaveFloats[0]);
                 }
             }
         }

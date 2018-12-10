@@ -317,10 +317,10 @@
                                               VerticalAlignment="Center" Width="1249" Foreground="{x:Null}"
                                               Background="{x:Null}" Margin="173,5,440,5">
                                 <ni:WritableGraph.Axes>
-                                    <ni:AxisDouble Range="0,58" Orientation="Horizontal"
+                                    <ni:AxisDouble Range="0,200" Orientation="Horizontal"
                                                    MinorDivisions="{x:Null}" Adjuster="None" InteractionMode="None" />
                                     <ni:AxisDouble Range="-1,1" Orientation="Vertical"
-                                                   MinorDivisions="{x:Null}" Adjuster="None"
+                                                   MinorDivisions="{x:Null}" Adjuster="FitLoosely"
                                                    InteractionMode="None">
                                         <ni:AxisDouble.MajorDivisions>
                                             <ni:RangeLabeledDivisions />
