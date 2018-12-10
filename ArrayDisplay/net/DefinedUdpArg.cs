@@ -377,7 +377,7 @@ namespace ArrayDisplay.net {
         public const int ORIG_CANNEL_NUMS = 8;
 
         public const int DELAY_FRAME_CHANNELS = 8;
-        public const int DELAY_FRAME_NUMS = 320;
+        public const int DELAY_FRAME_NUMS = 10;
         public const int DELAY_FRAME_LENGTH = 402;
 
         #endregion
