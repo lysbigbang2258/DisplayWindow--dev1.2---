@@ -199,9 +199,14 @@ namespace ArrayDisplay.UI {
         {
             //切换到系统设置状态
             //UdpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
-
-            //发送查询指令
-            udpCommand.GetDeviceState();
+            try {
+                //发送查询指令
+                udpCommand.GetDeviceState();
+            }
+            catch(Exception exception) {
+                Console.WriteLine(exception);
+            }
+            
         }
 
         /// <summary>

@@ -211,14 +211,20 @@ namespace ArrayDisplay.net {
             var tmp = ConstUdpArg.GetDelayTimeWriteCommand(int.Parse(DisPlayWindow.hMainWindow.tb_deleyChannel.Text) - 1);
             WriteData(tmp, data);
         }
-
+        /// <summary>
+        /// 发送改变通道号
+        /// </summary>
+        /// <param name="num"></param>
         public void WriteOrigChannel(int num) {
             var data = ConstUdpArg.OrigChannel_Write;
             byte[] temp = new byte[1];
              temp[0] = (byte)num;
             WriteData(data,temp);
         }
-
+        /// <summary>
+        /// 发送改变时分号
+        /// </summary>
+        /// <param name="num"></param>
         public void WriteOrigTDiv(int num) {
             var data = ConstUdpArg.OrigTimDiv_Write;
             byte[] temp = new byte[1];
