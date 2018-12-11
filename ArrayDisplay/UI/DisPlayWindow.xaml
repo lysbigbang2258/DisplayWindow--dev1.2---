@@ -288,7 +288,7 @@
                                     <TextBox Width="100" Height="32" Name="tb_origFram" FontFamily="18" TextAlignment="Center" Text="20" />
                                     <Label Width="100" Height="40">测试通道：</Label>
                                     <TextBox Width="100" Height="32" Name="tb_origChannel" FontFamily="18" Margin="0,0,5,0"
-                                             TextAlignment="Center" Text="1" PreviewTextInput="InputIntegerOnly" KeyDown="Tb_origChannel_OnKeyDown"/>
+                                             TextAlignment="Center" Text="1" PreviewTextInput="InputIntegerOnly" KeyDown="Tb_origChannel_OnKeyDown" />
                                     <Label Width="100" Height="40" Margin="0,0,5,0">测试时分：</Label>
                                     <TextBox Width="100" Height="32" Name="tb_orgiTdiv" FontFamily="18" Margin="0,0,5,0"
                                              TextAlignment="Center" Text="1" />

@@ -1,11 +1,12 @@
-﻿using System;
+﻿﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using ArrayDisplay.UI;
+﻿using System.Windows.Media.TextFormatting;
+﻿using ArrayDisplay.UI;
 
 namespace ArrayDisplay.net {
     public class UdpCommand : IDisposable {
@@ -211,6 +212,13 @@ namespace ArrayDisplay.net {
             WriteData(tmp, data);
         }
 
+        public void WriteOrigChannel(int num) {
+            var data = ConstUdpArg.OrigChannel_Write;
+            byte[] temp = new byte[1];
+             temp[0] = (byte)num;
+            WriteData(data,temp);
+        }
+
         #endregion
 
         #region 存(发送指令及数据)
@@ -261,11 +269,11 @@ namespace ArrayDisplay.net {
         /// <param name="addr">指令及地址</param>
         /// <param name="data">待发送的数据</param>
         void WriteData(byte[] addr, byte[] data) {
-            var sendData = new byte[addr.Length + 2];
-            Array.Copy(addr, sendData, addr.Length);
+            var sendData = new byte[addr.Length + data.Length];
+            Array.Copy(addr,0, sendData,0, addr.Length);
 
             //最后两位是需要发送的数据
-            Array.Copy(data, 0, sendData, sendData.Length - 2, 2);
+            Array.Copy(data, 0, sendData, sendData.Length - data.Length, data.Length);
 
             Send(sendData, ConstUdpArg.Dst_ComMsgIp);
         }

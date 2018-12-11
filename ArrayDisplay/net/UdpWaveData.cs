@@ -216,9 +216,15 @@ namespace ArrayDisplay.net {
             int offset = 0;
             if (!Equals(Ip, ConstUdpArg.Src_OrigWaveIp)) return;
             Array.Copy(buf, 0, head, 0, head.Length);
-            var channel = head[0];
-            var timdiv = head[1];
-
+            int channel = head[0];
+            int timdiv = head[1];
+            if (channel < 1 && channel > ConstUdpArg.ORIG_CHANNEL_NUMS) {
+                channel = 1;
+            }
+            if (timdiv < 1 && timdiv > ConstUdpArg.ORIG_TIME_NUMS)
+            {
+                timdiv = 1;
+            }
             offset += head.Length;
 
             Array.Copy(buf, offset, wavaDataproc.OrigWaveBytes[channel * 8 + timdiv], 0, buf.Length-2);

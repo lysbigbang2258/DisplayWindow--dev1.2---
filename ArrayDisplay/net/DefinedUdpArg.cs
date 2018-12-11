@@ -230,6 +230,24 @@ namespace ArrayDisplay.net {
             }
         }
 
+        public static byte[] OrigChannel_Write {
+            get {
+                return origChannel_Write;
+            }
+            set {
+                origChannel_Write = value;
+            }
+        }
+
+        public static byte[] OrigTimDiv_Write {
+            get {
+                return origTimDiv_Write;
+            }
+            set {
+                origTimDiv_Write = value;
+            }
+        }
+
         #endregion
 
         #region 指令变量Method
@@ -350,10 +368,15 @@ namespace ArrayDisplay.net {
         ///     删除指令
         /// </summary>
         static readonly byte[] delayChannel_Read = {0, 0, 2, 0, 0, 10};
-
         static readonly byte[] delayChannel_Write = {1, 0, 2, 0, 0, 10};
         static readonly byte[] delayChannel_Save = {1, 0, 2, 0, 0, 74};
 
+        /// <summary>
+        /// 原始数据操作
+        /// </summary>
+        static  byte[] origChannel_Write = {1, 0, 1, 0,0, 7 };
+        static  byte[] origTimDiv_Write = {1, 0, 1, 0,0, 8 };
+        
 
         #endregion
 

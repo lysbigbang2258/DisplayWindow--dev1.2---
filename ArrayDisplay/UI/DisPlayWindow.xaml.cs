@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -57,10 +58,8 @@ namespace ArrayDisplay.UI {
 
             led_normaldata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
             isTabWorkGotFocus = true;
-            //启动时 切换到'正常工作'状态
-            //UdpCommand.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
             //测试,关闭数据接收
-//            udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+            udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
             //isTabWorkGotFocus = true;
             //启动后等待0.5秒 自动加载一次系统状态参数
             //new Thread(LoadSystemInfo).Start();
@@ -576,25 +575,31 @@ namespace ArrayDisplay.UI {
         }
 
         //传输数据用于显示
-
-        void TextBox_KeyDown_workChNum(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
+            /// <summary>
+            /// 工作通道改变响应
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="e"></param>
+        void TextBox_KeyDown_workChNum(object sender, KeyEventArgs e) {
+            TextBox tb = sender as TextBox;
+            int workchNum = 1;
+            if (tb != null) {
+                workchNum = int.Parse(tb.Text); 
+            }
+            if (e.Key != Key.Enter) {
+                return;
+            }
+            try
             {
-                try
+                if (workchNum < 1 || workchNum > 256)
                 {
-                    SelectdInfo.WorkWaveChannel = int.Parse(tb_workChNum.Text.Trim());
-                    if (chNum < 1 || chNum > 256)
-                    {
-                        chNum = 1;
-                        tb_workChNum.Text = "1";
-                        SelectdInfo.WorkWaveChannel = 1;
-                    }
+                    tb_workChNum.Text = "1";
+                    SelectdInfo.WorkWaveChannel = 1;
                 }
-                catch (Exception)
-                {
-                    // ignored
-                }
+            }
+            catch (Exception)
+            {
+                // ignored
             }
         }
         /// <summary>
@@ -605,22 +610,32 @@ namespace ArrayDisplay.UI {
         void Tb_origChannel_OnKeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter)
             {
+                TextBox tb = sender as TextBox;
+                int num = 1;
+                if (tb != null)
+                {
+                    num = int.Parse(tb.Text);
+                }
                 try
                 {
-                    SelectdInfo.WorkWaveChannel = int.Parse(tb_workChNum.Text.Trim());
-                    if (chNum < 1 || chNum > ConstUdpArg.ORIG_CHANNEL_NUMS)
+                    if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS)
                     {
-                        chNum = 1;
+                        num = 1;
                         tb_workChNum.Text = "1";
-                        SelectdInfo.WorkWaveChannel = 1;
+                        return;
                     }
                 }
                 catch (Exception)
                 {
                     // ignored
                 }
+                udpCommand.WriteOrigChannel(num);
             }
         }
+
+       
+        
+        
 
         void SoundValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { }
 
@@ -666,7 +681,6 @@ namespace ArrayDisplay.UI {
         //int _port;
         readonly DataFile dataFile;
         public static int sndCoefficent = 50;
-        public static int chNum = 1; //通道数
         public static DxPlaySound dxplaysnd; //播放声音对象
         UdpWaveData capudp; //波形数据对象
         public ConstUdpArg constUdpArg; //

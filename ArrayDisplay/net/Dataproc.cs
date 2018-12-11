@@ -40,8 +40,8 @@ namespace ArrayDisplay.net {
             int olength = ConstUdpArg.ORIG_FRAME_LENGTH; //每帧长度
             for (int i = 0; i < oNums; i++)
             {
-                OrigWaveBytes[i] = new byte[olength * oFrime];
-                OrigWaveFloats[i] = new float[olength / 2 * oFrime];
+                OrigWaveBytes[i] = new byte[(olength-2) * oFrime];
+                OrigWaveFloats[i] = new float[(olength-2) / 2 * oFrime];
             }
 
 
