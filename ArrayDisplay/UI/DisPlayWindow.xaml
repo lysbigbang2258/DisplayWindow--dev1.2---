@@ -486,13 +486,8 @@
                                     </Grid>
                                 </Grid>
                                 <Grid Column="1">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <ni:Graph Grid.Row="0" Name="graph_energyFirst" Margin="5,5,-102,5">
+                                    
+                                    <ni:Graph Grid.Row="0" Name="graph_energyFirst">
                                         <ni:Graph.Axes>
                                             <ni:AxisDouble x:Name="xScale3" Range="1,64" Orientation="Horizontal"
                                                            MinorDivisions="{x:Null}" Adjuster="None" >
@@ -511,64 +506,7 @@
                                         </ni:Graph.DefaultPlotRenderers>
 
                                     </ni:Graph>
-                                    <ni:Graph Grid.Row="1" x:Name="graph_energySecond" Margin="5,5,-102,5">
-                                        <ni:Graph.Axes>
-                                            <ni:AxisDouble x:Name="xScale2" Range="65,128" Orientation="Horizontal"
-                                                           MinorDivisions="{x:Null}" Adjuster="None">
-                                                <ni:AxisDouble.MajorGridLines>
-                                                    <ni:GridLines Stroke="Orange" StrokeDashArray="4,2"
-                                                                  StrokeThickness="2" StrokeDashCap="Round"
-                                                                  StrokeDashOffset="1" />
-                                                </ni:AxisDouble.MajorGridLines>
-                                            </ni:AxisDouble>
-                                            <ni:AxisDouble x:Name="yScale2" Range="0,50" Orientation="Vertical"
-                                                           MinorDivisions="{x:Null}" Adjuster="None" Label="Ampliton" />
-                                        </ni:Graph.Axes>
-                                        <ni:Graph.DefaultPlotRenderers>
-                                            <ni:BarPlotRenderer Stroke="White" Fill="Purple" BarWidth="0.5"
-                                                                StrokeThickness="0" />
-                                        </ni:Graph.DefaultPlotRenderers>
-
-                                    </ni:Graph>
-                                    <ni:Graph Grid.Row="2" x:Name="graph_energyThrid" Margin="5,5,-102,5">
-                                        <ni:Graph.Axes>
-                                            <ni:AxisDouble x:Name="xScale4" Range="129,192" Orientation="Horizontal"
-                                                           MinorDivisions="{x:Null}" Adjuster="None">
-                                                <ni:AxisDouble.MajorGridLines>
-                                                    <ni:GridLines Stroke="Orange" StrokeDashArray="4,2"
-                                                                  StrokeThickness="2" StrokeDashCap="Round"
-                                                                  StrokeDashOffset="1" />
-                                                </ni:AxisDouble.MajorGridLines>
-                                            </ni:AxisDouble>
-                                            <ni:AxisDouble x:Name="yScale4" Range="20,50" Orientation="Vertical"
-                                                           MinorDivisions="{x:Null}" Adjuster="FitVisibleLoosely" Label="Ampliton" />
-                                        </ni:Graph.Axes>
-                                        <ni:Graph.DefaultPlotRenderers>
-                                            <ni:BarPlotRenderer Stroke="White" Fill="Purple" BarWidth="0.5"
-                                                                StrokeThickness="0" />
-                                        </ni:Graph.DefaultPlotRenderers>
-
-                                    </ni:Graph>
-                                    <ni:Graph Grid.Row="3" x:Name="graph1_energyFourth" Margin="5,5,-102,5">
-                                        <ni:Graph.Axes>
-                                            <ni:AxisDouble x:Name="xScale5" Range="193,256" Orientation="Horizontal"
-                                                           MinorDivisions="{x:Null}" Adjuster="None">
-                                                <ni:AxisDouble.MajorGridLines>
-                                                    <ni:GridLines Stroke="Orange" StrokeDashArray="4,2"
-                                                                  StrokeThickness="2" StrokeDashCap="Round"
-                                                                  StrokeDashOffset="1" />
-                                                </ni:AxisDouble.MajorGridLines>
-                                            </ni:AxisDouble>
-                                            <ni:AxisDouble x:Name="yScale5" Range="20,50" Orientation="Vertical"
-                                                           MinorDivisions="{x:Null}" Adjuster="FitVisibleLoosely" Label="Ampliton" />
-                                        </ni:Graph.Axes>
-                                        <ni:Graph.DefaultPlotRenderers>
-                                            <ni:BarPlotRenderer Stroke="White" Fill="Purple" BarWidth="0.5"
-                                                                StrokeThickness="0" />
-                                        </ni:Graph.DefaultPlotRenderers>
-
-                                    </ni:Graph>
-
+                                    
                                 </Grid>
                             </Grid>
                         </Grid>
