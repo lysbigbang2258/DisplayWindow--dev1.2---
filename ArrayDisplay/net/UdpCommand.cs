@@ -219,6 +219,13 @@ namespace ArrayDisplay.net {
             WriteData(data,temp);
         }
 
+        public void WriteOrigTDiv(int num) {
+            var data = ConstUdpArg.OrigTimDiv_Write;
+            byte[] temp = new byte[1];
+            temp[0] = (byte)num;
+            WriteData(data, temp); 
+        }
+
         #endregion
 
         #region 存(发送指令及数据)
@@ -589,5 +596,7 @@ namespace ArrayDisplay.net {
         }
 
         #endregion
+
+        
     }
 }

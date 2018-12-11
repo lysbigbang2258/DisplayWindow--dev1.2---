@@ -621,7 +621,7 @@ namespace ArrayDisplay.UI {
                     if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS)
                     {
                         num = 1;
-                        tb_workChNum.Text = "1";
+                        tb_origChannel.Text = "1";
                         return;
                     }
                 }
@@ -632,7 +632,36 @@ namespace ArrayDisplay.UI {
                 udpCommand.WriteOrigChannel(num);
             }
         }
-
+        /// <summary>
+        /// 原始时分改变响应
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Tb_orgiTdiv_OnKeyDown(object sender, KeyEventArgs e) {
+            if (e.Key == Key.Enter)
+            {
+                TextBox tb = sender as TextBox;
+                int num = 1;
+                if (tb != null)
+                {
+                    num = int.Parse(tb.Text);
+                }
+                try
+                {
+                    if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS)
+                    {
+                        num = 1;
+                        tb_orgiTdiv.Text = "1";
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+                udpCommand.WriteOrigTDiv(num);
+            } 
+        }
        
         
         

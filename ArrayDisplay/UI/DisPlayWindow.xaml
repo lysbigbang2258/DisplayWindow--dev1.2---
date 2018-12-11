@@ -291,7 +291,7 @@
                                              TextAlignment="Center" Text="1" PreviewTextInput="InputIntegerOnly" KeyDown="Tb_origChannel_OnKeyDown" />
                                     <Label Width="100" Height="40" Margin="0,0,5,0">测试时分：</Label>
                                     <TextBox Width="100" Height="32" Name="tb_orgiTdiv" FontFamily="18" Margin="0,0,5,0"
-                                             TextAlignment="Center" Text="1" />
+                                             TextAlignment="Center" Text="1" PreviewTextInput="InputIntegerOnly" KeyDown="Tb_orgiTdiv_OnKeyDown" />
                                     <Button Width="100" Height="32" FontFamily="18" x:Name="btn_origstart"
                                             Click="OrigDataStart_OnClick" Background="#FF66EE66" Content="启动" />
                                 </WrapPanel>
