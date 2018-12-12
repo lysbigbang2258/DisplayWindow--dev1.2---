@@ -387,7 +387,7 @@ namespace ArrayDisplay.net {
         public const int ARRAY_USED = 64; //阵元数
         //Buffer设置
 //        public const int WORK_FRAME_NUMS = 31250; //正常工作波形同时显示帧数
-        public const int WORK_FRAME_NUMS = 1024 * 16 * 2; //正常工作波形同时显示帧数
+        public const int WORK_FRAME_NUMS = 1024; //正常工作波形同时显示帧数
         public const int WORK_FRAME_LENGTH = 1024; // 正常工作波形帧长
         //能量图像素长度
         public const int MAX_ENERGY_PIXELS_LENGTH = 70;

@@ -152,6 +152,22 @@ namespace ArrayDisplay.UI {
 
         #endregion
 
+        #region  基础功能
+        /// <summary>
+        ///     ///文本框只允许输入数字
+        ///     /// 脉冲周期/脉冲延时/脉冲宽度///
+        /// </summary>
+        void InputIntegerOnly(object sender, TextCompositionEventArgs e)
+        {
+            //throw new NotImplementedException();
+            Regex re = new Regex("[^0-9.-]+");
+            if (e != null)
+            {
+                e.Handled = re.IsMatch(e.Text);
+            }
+        }
+        #endregion
+
         #region 点击响应函数
 
         /// <summary>
@@ -353,17 +369,7 @@ namespace ArrayDisplay.UI {
 
         #region 控件响应函数
 
-        /// <summary>
-        ///     ///文本框只允许输入数字
-        ///     /// 脉冲周期/脉冲延时/脉冲宽度///
-        /// </summary>
-        void InputIntegerOnly(object sender, TextCompositionEventArgs e) {
-            //throw new NotImplementedException();
-            Regex re = new Regex("[^0-9.-]+");
-            if (e != null) {
-                e.Handled = re.IsMatch(e.Text);
-            }
-        }
+        
 
         /// <summary>
         ///     可调整值的TextBox上滚轮动作响应(整数)
@@ -493,19 +499,19 @@ namespace ArrayDisplay.UI {
             TextBox tb = sender as TextBox;
             int workchNum = 1;
             if (tb != null) {
-                workchNum = int.Parse(tb.Text);
+                int.TryParse(tb.Text,out workchNum);
             }
-            if (e.Key != Key.Enter) {
-                return;
-            }
-            try {
-                if (workchNum < 1 || workchNum > 256) {
-                    tb_workChNum.Text = "1";
-                    SelectdInfo.WorkWaveChannel = 1;
+            if (e.Key == Key.Enter) {
+                try {
+                    if (workchNum < 1 || workchNum > 256) {
+                        tb_workChNum.Text = "1";
+                        SelectdInfo.WorkWaveChannel = 1;
+                    }
+                    SelectdInfo.WorkWaveChannel = workchNum;
                 }
-            }
-            catch(Exception) {
-                // ignored
+                catch(Exception) {
+                    // ignored
+                }
             }
         }
 
@@ -519,7 +525,7 @@ namespace ArrayDisplay.UI {
                 TextBox tb = sender as TextBox;
                 int num = 1;
                 if (tb != null) {
-                    num = int.Parse(tb.Text);
+                    int.TryParse(tb.Text,out num);
                 }
                 try {
                     if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS) {
@@ -545,7 +551,7 @@ namespace ArrayDisplay.UI {
                 TextBox tb = sender as TextBox;
                 int num = 1;
                 if (tb != null) {
-                    num = int.Parse(tb.Text);
+                    int.TryParse(tb.Text, out num);
                 }
                 try {
                     if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS) {

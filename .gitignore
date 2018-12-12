@@ -12,7 +12,7 @@ packages/
 *.suo  
 *.user  
 *.sln.docstates  
-  
+*.sln.DotSetting.user  
 # Build results  
 [Dd]ebug/  
 [Rr]elease/  

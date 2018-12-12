@@ -364,6 +364,7 @@
                                             <TextBox x:Name="tb_workChNum" Text="1" FontSize="16" Margin="0,0,0,0"
                                                      Width="98" Height="32"
                                                      VerticalAlignment="Center" TextAlignment="Center"
+                                                     PreviewTextInput="InputIntegerOnly"
                                                      KeyDown="TextBox_KeyDown_workChNum"
                                                      VerticalContentAlignment="Center" HorizontalAlignment="Right" />
                                             <ni:LED x:Name="led_normaldata" FalseContent="Off"
