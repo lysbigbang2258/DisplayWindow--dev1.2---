@@ -248,6 +248,36 @@ namespace ArrayDisplay.net {
             }
         }
 
+        /// <summary>
+        /// Dac操作
+        /// </summary>
+        public static byte[] DacChannel_Read {
+            get {
+                return dacChannel_Read;
+            }
+            set {
+                dacChannel_Read = value;
+            }
+        }
+
+        public static byte[] DacChannel_Write {
+            get {
+                return dacChannel_Write;
+            }
+            set {
+                dacChannel_Write = value;
+            }
+        }
+
+        public static byte[] DacChannel_Save {
+            get {
+                return dacChannel_Save;
+            }
+            set {
+                dacChannel_Save = value;
+            }
+        }
+
         #endregion
 
         #region 指令变量Method
@@ -280,6 +310,15 @@ namespace ArrayDisplay.net {
             channel.SetValue((byte) (channel[5] + (idcNum - 1) * 2), 5);
             return channel;
         }
+        /// <summary>读指令:延时通道</summary>
+        public static byte[] GetCanChannelReadCommand(int idcNum)
+        {
+            var channel = new byte[dacChannel_Read.Length];
+            Array.Copy(dacChannel_Read, 0, channel, 0, dacChannel_Read.Length);
+            channel.SetValue((byte)(channel[5] + (idcNum - 1)*2), 5);
+            return channel;
+        }
+
 
         /// <summary>写指令:延时通道</summary>
         public static byte[] GetDelayTimeWriteCommand(int idcNum) {
@@ -376,7 +415,13 @@ namespace ArrayDisplay.net {
         /// </summary>
         static  byte[] origChannel_Write = {1, 0, 1, 0,0, 7 };
         static  byte[] origTimDiv_Write = {1, 0, 1, 0,0, 8 };
-        
+
+        /// <summary>
+        /// Dac操作
+        /// </summary>
+        static byte[] dacChannel_Read = { 0, 0, 2, 0, 0, 91 };
+        static byte[] dacChannel_Write = { 1, 0, 2, 0, 0 }; 
+        static byte[] dacChannel_Save = { 1, 0, 1, 0, 0, 155 }; 
 
         #endregion
 
@@ -387,7 +432,7 @@ namespace ArrayDisplay.net {
         public const int ARRAY_USED = 64; //阵元数
         //Buffer设置
 //        public const int WORK_FRAME_NUMS = 31250; //正常工作波形同时显示帧数
-        public const int WORK_FRAME_NUMS = 1024; //正常工作波形同时显示帧数
+        public const int WORK_FRAME_NUMS = 1024*16 *2; //正常工作波形同时显示帧数
         public const int WORK_FRAME_LENGTH = 1024; // 正常工作波形帧长
         //能量图像素长度
         public const int MAX_ENERGY_PIXELS_LENGTH = 70;

@@ -297,19 +297,19 @@
                                 </WrapPanel>
                                 <WrapPanel Grid.ColumnSpan="3" Margin="0,41,0,254">
                                     <Label Width="100" Height="40">DAC幅值：</Label>
-                                    <TextBox Width="100" Height="32" FontFamily="18" TextAlignment="Center"  Text="3000"/>
+                                    <TextBox Width="100" Height="32" Name="tb_dacLen" FontFamily="18" TextAlignment="Center"  Text="3000"/>
                                     <Label Width="100" Height="40">DAC通道：</Label>
-                                    <TextBox Width="100" Height="32" FontFamily="18" Text="1" TextAlignment="Center" />
+                                    <TextBox Width="100" Height="32" Name="tb_dacChannel" FontFamily="18" Text="1" TextAlignment="Center" />
 
-                                    <Button Content="写" Width="100" Height="40" 
-                                            VerticalContentAlignment="Center" Margin="5,0,5,0" />
                                     <Button Content="读" Width="100" Height="40" 
-                                            VerticalContentAlignment="Center" Margin="0,0,5,0" />
-                                    <Button Content="存" Width="100" Height="40"  Margin="0,0,5,0" />
+                                            VerticalContentAlignment="Center" Margin="5,0,5,0" Click="DacLenRead_OnClick" />
+                                    <Button Content="写" Width="100" Height="40" 
+                                            VerticalContentAlignment="Center" Margin="0,0,5,0" Click="DacLenWrite_OnClick" />
+                                    <Button Content="存" Width="100" Height="40"  Margin="0,0,5,0" Click="DacLenSave_OnClick" />
 
                                     <Label Width="140" Height="40" Margin="5">C值DAC幅度：</Label>
-                                    <TextBox Width="100" Height="32" FontFamily="18" TextAlignment="Center" />
-                                    <Button Content="计算" Width="100" Height="40" Margin="5" />
+                                    <TextBox Width="100" Height="32" FontFamily="18" TextAlignment="Center"  Name="tb_dacCvalue"/>
+                                    <Button Content="计算" Width="100" Height="40" Margin="5"  Click="CalCanCvalue_OnClick"/>
                                 </WrapPanel>
                             </Grid>
                             <ni:WritableGraph x:Name="orige_graph" HorizontalAlignment="Center" Height="606"

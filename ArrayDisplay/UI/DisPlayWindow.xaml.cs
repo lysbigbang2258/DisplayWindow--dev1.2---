@@ -47,8 +47,13 @@ namespace ArrayDisplay.UI {
             tb_setting_pulse_delay.SetBinding(TextBox.TextProperty, new Binding("PulseDelay") {Source = systemInfo});
             tb_setting_pulse_width.SetBinding(TextBox.TextProperty, new Binding("PulseWidth") {Source = systemInfo});
             tb_setting_adc_offset.SetBinding(TextBox.TextProperty, new Binding("AdcOffset") {Source = systemInfo});
+
+
             tb_deleyTime.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayTime") {Source = systemInfo});
             tb_deleyChannel.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayNums") {Source = systemInfo});
+
+            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") {Source = systemInfo});
+            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") {Source = systemInfo});
 
             tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") {Source = SelectdInfo, Mode = BindingMode.TwoWay});
 
@@ -75,7 +80,7 @@ namespace ArrayDisplay.UI {
             Array.Copy(e, 0, graphdata, 0, len);
             
             for(int i = 0; i < len; i++) {
-                if (Math.Abs(graphdata[i]) < 0.0000001) {
+                if (Math.Abs(graphdata[i]) < double.Epsilon) {
                     graphdata[i] = 0;
                 }
                 else {
@@ -364,7 +369,21 @@ namespace ArrayDisplay.UI {
             StateWindow win = new StateWindow();
             win.ShowDialog();
         }
-
+        /// <summary>
+        /// 计算C值
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void CalCanCvalue_OnClick(object sender, RoutedEventArgs e) {
+            var daclen = 0;
+            int.TryParse(tb_dacLen.Text, out daclen);
+            if (daclen!=0) {
+                var tmp = daclen * 0.754;
+                var result = Math.Round(tmp, MidpointRounding.AwayFromZero);//实现四舍五入
+                tb_dacCvalue.Text = result.ToString();
+            }
+            
+        }
         #endregion
 
         #region 控件响应函数
@@ -897,6 +916,43 @@ namespace ArrayDisplay.UI {
 
         #endregion
 
+        #region Dac信息.(读/写/存).按钮响应
+
+        void DacLenRead_OnClick(object sender, RoutedEventArgs e) {
+            udpCommand.ReadCanChannelLen();
+        }
+
+        void DacLenWrite_OnClick(object sender, RoutedEventArgs e) {
+            string strT = tb_dacLen.Text;
+            if (string.IsNullOrEmpty(strT))
+            {
+                return;
+            }
+            int t = int.Parse(strT);
+
+            udpCommand.WriteDacChannel(t);
+        }
+
+        void DacLenSave_OnClick(object sender, RoutedEventArgs e) {
+            string strT = tb_deleyTime.Text;
+            if (string.IsNullOrEmpty(strT))
+            {
+                return;
+            }
+            int intT = int.Parse(strT);
+            int a = intT / 256;
+            int b = intT - a * 256;
+
+            var data = new byte[2];
+            data.SetValue((byte)a, 0);
+            data.SetValue((byte)b, 1);
+
+            udpCommand.SaveDelayTime(data);
+        }
+        #endregion
+
+        
+
         #endregion
 
         #region IDisposable
@@ -922,5 +978,7 @@ namespace ArrayDisplay.UI {
         }
 
         #endregion
+
+        
     }
 }

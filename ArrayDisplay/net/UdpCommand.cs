@@ -169,6 +169,13 @@ namespace ArrayDisplay.net {
             ReceiveChannelDeleyTime(20);
         }
 
+        /// <summary>///读取延时信息/// </summary>
+        public void ReadCanChannelLen()
+        {
+            var sedip = ConstUdpArg.GetCanChannelReadCommand(DisPlayWindow.systemInfo.DacChannel);
+            Send(sedip, ConstUdpArg.Dst_ComMsgIp);
+            ReceiveCanChannelLen(20);
+        }
         #endregion
 
         #region 写(发送指令及数据)
@@ -211,8 +218,9 @@ namespace ArrayDisplay.net {
             var tmp = ConstUdpArg.GetDelayTimeWriteCommand(int.Parse(DisPlayWindow.hMainWindow.tb_deleyChannel.Text) - 1);
             WriteData(tmp, data);
         }
+
         /// <summary>
-        /// 发送改变通道号
+        /// 写入改变原始信号通道号
         /// </summary>
         /// <param name="num"></param>
         public void WriteOrigChannel(int num) {
@@ -222,7 +230,7 @@ namespace ArrayDisplay.net {
             WriteData(data,temp);
         }
         /// <summary>
-        /// 发送改变时分号
+        /// 写入改变原始信号时分号
         /// </summary>
         /// <param name="num"></param>
         public void WriteOrigTDiv(int num) {
@@ -231,7 +239,28 @@ namespace ArrayDisplay.net {
             temp[0] = (byte)num;
             WriteData(data, temp); 
         }
+        /// <summary>
+        /// 写入Dac通道号
+        /// </summary>
+        /// <param name="num"></param>
+        public void WriteDacChannel(int num) {
+            var partAddr = ConstUdpArg.DacChannel_Write;
+            byte[] addr = new byte[partAddr.Length + 1];
+            Array.Copy(partAddr, 0, addr, 0, partAddr.Length);
+            var offset = partAddr.Length;
 
+            int len;
+            int.TryParse(DisPlayWindow.hMainWindow.tb_dacChannel.Text, out len);
+            int chennelsite = 91 + len; 
+            byte[] ctmp = new byte[1];
+            ctmp[0] = (byte) chennelsite;
+            addr.SetValue(ctmp[0], offset);
+            var data = new byte[2];
+            int t = num / 256;
+            data[0] = (byte)t;
+            data[1] = (byte)(num - t * 256);
+            WriteData(addr, data);
+        }
         #endregion
 
         #region 存(发送指令及数据)
@@ -374,10 +403,7 @@ namespace ArrayDisplay.net {
 
         #endregion
 
-        #region 系统参数(读),数据接收
-
-        #region 接收设备类型数据
-
+        #region 系统参数(读),数据接收      
         /// <summary>
         ///     接收设备类型数据
         /// </summary>
@@ -391,10 +417,6 @@ namespace ArrayDisplay.net {
                                       DisPlayWindow.systemInfo.McType = mcType;
                                   });
         }
-
-        #endregion
-
-        #region 接收设备ID数据
 
         /// <summary>
         ///     接收设备ID数据
@@ -411,10 +433,6 @@ namespace ArrayDisplay.net {
                                       DisPlayWindow.systemInfo.McId = mcId;
                                   });
         }
-
-        #endregion
-
-        #region 接收设备Mac数据
 
         /// <summary>
         ///     接收设备ID数据
@@ -436,11 +454,7 @@ namespace ArrayDisplay.net {
                                       DisPlayWindow.systemInfo.McMac = mcMac;
                                   });
         }
-
-        #endregion
-
-        #region 接收脉冲周期数据
-
+     
         public void ReceivePulsePeriod(int bufferLength) {
             var rcvUdpBuffer = ReadRemote(bufferLength);
 
@@ -453,11 +467,7 @@ namespace ArrayDisplay.net {
                                       SetData(Encoding.ASCII.GetString(cmd, 0, 6), temp);
                                   });
         }
-
-        #endregion
-
-        #region 接收脉冲延时数据
-
+          
         public void ReceivePulseDelay(int bufferLength) {
             Task.Factory.StartNew(() => {
                                       var rcvUdpBuffer = ReadRemote(bufferLength);
@@ -469,10 +479,6 @@ namespace ArrayDisplay.net {
                                       SetData(Encoding.ASCII.GetString(cmd, 0, 6), temp);
                                   });
         }
-
-        #endregion
-
-        #region 接收脉冲宽度数据
 
         public void ReceivePulseWidth(int bufferLength) {
             Task.Factory.StartNew(() => {
@@ -486,10 +492,6 @@ namespace ArrayDisplay.net {
                                   });
         }
 
-        #endregion
-
-        #region 接收ADC偏移数据
-
         public void ReceiveAdcOffset(int bufferLength) {
             Task.Factory.StartNew(() => {
                                       var rcvUdpBuffer = ReadRemote(bufferLength);
@@ -501,10 +503,6 @@ namespace ArrayDisplay.net {
                                       SetData(Encoding.ASCII.GetString(cmd, 0, 6), temp);
                                   });
         }
-
-        #endregion
-
-        #region 接收通道延时数据
 
         public void ReceiveChannelDeleyTime(int bufferLength) {
             Task.Factory.StartNew(() => {
@@ -518,7 +516,19 @@ namespace ArrayDisplay.net {
                                   });
         }
 
-        #endregion
+        public void ReceiveCanChannelLen(int bufferLength)
+        {
+            Task.Factory.StartNew(() =>
+                                  {
+                                      var rcvUdpBuffer = ReadRemote(bufferLength);
+                                      //返回数据以指令为开头
+                                      var cmd = new byte[6];
+                                      Array.Copy(rcvUdpBuffer, 0, cmd, 0, 6);
+                                      var temp = new byte[2];
+                                      Array.Copy(rcvUdpBuffer, 6, temp, 0, temp.Length);
+                                      SetData(Encoding.ASCII.GetString(cmd, 0, 6), temp);
+                                  });
+        }
 
         /// 将接收到的(脉冲周期/脉冲延时/脉冲宽度/ADC偏移)数据转换为界面显示的值
         /// <param name="data"></param>
@@ -594,6 +604,12 @@ namespace ArrayDisplay.net {
                 data[1] = t;
                 int delaytime = BitConverter.ToUInt16(data, 0);
                 DisPlayWindow.systemInfo.ChannelDelayTime = delaytime;
+            }
+            else if (Encoding.ASCII.GetString(ConstUdpArg.GetCanChannelReadCommand(DisPlayWindow.systemInfo.DacChannel), 0, 6).Equals(cmd)) //Dac数据
+            {
+                int result =  data[0] * 256;
+                result += data[1];
+                DisPlayWindow.systemInfo.DacLenth = result;
             }
             else {
 //其他,未定义
