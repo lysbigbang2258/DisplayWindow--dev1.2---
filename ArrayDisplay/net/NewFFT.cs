@@ -44,8 +44,13 @@ namespace ArrayDisplay.net {
             }
             for (int i = 0; i < fftnumofSamples; i++)
             {
-                logMagnitudes[i] = 20.0 * Math.Log10(magnitudes[i]);
-                resultPoints[i] = new Point(xwaveform[i], logMagnitudes[i]);
+                if (Math.Abs(magnitudes[i]) < double.Epsilon) {
+                    logMagnitudes[i] = 0;
+                }
+                else {
+                    logMagnitudes[i] = 20.0 * Math.Log10(magnitudes[i]);
+                }
+                resultPoints[i] = new Point(xwaveform[i], logMagnitudes[i]); 
             }
             return resultPoints;
 

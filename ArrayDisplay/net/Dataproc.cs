@@ -132,7 +132,13 @@ namespace ArrayDisplay.net {
                 }
                 float max = EnergyFloats.Max();
                 for(int i = 0; i < EnergyFloats.Length; i++) {
-                    EnergyFloats[i] = EnergyFloats[i] / max;
+                    if (Math.Abs(max) > float.Epsilon) {
+                        EnergyFloats[i] = EnergyFloats[i] / max;
+                    }
+                    else {
+                        EnergyFloats[i] = 0;
+                    }
+                    
                 }
                 if (EnergyArrayEventHandler != null) {
                     EnergyArrayEventHandler.Invoke(null, EnergyFloats);
@@ -209,11 +215,12 @@ namespace ArrayDisplay.net {
                 FreqWaveEvent.WaitOne();
                 FreqWaveOne = TransFormFft.FFT(WorkWavefdatas);
                 var dataPoints = NewFFT.Start(WorkWavefdatas);
-                if (FrapGraphEventHandler != null) {
-                    FrapGraphEventHandler.Invoke(null, FreqWaveOne);
+//                if (FrapGraphEventHandler != null) {
+//                    FrapGraphEventHandler.Invoke(null, FreqWaveOne);
+//                }
+                if (FrapPointGraphEventHandler != null) {
+                    FrapPointGraphEventHandler(null, dataPoints);   
                 }
-
-                FrapPointGraphEventHandler(null, dataPoints);
             }
         }
 
