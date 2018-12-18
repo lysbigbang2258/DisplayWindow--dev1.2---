@@ -12,15 +12,15 @@ namespace ArrayDisplay.net {
     public class UdpWaveData:IDisposable{
         #region Field
 
-        public static bool isRunning;
-        public static LinkedList<Array> linkbuffer = new LinkedList<Array>();
+        public static bool isBuilded; //UDP是否创建
+        public static LinkedList<Array> linkbuffer = new LinkedList<Array>();//缓存数据buff
 //        public static EventHandler<byte[]> divDataEventHandler;
         public static bool isReceived;
-        public static int frameNums;
-        public static ConstUdpArg.WaveType waveType;
+        public static int frameNums; //一帧数据长度
+        public static ConstUdpArg.WaveType waveType;//波形数据类型
         public int[] channelOffsets = new int[8];
         public byte[][] detesBytes;
-        byte[] rcvBuf;
+        byte[] rcvBuf;//接收数据缓存
         readonly Socket waveSocket;
         public Dataproc wavaDataproc;
         public byte[] saveBytes; 
@@ -42,8 +42,18 @@ namespace ArrayDisplay.net {
             get;
             private set;
         }
-
-        public static EventHandler<byte[]> SaveDataEventHandler
+        /// <summary>
+        /// 正常工作数据保存方法
+        /// </summary>
+        public static EventHandler<byte[]> WorkSaveDataEventHandler
+        {
+            get;
+            set;
+        }
+        /// <summary>
+        /// 原始数据保存方法
+        /// </summary>
+        public static EventHandler<byte[]> OrigSaveDataEventHandler
         {
             get;
             set;
@@ -71,7 +81,7 @@ namespace ArrayDisplay.net {
                 waveSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
                                         ProtocolType.Udp);
                 waveSocket.Bind(ip);
-                isRunning = true;
+                isBuilded = true;
             }
             catch(Exception e) {
                 Console.WriteLine(@"创建UDP失败...错误为{0}", e);
@@ -134,7 +144,7 @@ namespace ArrayDisplay.net {
             Console.WriteLine(@"启动UDP线程...");
             Stopwatch watch = new Stopwatch();
             try {
-                while(isRunning) {
+                while(isBuilded) {
                     int index = 0;
                     while(index < frameNums) {
                         int offset = 0;
@@ -151,12 +161,13 @@ namespace ArrayDisplay.net {
                         }
                         switch(WaveType) {
                             case ConstUdpArg.WaveType.Normal:
-                                if (SaveDataEventHandler!=null) {
-                                    SaveDataEventHandler(null, rcvBuf);
+                                if (WorkSaveDataEventHandler!=null) {
+                                    WorkSaveDataEventHandler(null, rcvBuf);
                                 }
                                 PutWorkData(rcvBuf, index++);
                                 break;
                             case ConstUdpArg.WaveType.Orig:
+                                
                                 PutOrigData(rcvBuf);
                                 index++;
                                 break;
@@ -189,7 +200,7 @@ namespace ArrayDisplay.net {
                 }
             }
             catch(ThreadAbortException) {
-                isRunning = false;
+                isBuilded = false;
                 waveSocket.Close();
                 isReceived = false;
                 Console.WriteLine(@"关闭Socket...");
@@ -210,7 +221,11 @@ namespace ArrayDisplay.net {
                        temp.Length);
             channelOffsets[channel] += temp.Length;
         }
-
+        /// <summary>
+        /// 将原始数据保存到对应通道
+        /// 发送数据到保存线程
+        /// </summary>
+        /// <param name="buf"></param>
         void PutOrigData(byte[] buf) {
             var head = new byte[2];
             int offset = 0;
@@ -226,8 +241,13 @@ namespace ArrayDisplay.net {
                 timdiv = 1;
             }
             offset += head.Length;
+            byte[] data = new byte[buf.Length-2];
+            Array.Copy(buf, offset,data , 0, buf.Length-2);
+            wavaDataproc.OrigWaveBytes[channel * 8 + timdiv] = data;
 
-            Array.Copy(buf, offset, wavaDataproc.OrigWaveBytes[channel * 8 + timdiv], 0, buf.Length-2);
+            if (OrigSaveDataEventHandler!=null) {    //发送给保存线程
+                OrigSaveDataEventHandler(null, data);
+            }
         }
 
         /// <summary>
@@ -246,7 +266,7 @@ namespace ArrayDisplay.net {
         }
 
         public void Close() {
-            isRunning = false;
+            isBuilded = false;
             isReceived = false;
             linkbuffer.Clear();
             Console.WriteLine(@"关闭UDP线程...");

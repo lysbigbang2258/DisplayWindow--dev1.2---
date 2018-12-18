@@ -283,7 +283,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                                <WrapPanel Grid.ColumnSpan="3" Margin="0,0,0,305">
+                                <WrapPanel Grid.ColumnSpan="3">
                                     <Label Width="100" Height="40" HorizontalContentAlignment="Center" >帧数：</Label>
                                     <TextBox Width="100" Height="32" Name="tb_origFram" FontFamily="18" TextAlignment="Center" Text="20" />
                                     <Label Width="100" Height="40">测试通道：</Label>
@@ -294,6 +294,8 @@
                                              TextAlignment="Center" Text="1" PreviewTextInput="InputIntegerOnly" KeyDown="Tb_orgiTdiv_OnKeyDown" />
                                     <Button Width="100" Height="32" FontFamily="18" x:Name="btn_origstart"
                                             Click="OrigDataStart_OnClick" Background="#FF66EE66" Content="启动" />
+                                    <Button Content="保存数据"  Width="100" Height="32" FontFamily="18" Margin="15,0,0,0"
+                                            Click="SaveOrigData_OnClick" x:Name="btn_origsave"/>
                                 </WrapPanel>
                                 <WrapPanel Grid.ColumnSpan="3" Margin="0,41,0,254">
                                     <Label Width="100" Height="40">DAC幅值：</Label>
@@ -335,6 +337,7 @@
                                     </ni:Plot>
                                 </ni:WritableGraph.Plots>
                             </ni:WritableGraph>
+                            
                         </StackPanel>
                     </TabItem>
                     <TabItem Header="正常工作" Name="normalItems" MouseDoubleClick="NormalWave_OnMouseDoubleClick">

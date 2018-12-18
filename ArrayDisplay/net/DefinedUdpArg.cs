@@ -439,7 +439,7 @@ namespace ArrayDisplay.net {
         public const int MIN_ENERGY_PIXELS_LENGTH = 0;
         public const int DEAFULT_ENERGY_PIXELS_LENGTH = 30;
 
-        public const int ORIG_FRAME_NUMS = 20; //原始工作波形同时显示帧数
+        public const int ORIG_FRAME_NUMS = 2000; //原始工作波形同时显示帧数
         public const int ORIG_FRAME_LENGTH = 1282; //原始工作波形帧长
         public const int ORIG_DETECT_LENGTH = 64;  
         public const int ORIG_TIME_NUMS = 8;

@@ -53,7 +53,6 @@ namespace ArrayDisplay.net {
                 resultPoints[i] = new Point(xwaveform[i], logMagnitudes[i]); 
             }
             return resultPoints;
-
         }
     }
 }

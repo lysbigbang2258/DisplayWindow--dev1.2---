@@ -199,10 +199,10 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void SaveData_OnClick(object sender, RoutedEventArgs e) {
-            isSaveFlag = !isSaveFlag;
-            if (isSaveFlag) {
+            isworkSaveFlag = !isworkSaveFlag;
+            if (isworkSaveFlag) {
                 btnSave.Content = "开始保存";
-                dataFile.EnableSaveFile();
+                dataFile.EnableWorkSaveFile();
                 SelectdInfo.IsSaveData = true;
             }
 
@@ -231,12 +231,12 @@ namespace ArrayDisplay.UI {
         void WorkDataStart_OnClick(object sender, RoutedEventArgs e) {
             try {
                 udpCommand.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
-                if (!UdpWaveData.isRunning) {
+                if (!UdpWaveData.isBuilded) {
                     capudp = new UdpWaveData(ConstUdpArg.SrcNorm_WaveIp);
                     btn_normalstart.Content = "停止";
                 }
                 else {
-                    if (UdpWaveData.isRunning && UdpWaveData.WaveType == ConstUdpArg.WaveType.Normal) {
+                    if (UdpWaveData.isBuilded && UdpWaveData.WaveType == ConstUdpArg.WaveType.Normal) {
                         capudp.Close();
                         btn_normalstart.Content = "启动";
                     }
@@ -263,12 +263,12 @@ namespace ArrayDisplay.UI {
         void OrigDataStart_OnClick(object sender, RoutedEventArgs e) {
             try {
                 udpCommand.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
-                if (!UdpWaveData.isRunning) {
+                if (!UdpWaveData.isBuilded) {
                     capudp = new UdpWaveData(ConstUdpArg.Src_OrigWaveIp);
                     btn_origstart.Content = "停止";
                 }
                 else {
-                    if (UdpWaveData.isRunning && UdpWaveData.WaveType == ConstUdpArg.WaveType.Orig) {
+                    if (UdpWaveData.isBuilded && UdpWaveData.WaveType == ConstUdpArg.WaveType.Orig) {
                         capudp.Close();
                         btn_normalstart.Content = "启动";
                         orige_graph.Dispatcher.Invoke(() => {
@@ -298,12 +298,12 @@ namespace ArrayDisplay.UI {
         void DelayDataStart_OnClick(object sender, RoutedEventArgs e) {
             try {
                 udpCommand.SwitchWindow(ConstUdpArg.SwicthToDeleyWindow);
-                if (!UdpWaveData.isRunning) {
+                if (!UdpWaveData.isBuilded) {
                     capudp = new UdpWaveData(ConstUdpArg.Src_DelayWaveIp);
                     btn_delaystart.Content = "停止";
                 }
                 else {
-                    if (UdpWaveData.isRunning && UdpWaveData.WaveType == ConstUdpArg.WaveType.Delay) {
+                    if (UdpWaveData.isBuilded && UdpWaveData.WaveType == ConstUdpArg.WaveType.Delay) {
                         capudp.Close();
                         btn_delaystart.Content = "启动";
                         delay_graph.Dispatcher.Invoke(() => {
@@ -630,7 +630,8 @@ namespace ArrayDisplay.UI {
         public ConstUdpArg constUdpArg; //
         public UdpCommand udpCommand;
         //public ConstUdpArg ConstUdpArg;
-        public bool isSaveFlag;
+        public bool isworkSaveFlag;
+        public bool isorigSaveFlag;
         public int delayChannel;
 
         #endregion
@@ -979,6 +980,20 @@ namespace ArrayDisplay.UI {
 
         #endregion
 
-        
+        void SaveOrigData_OnClick(object sender, RoutedEventArgs e) {
+            isorigSaveFlag = !isorigSaveFlag;
+            if (isorigSaveFlag)
+            {
+                btn_origsave.Content = "开始保存";
+                dataFile.EnableOrigSaveFile();
+                SelectdInfo.IsSaveData = true;
+            }
+
+            else
+            {
+                btn_origsave.Content = "保存数据";
+                dataFile.DisableSaveFile();
+            }
+        }
     }
 }
