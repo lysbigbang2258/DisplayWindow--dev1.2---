@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Windows;
+using NationalInstruments.Controls;
 
 // ReSharper disable StringIndexOfIsCultureSpecific.1
 
@@ -13,12 +14,13 @@ namespace ArrayDisplay.net {
         #region Field
 
         public static bool isBuilded; //UDP是否创建
-        public static LinkedList<Array> linkbuffer = new LinkedList<Array>();//缓存数据buff
+        static LinkedList<Array> linkbuffer = new LinkedList<Array>();//缓存数据buff
 //        public static EventHandler<byte[]> divDataEventHandler;
         public static bool isReceived;
         public static int frameNums; //一帧数据长度
         public static ConstUdpArg.WaveType waveType;//波形数据类型
-        public int[] channelOffsets = new int[8];
+        int[] delaychannelOffsets = new int[8];
+        int[] origchannelOffsets = new int[64];
         public byte[][] detesBytes;
         byte[] rcvBuf;//接收数据缓存
         readonly Socket waveSocket;
@@ -187,8 +189,7 @@ namespace ArrayDisplay.net {
                         case ConstUdpArg.WaveType.Orig:
                             wavaDataproc.OrigBytesEvent.Set();
                             break;
-                        case ConstUdpArg.WaveType.Delay:
-                            channelOffsets = new int[8];
+                        case ConstUdpArg.WaveType.Delay:                            
                             wavaDataproc.DelayBytesEvent.Set();
                             break;
                         default:
@@ -217,9 +218,9 @@ namespace ArrayDisplay.net {
             int channel = head[1];
             offset += head.Length;
             Array.Copy(buf, offset, temp, 0, temp.Length);
-            Array.Copy(temp, 0, wavaDataproc.DelayWaveBytes[channel], channelOffsets[channel],
+            Array.Copy(temp, 0, wavaDataproc.DelayWaveBytes[channel], delaychannelOffsets[channel],
                        temp.Length);
-            channelOffsets[channel] += temp.Length;
+            delaychannelOffsets[channel] += temp.Length;
         }
         /// <summary>
         /// 将原始数据保存到对应通道
@@ -233,18 +234,25 @@ namespace ArrayDisplay.net {
             Array.Copy(buf, 0, head, 0, head.Length);
             int channel = head[0];
             int timdiv = head[1];
-            if (channel < 1 && channel > ConstUdpArg.ORIG_CHANNEL_NUMS) {
+            if (channel < 0 && channel > ConstUdpArg.ORIG_CHANNEL_NUMS) {
                 channel = 1;
             }
-            if (timdiv < 1 && timdiv > ConstUdpArg.ORIG_TIME_NUMS)
+            if (timdiv < 0 && timdiv > ConstUdpArg.ORIG_TIME_NUMS)
             {
                 timdiv = 1;
             }
             offset += head.Length;
             byte[] data = new byte[buf.Length-2];
             Array.Copy(buf, offset,data , 0, buf.Length-2);
-            wavaDataproc.OrigWaveBytes[channel * 8 + timdiv] = data;
-
+            var len = origchannelOffsets[channel * 8 + timdiv];
+            if (len >= wavaDataproc.OrigWaveBytes[0].Length)
+            {
+                origchannelOffsets[channel * 8 + timdiv] = 0;
+                len = 0;
+            }
+            Array.Copy(buf, offset, wavaDataproc.OrigWaveBytes[channel * 8 + timdiv], len, buf.Length - 2);
+           
+            origchannelOffsets[channel * 8 + timdiv] += data.Length;
             if (OrigSaveDataEventHandler!=null) {    //发送给保存线程
                 OrigSaveDataEventHandler(null, data);
             }

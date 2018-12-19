@@ -316,13 +316,13 @@
                             </Grid>
                             <ni:WritableGraph x:Name="orige_graph" HorizontalAlignment="Center" Height="606"
                                               VerticalAlignment="Center" Width="1249" Foreground="{x:Null}"
-                                              Background="{x:Null}" Margin="173,5,440,5">
+                                              Background="{x:Null}" >
                                 <ni:WritableGraph.Axes>
                                     <ni:AxisDouble Range="0,200" Orientation="Horizontal"
-                                                   MinorDivisions="{x:Null}" Adjuster="None" InteractionMode="None" />
+                                                   MinorDivisions="{x:Null}" Adjuster="None"  />
                                     <ni:AxisDouble Range="-1,1" Orientation="Vertical"
-                                                   MinorDivisions="{x:Null}" Adjuster="FitLoosely"
-                                                   InteractionMode="None">
+                                                   MinorDivisions="{x:Null}" Adjuster="None"
+                                                   >
                                         <ni:AxisDouble.MajorDivisions>
                                             <ni:RangeLabeledDivisions />
                                         </ni:AxisDouble.MajorDivisions>

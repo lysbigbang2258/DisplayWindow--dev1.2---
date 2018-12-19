@@ -98,20 +98,36 @@ namespace ArrayDisplay.net {
         void ThreadOrigWaveStart() {
             while(true) {
                 OrigBytesEvent.WaitOne();
-                var r = new byte[4];
+//                var r = new byte[4];
+//                for (int i = 0; i < ConstUdpArg.ORIG_DETECT_LENGTH; i++)
+//                {
+//                    for (int j = 0; j < OrigWaveBytes[0].Length / 4 - 1; j++)
+//                    {
+//                        r[0] = OrigWaveBytes[i][j * 4 + 3];
+//                        r[1] = OrigWaveBytes[i][j * 4 + 2];
+//                        r[2] = OrigWaveBytes[i][j * 4 + 1];
+//                        r[3] = OrigWaveBytes[i][j * 4];
+//                        int a = BitConverter.ToInt32(r, 0);
+//                        OrigWaveFloats[i][j] = a / (1048576*256*2.0f);
+//                    }
+//                }
+//                if (OrigGraphEventHandler !=null) {
+//                    OrigGraphEventHandler.Invoke(null, OrigWaveFloats[0]);
+//                }
+                var r = new byte[2];
                 for (int i = 0; i < ConstUdpArg.ORIG_DETECT_LENGTH; i++)
                 {
-                    for (int j = 0; j < OrigWaveBytes[0].Length / 4 - 1; j++)
+                    for (int j = 0; j < OrigWaveBytes[0].Length / 2 - 1; j++)
                     {
-                        r[0] = OrigWaveBytes[i][j * 4 + 3];
-                        r[1] = OrigWaveBytes[i][j * 4 + 2];
-                        r[2] = OrigWaveBytes[i][j * 4 + 1];
-                        r[3] = OrigWaveBytes[i][j * 4];
-                        int a = BitConverter.ToInt32(r, 0);
-                        OrigWaveFloats[i][j] = a / 1048576.0f;
+                        r[0] = OrigWaveBytes[i][j * 2 + 1];
+                        r[1] = OrigWaveBytes[i][j * 2];
+                        short a = BitConverter.ToInt16(r, 0);
+
+                        OrigWaveFloats[i][j] = a / 8192.0f;
                     }
                 }
-                if (OrigGraphEventHandler !=null) {
+                if (OrigGraphEventHandler != null)
+                {
                     OrigGraphEventHandler.Invoke(null, OrigWaveFloats[0]);
                 }
             }
