@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Forms;
@@ -32,6 +33,7 @@ namespace ArrayDisplay.UI {
             Dataproc.EnergyArrayEventHandler += OnEnergyArrayGraph; //能量图事件处理方法
             Dataproc.FrapPointGraphEventHandler += OnFrapPointGraph; //使用新FFT频域事件处理
             hMainWindow = this;
+
             systemInfo = new SystemInfo();
             SelectdInfo = new OnSelectdInfo();
             dataFile = new DataFile.DataFile();
@@ -58,6 +60,10 @@ namespace ArrayDisplay.UI {
             tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") {Source = SelectdInfo, Mode = BindingMode.TwoWay});
 
             #endregion
+
+            origChannel = 0;
+            delayChannel = 0;
+
 
             led_normaldata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
             isTabWorkGotFocus = true;
@@ -110,18 +116,18 @@ namespace ArrayDisplay.UI {
             }
             delay_graph.Dispatcher.Invoke(() => {
                                               delay_graph.DataSource = 0;
-                                              delay_graph.DataSource = e[DelayChannel];
+                                              delay_graph.DataSource = e[DelayChannel]; 
                                           });
         }
 
         /// <summary>///控件读入原始波形/// </summary>
-        void OnOrigGraph(object sender, float[] e) {
+        void OnOrigGraph(object sender, float[][] e) {
             if (e == null) {
                 return;
             }
             orige_graph.Dispatcher.Invoke(() => {
                                               orige_graph.DataSource = 0;
-                                              orige_graph.DataSource = e;
+                                              orige_graph.DataSource = e[OrigChannel];
                                           });
         }
 
@@ -359,7 +365,17 @@ namespace ArrayDisplay.UI {
 
         /// <summary>///计算B值 /// </summary>
         void Btn_calBvalue_OnClick(object sender, RoutedEventArgs e) {
-          
+            Task.Run(() => {
+                         for(int i = 0; i < ConstUdpArg.ORIG_CHANNEL_NUMS; i++) {
+                             udpCommand.WriteOrigChannel(i);
+                             for(int j = 0; j < ConstUdpArg.ORIG_TIME_NUMS; j++) {
+                                 udpCommand.WriteOrigChannel(j);
+                                 Thread.Sleep(1000);
+                             }
+                         }
+                     });
+
+
         }
 
         /// <summary>
@@ -591,8 +607,29 @@ namespace ArrayDisplay.UI {
         void SoundValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { }
 
         void Tb_deleyChannel_OnKeyDown(object sender, KeyEventArgs e) {
-            int.TryParse(tb_deleyChannel.Text, out delayChannel);
-            delayChannel -= 1;
+            TextBox tb = sender as TextBox;
+            int channel = 1;
+            if (tb != null)
+            {
+                int.TryParse(tb.Text, out channel);
+            }
+            if (e.Key == Key.Enter)
+            {
+                try
+                {
+                    if (channel < 1 || channel > 8)
+                    {
+                        tb_workChNum.Text = "1";
+                        delayChannel =1;
+                    }
+                    delayChannel = channel - 1;
+
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+            }
         }
 
         //读取B值文件中的数据
@@ -608,6 +645,18 @@ namespace ArrayDisplay.UI {
             }
             set {
                 value = delayChannel;
+            }
+        }
+
+        public int OrigChannel
+        {
+            get
+            {
+                return origChannel;
+            }
+            set
+            {
+                value = origChannel;
             }
         }
 
@@ -627,15 +676,15 @@ namespace ArrayDisplay.UI {
         //int _port;
         readonly DataFile.DataFile dataFile;
         public static int sndCoefficent = 50;
-        public static DxPlaySound dxplaysnd; //播放声音对象
+        static DxPlaySound dxplaysnd; //播放声音对象
         UdpWaveData capudp; //波形数据对象
-        public ConstUdpArg constUdpArg; //
-        public UdpCommand udpCommand;
+        ConstUdpArg constUdpArg; //
+        UdpCommand udpCommand;
         //public ConstUdpArg ConstUdpArg;
-        public bool isworkSaveFlag;
-        public bool isorigSaveFlag;
-        public int delayChannel;
-
+        bool isworkSaveFlag;
+        bool isorigSaveFlag;
+        int delayChannel;
+        int origChannel;
         #endregion
 
         //BindingSource dtBindingSource = new BindingSource();
@@ -652,6 +701,7 @@ namespace ArrayDisplay.UI {
         bool isTabAutoGotFocus;
         //标记,当前界面,多通道显示
         bool isTabMultGotFocus;
+        
 
         //Tab切换,延时校准
         void TabDelayOnGotFocus(object sender, RoutedEventArgs e) {

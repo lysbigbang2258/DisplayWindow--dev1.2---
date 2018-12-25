@@ -37,16 +37,16 @@ namespace ArrayDisplay.net {
             OrigTimeDiv = 0;
             int oFrime = ConstUdpArg.ORIG_FRAME_NUMS; //原始数据帧数
             Origdata = new byte[oFrime * arryNum];
-            int olength = ConstUdpArg.ORIG_FRAME_LENGTH; //每帧长度
+            int olength = ConstUdpArg.ORIG_FRAME_LENGTH-2; //每帧长度
             for (int i = 0; i < oNums; i++)
             {
-                OrigWaveBytes[i] = new byte[(olength-2) * oFrime];
-                OrigWaveFloats[i] = new float[(olength-2) / 2 * oFrime];
+                OrigWaveBytes[i] = new byte[olength * oFrime];
+                OrigWaveFloats[i] = new float[olength / 2 * oFrime];
             }
 
 
             int dchannels = ConstUdpArg.DELAY_FRAME_CHANNELS;
-            int dframeLen = ConstUdpArg.DELAY_FRAME_LENGTH;
+            int dframeLen = ConstUdpArg.DELAY_FRAME_LENGTH-2;
             int dframeNum = ConstUdpArg.DELAY_FRAME_NUMS;
             DelayWaveBytes = new byte[dchannels][];
             DelayWaveFloats = new float[dchannels][];
@@ -128,7 +128,7 @@ namespace ArrayDisplay.net {
                 }
                 if (OrigGraphEventHandler != null)
                 {
-                    OrigGraphEventHandler.Invoke(null, OrigWaveFloats[0]);
+                    OrigGraphEventHandler.Invoke(null, OrigWaveFloats);
                 }
             }
         }
@@ -394,7 +394,7 @@ namespace ArrayDisplay.net {
             set;
         }
 
-        public static EventHandler<float[]> OrigGraphEventHandler {
+        public static EventHandler<float[][]> OrigGraphEventHandler {
             get;
             set;
         }

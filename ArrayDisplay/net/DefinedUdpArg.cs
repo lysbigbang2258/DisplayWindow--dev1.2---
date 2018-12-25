@@ -459,6 +459,7 @@ namespace ArrayDisplay.net {
         public const int ORIG_FRAME_LENGTH = 1282; //原始工作波形帧长
         public const int ORIG_DETECT_LENGTH = 64;  
         public const int ORIG_TIME_NUMS = 8;
+        public const int ORIG_TIME_OLDNUMS= 32;
         public const int ORIG_CHANNEL_NUMS = 8;
 
         public const int DELAY_FRAME_CHANNELS = 8;

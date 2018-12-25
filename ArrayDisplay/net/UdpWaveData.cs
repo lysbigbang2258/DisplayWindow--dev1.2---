@@ -158,8 +158,7 @@ namespace ArrayDisplay.net {
                             if (Equals(senderRemote, ConstUdpArg.Dst_WorkDatIp)) offset += ret;
                         }
                         catch(Exception e) {
-                            Console.WriteLine(e);
-                            throw;
+//                            Console.WriteLine(e);
                         }
                         switch(WaveType) {
                             case ConstUdpArg.WaveType.Normal:
@@ -218,9 +217,13 @@ namespace ArrayDisplay.net {
             int channel = head[1];
             offset += head.Length;
             Array.Copy(buf, offset, temp, 0, temp.Length);
-            Array.Copy(temp, 0, wavaDataproc.DelayWaveBytes[channel], delaychannelOffsets[channel],
-                       temp.Length);
-            delaychannelOffsets[channel] += temp.Length;
+            if (delaychannelOffsets[channel] >= wavaDataproc.DelayWaveBytes[0].Length) {
+                origchannelOffsets[channel] = 0;
+            }
+
+                Array.Copy(temp, 0, wavaDataproc.DelayWaveBytes[channel], delaychannelOffsets[channel],
+                           temp.Length);
+                origchannelOffsets[channel] += temp.Length;         
         }
         /// <summary>
         /// 将原始数据保存到对应通道
