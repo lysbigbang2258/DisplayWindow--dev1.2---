@@ -13,7 +13,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ArrayDisplay.File {
+namespace ArrayDisplay.DataFile {
 
     #region 常量定义
 

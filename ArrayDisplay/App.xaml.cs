@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Windows;
-using ArrayDisplay.File;
+using ArrayDisplay.DataFile;
 using ArrayDisplay.net;
 using log4net;
 using log4net.Config;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -8,7 +9,6 @@ using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
-using ArrayDisplay.File;
 using ArrayDisplay.net;
 using ArrayDisplay.sound;
 using Binding = System.Windows.Data.Binding;
@@ -34,7 +34,7 @@ namespace ArrayDisplay.UI {
             hMainWindow = this;
             systemInfo = new SystemInfo();
             SelectdInfo = new OnSelectdInfo();
-            dataFile = new DataFile();
+            dataFile = new DataFile.DataFile();
             udpCommand = new UdpCommand();
             constUdpArg = new ConstUdpArg(); //获取Udp指令
 
@@ -330,7 +330,7 @@ namespace ArrayDisplay.UI {
             dialog.RootFolder = Environment.SpecialFolder.MyComputer;
             dialog.ShowNewFolderButton = true;
 
-            DialogResult result = dialog.ShowDialog();
+            DialogResult result = dialog.ShowDialog();                           
 
             tb_filePath.Text = dialog.SelectedPath;
         }
@@ -358,7 +358,9 @@ namespace ArrayDisplay.UI {
         }
 
         /// <summary>///计算B值 /// </summary>
-        void Btn_calBvalue_OnClick(object sender, RoutedEventArgs e) { }
+        void Btn_calBvalue_OnClick(object sender, RoutedEventArgs e) {
+          
+        }
 
         /// <summary>
         ///     打开多波形界面
@@ -623,7 +625,7 @@ namespace ArrayDisplay.UI {
         //Udp_Data _capudp;
         //string _ip;
         //int _port;
-        readonly DataFile dataFile;
+        readonly DataFile.DataFile dataFile;
         public static int sndCoefficent = 50;
         public static DxPlaySound dxplaysnd; //播放声音对象
         UdpWaveData capudp; //波形数据对象
@@ -984,7 +986,7 @@ namespace ArrayDisplay.UI {
             isorigSaveFlag = !isorigSaveFlag;
             if (isorigSaveFlag)
             {
-                btn_origsave.Content = "开始保存";
+                btn_origsave.Content = "正在保存";
                 dataFile.EnableOrigSaveFile();
                 SelectdInfo.IsSaveData = true;
             }

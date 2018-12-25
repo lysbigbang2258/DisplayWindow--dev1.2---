@@ -8,7 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using ArrayDisplay.File;
+using ArrayDisplay.DataFile;
 using Timer = System.Timers.Timer;
 
 namespace ArrayDisplay.MyUserControl.ArrayEnergy {

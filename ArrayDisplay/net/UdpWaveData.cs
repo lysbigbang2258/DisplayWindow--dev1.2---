@@ -264,8 +264,7 @@ namespace ArrayDisplay.net {
         /// <param name="buf">一帧数据，长度为1024，每4位表示1个探头数据</param>
         /// <param name="index">帧数</param>
         void PutWorkData(byte[] buf, int index) {
-            
-            var temp = new byte[4];
+            var temp = new byte[4];  
             if (!Equals(Ip, ConstUdpArg.SrcNorm_WaveIp)) return;
             for(int i = 0; i < (buf.Length / 4); i++) {
                 Array.Copy(buf, i * 4, temp, 0, temp.Length);

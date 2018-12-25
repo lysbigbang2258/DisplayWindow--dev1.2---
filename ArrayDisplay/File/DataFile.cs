@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using ArrayDisplay.net;
 using ArrayDisplay.UI;
 
-namespace ArrayDisplay.File {
+namespace ArrayDisplay.DataFile {
     public class DataFile : IDisposable {
         readonly List<byte[]> workSavelist; //保存接收数据
         readonly List<byte[]> origSavelist; //保存接收数据

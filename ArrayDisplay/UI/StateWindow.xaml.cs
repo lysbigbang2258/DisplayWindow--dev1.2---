@@ -2,7 +2,7 @@
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
-using ArrayDisplay.File;
+using ArrayDisplay.DataFile;
 using ArrayDisplay.MyUserControl.ArrayEnergy;
 using ArrayDisplay.net;
 

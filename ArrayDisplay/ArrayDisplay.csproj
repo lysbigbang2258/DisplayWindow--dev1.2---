@@ -131,6 +131,7 @@
       <DependentUpon>DisPlayWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="File\DefineConst.cs" />
+    <Compile Include="net\IniFile.cs" />
     <Compile Include="UI\StateWindow.xaml.cs">
       <DependentUpon>StateWindow.xaml</DependentUpon>
     </Compile>
@@ -194,7 +195,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\cong_黑.png" />

@@ -194,7 +194,8 @@ namespace ArrayDisplay.net {
                         Array.Copy(x, 0, PlayWaveBytes[i], j * 2, 2);
                     }
                 }
-                WorkWavefdatas = WorkWaveFloats[DisPlayWindow.SelectdInfo.WorkWaveChannel];
+                var offset = ConstUdpArg.offsetArray[DisPlayWindow.SelectdInfo.WorkWaveChannel];
+                WorkWavefdatas = WorkWaveFloats[offset];
                 //            WorkWaveTwo = WorkWaveFloats[DisPlayWindow.onSelectdInfo.WorkWaveChannel+1];
 
                 if (PreGraphEventHandler != null)
