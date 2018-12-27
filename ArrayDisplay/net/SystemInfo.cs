@@ -131,29 +131,7 @@ namespace ArrayDisplay.net {
             }
         }
 
-        public int DacLenth {
-            get
-            {
-                return  daclen;
-            }
-            set
-            {
-                daclen = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public int DacChannel {
-            get
-            {
-                return dacChannel;
-            }
-            set
-            {
-                dacChannel = value;
-                OnPropertyChanged();
-            }
-        }
+      
 
 
         #endregion
@@ -170,8 +148,7 @@ namespace ArrayDisplay.net {
         int pulseDelay = -1;
         int pulsePeriod = -1;
         int pulseWidth = -1;
-        int daclen = 3000;
-        int dacChannel = 2;
+        
         #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;

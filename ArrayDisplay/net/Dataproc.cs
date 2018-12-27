@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
 using ArrayDisplay.UI;
@@ -60,6 +61,7 @@ namespace ArrayDisplay.net {
             DelayBytesEvent = new AutoResetEvent(false);
             OrigBytesEvent = new AutoResetEvent(false);
             WorkBytesEvent = new AutoResetEvent(false);
+            OrigBvalueEvent = new AutoResetEvent(false);
 
             new Thread(ThreadOrigWaveStart) {IsBackground = true}.Start();
             new Thread(ThreadWorkWaveStart) {IsBackground = true}.Start();
@@ -67,8 +69,15 @@ namespace ArrayDisplay.net {
             new Thread(ThreadDelayWaveStart) {IsBackground = true}.Start();
             new Thread(ThreadFreqWaveStart) {IsBackground = true}.Start();
 
-            
 
+            IsBavlueReaded = false;
+
+
+        }
+
+        public static AutoResetEvent OrigBvalueEvent {
+            get;
+            set;
         }
 
         /// <summary>
@@ -98,22 +107,6 @@ namespace ArrayDisplay.net {
         void ThreadOrigWaveStart() {
             while(true) {
                 OrigBytesEvent.WaitOne();
-//                var r = new byte[4];
-//                for (int i = 0; i < ConstUdpArg.ORIG_DETECT_LENGTH; i++)
-//                {
-//                    for (int j = 0; j < OrigWaveBytes[0].Length / 4 - 1; j++)
-//                    {
-//                        r[0] = OrigWaveBytes[i][j * 4 + 3];
-//                        r[1] = OrigWaveBytes[i][j * 4 + 2];
-//                        r[2] = OrigWaveBytes[i][j * 4 + 1];
-//                        r[3] = OrigWaveBytes[i][j * 4];
-//                        int a = BitConverter.ToInt32(r, 0);
-//                        OrigWaveFloats[i][j] = a / (1048576*256*2.0f);
-//                    }
-//                }
-//                if (OrigGraphEventHandler !=null) {
-//                    OrigGraphEventHandler.Invoke(null, OrigWaveFloats[0]);
-//                }
                 var r = new byte[2];
                 for (int i = 0; i < ConstUdpArg.ORIG_DETECT_LENGTH; i++)
                 {
@@ -126,9 +119,20 @@ namespace ArrayDisplay.net {
                         OrigWaveFloats[i][j] = a / 8192.0f;
                     }
                 }
+
                 if (OrigGraphEventHandler != null)
                 {
                     OrigGraphEventHandler.Invoke(null, OrigWaveFloats);
+                }
+                if (IsBavlueReaded) {
+                    float[] bValues = new float[OrigWaveFloats.Length];
+                    for (int i = 0; i < OrigWaveFloats.Length; i++) {
+                        float[] query =( from s in OrigWaveFloats[i] orderby s select s).ToArray();
+                        var min = query[1];
+                        var max = query[query.Length - 1];
+                        bValues[i] = (max-min) / 2.0f;
+                    }
+                    OrigBvalueEventHandler(null, bValues);   
                 }
             }
         }
@@ -194,7 +198,7 @@ namespace ArrayDisplay.net {
                         Array.Copy(x, 0, PlayWaveBytes[i], j * 2, 2);
                     }
                 }
-                var offset = ConstUdpArg.offsetArray[DisPlayWindow.SelectdInfo.WorkWaveChannel];
+                var offset = ConstUdpArg.offsetArray[DisPlayWindow.selectdInfo.WorkWaveChannel];
                 WorkWavefdatas = WorkWaveFloats[offset];
                 //            WorkWaveTwo = WorkWaveFloats[DisPlayWindow.onSelectdInfo.WorkWaveChannel+1];
 
@@ -206,7 +210,7 @@ namespace ArrayDisplay.net {
 
                 if (SoundEventHandler != null)
                 {
-                    int channel = DisPlayWindow.SelectdInfo.WorkWaveChannel;
+                    int channel = DisPlayWindow.selectdInfo.WorkWaveChannel;
                     if (channel > 0)
                     {
                         SoundEventHandler.Invoke(null, PlayWaveBytes[channel]);
@@ -414,6 +418,11 @@ namespace ArrayDisplay.net {
             set;
         }
 
+        public static EventHandler<float[]> OrigBvalueEventHandler {
+            get;
+            set;
+        }
+
         /// <summary>
         ///     外界数据
         /// </summary>
@@ -505,6 +514,10 @@ namespace ArrayDisplay.net {
             set;
         }
 
+        public static bool IsBavlueReaded {
+            get;
+            set;
+        }
         #endregion
     }
 }

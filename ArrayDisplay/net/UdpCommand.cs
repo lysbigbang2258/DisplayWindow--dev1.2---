@@ -172,7 +172,7 @@ namespace ArrayDisplay.net {
         /// <summary>///读取延时信息/// </summary>
         public void ReadCanChannelLen()
         {
-            var sedip = ConstUdpArg.GetCanChannelReadCommand(DisPlayWindow.systemInfo.DacChannel);
+            var sedip = ConstUdpArg.GetCanChannelReadCommand(DisPlayWindow.selectdInfo.DacChannel);
             Send(sedip, ConstUdpArg.Dst_ComMsgIp);
             ReceiveCanChannelLen(20);
         }
@@ -605,11 +605,11 @@ namespace ArrayDisplay.net {
                 int delaytime = BitConverter.ToUInt16(data, 0);
                 DisPlayWindow.systemInfo.ChannelDelayTime = delaytime;
             }
-            else if (Encoding.ASCII.GetString(ConstUdpArg.GetCanChannelReadCommand(DisPlayWindow.systemInfo.DacChannel), 0, 6).Equals(cmd)) //Dac数据
+            else if (Encoding.ASCII.GetString(ConstUdpArg.GetCanChannelReadCommand(DisPlayWindow.selectdInfo.DacChannel), 0, 6).Equals(cmd)) //Dac数据
             {
                 int result =  data[0] * 256;
                 result += data[1];
-                DisPlayWindow.systemInfo.DacLenth = result;
+                DisPlayWindow.selectdInfo.DacLenth = result;
             }
             else {
 //其他,未定义

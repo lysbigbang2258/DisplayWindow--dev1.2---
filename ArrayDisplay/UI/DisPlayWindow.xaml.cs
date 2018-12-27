@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using ArrayDisplay.net;
 using ArrayDisplay.sound;
 using Binding = System.Windows.Data.Binding;
@@ -32,13 +33,13 @@ namespace ArrayDisplay.UI {
 //          Dataproc.FrapGraphEventHandler += OnFrapGraph; //Work频域波形事件处理方法
             Dataproc.EnergyArrayEventHandler += OnEnergyArrayGraph; //能量图事件处理方法
             Dataproc.FrapPointGraphEventHandler += OnFrapPointGraph; //使用新FFT频域事件处理
+            Dataproc.OrigBvalueEventHandler += OnBvalueMethod;  //获取B值
             hMainWindow = this;
 
             systemInfo = new SystemInfo();
-            SelectdInfo = new OnSelectdInfo();
+            selectdInfo = new OnSelectdInfo();
             dataFile = new DataFile.DataFile();
             udpCommand = new UdpCommand();
-            constUdpArg = new ConstUdpArg(); //获取Udp指令
 
             #region UI绑定
 
@@ -50,21 +51,23 @@ namespace ArrayDisplay.UI {
             tb_setting_pulse_width.SetBinding(TextBox.TextProperty, new Binding("PulseWidth") {Source = systemInfo});
             tb_setting_adc_offset.SetBinding(TextBox.TextProperty, new Binding("AdcOffset") {Source = systemInfo});
 
-
             tb_deleyTime.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayTime") {Source = systemInfo});
             tb_deleyChannel.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayNums") {Source = systemInfo});
 
-            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") {Source = systemInfo});
-            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") {Source = systemInfo});
+            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") { Source = selectdInfo });
+            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") { Source = selectdInfo });
 
-            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") {Source = SelectdInfo, Mode = BindingMode.TwoWay});
+            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") {Source = selectdInfo, Mode = BindingMode.TwoWay});
 
             #endregion
 
-            origChannel = 0;
-            delayChannel = 0;
+            OrigChannel = 0;
+            DelayChannel = 0;
+            OrigTiv = 0;
 
-
+            timer_bvalue = new DispatcherTimer();
+            timer_blist = new DispatcherTimer();
+            Bvalues = new float[ConstUdpArg.ORIG_CHANNEL_NUMS * ConstUdpArg.ORIG_TIME_NUMS];
             led_normaldata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
             isTabWorkGotFocus = true;
             //测试,关闭数据接收
@@ -76,15 +79,47 @@ namespace ArrayDisplay.UI {
             //UdpCommand.GetDeviceState();
         }
 
+        
+
+        #region  基础功能
+
+        /// <summary>
+        ///     ///文本框只允许输入数字
+        ///     /// 脉冲周期/脉冲延时/脉冲宽度///
+        /// </summary>
+        void InputIntegerOnly(object sender, TextCompositionEventArgs e) {
+            //throw new NotImplementedException();
+            Regex re = new Regex("[^0-9.-]+");
+            if (e != null) {
+                e.Handled = re.IsMatch(e.Text);
+            }
+        }
+
+        #endregion
+
+        void SaveOrigData_OnClick(object sender, RoutedEventArgs e) {
+            isorigSaveFlag = !isorigSaveFlag;
+            if (isorigSaveFlag) {
+                btn_origsave.Content = "正在保存";
+                dataFile.EnableOrigSaveFile();
+                selectdInfo.IsSaveData = true;
+            }
+
+            else {
+                btn_origsave.Content = "保存数据";
+                dataFile.DisableSaveFile();
+            }
+        }
+
         #region 读取波形数据
 
         /// <summary>///控件读入能量图波形/// </summary>
         void OnEnergyArrayGraph(object sender, float[] e) {
             int len = ConstUdpArg.ARRAY_USED;
             var graphdata = new float[len];
-            
+
             Array.Copy(e, 0, graphdata, 0, len);
-            
+
             for(int i = 0; i < len; i++) {
                 if (Math.Abs(graphdata[i]) < double.Epsilon) {
                     graphdata[i] = 0;
@@ -116,7 +151,7 @@ namespace ArrayDisplay.UI {
             }
             delay_graph.Dispatcher.Invoke(() => {
                                               delay_graph.DataSource = 0;
-                                              delay_graph.DataSource = e[DelayChannel]; 
+                                              delay_graph.DataSource = e[DelayChannel];
                                           });
         }
 
@@ -127,7 +162,7 @@ namespace ArrayDisplay.UI {
             }
             orige_graph.Dispatcher.Invoke(() => {
                                               orige_graph.DataSource = 0;
-                                              orige_graph.DataSource = e[OrigChannel];
+                                              orige_graph.DataSource = e[OrigChannel * ConstUdpArg.ORIG_CHANNEL_NUMS +OrigTiv];
                                           });
         }
 
@@ -161,22 +196,12 @@ namespace ArrayDisplay.UI {
                                                     });
         }
 
-        #endregion
-
-        #region  基础功能
-        /// <summary>
-        ///     ///文本框只允许输入数字
-        ///     /// 脉冲周期/脉冲延时/脉冲宽度///
-        /// </summary>
-        void InputIntegerOnly(object sender, TextCompositionEventArgs e)
-        {
-            //throw new NotImplementedException();
-            Regex re = new Regex("[^0-9.-]+");
-            if (e != null)
-            {
-                e.Handled = re.IsMatch(e.Text);
-            }
+        void OnBvalueMethod(object sender, float[] e) {
+            if (e!=null && e.Length == Bvalues.Length) {
+                e.CopyTo(Bvalues, 0);
+            }            
         }
+
         #endregion
 
         #region 点击响应函数
@@ -209,7 +234,7 @@ namespace ArrayDisplay.UI {
             if (isworkSaveFlag) {
                 btnSave.Content = "开始保存";
                 dataFile.EnableWorkSaveFile();
-                SelectdInfo.IsSaveData = true;
+                selectdInfo.IsSaveData = true;
             }
 
             else {
@@ -271,12 +296,14 @@ namespace ArrayDisplay.UI {
                 udpCommand.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
                 if (!UdpWaveData.isBuilded) {
                     capudp = new UdpWaveData(ConstUdpArg.Src_OrigWaveIp);
+                    udpCommand.WriteOrigChannel(OrigChannel);
+                    udpCommand.WriteOrigTDiv(OrigTiv);
                     btn_origstart.Content = "停止";
                 }
                 else {
                     if (UdpWaveData.isBuilded && UdpWaveData.WaveType == ConstUdpArg.WaveType.Orig) {
                         capudp.Close();
-                        btn_normalstart.Content = "启动";
+                        btn_origstart.Content = "启动";
                         orige_graph.Dispatcher.Invoke(() => {
                                                           orige_graph.DataSource = 0;
                                                       });
@@ -336,7 +363,7 @@ namespace ArrayDisplay.UI {
             dialog.RootFolder = Environment.SpecialFolder.MyComputer;
             dialog.ShowNewFolderButton = true;
 
-            DialogResult result = dialog.ShowDialog();                           
+            DialogResult result = dialog.ShowDialog();
 
             tb_filePath.Text = dialog.SelectedPath;
         }
@@ -364,17 +391,28 @@ namespace ArrayDisplay.UI {
         }
 
         /// <summary>///计算B值 /// </summary>
-        void Btn_calBvalue_OnClick(object sender, RoutedEventArgs e) {
+        void CalBvalue_OnClick(object sender, RoutedEventArgs e) {
+            Dataproc.IsBavlueReaded = true;
+//            OrigDataStart_OnClick(null,null);
             Task.Run(() => {
-                         for(int i = 0; i < ConstUdpArg.ORIG_CHANNEL_NUMS; i++) {
-                             udpCommand.WriteOrigChannel(i);
-                             for(int j = 0; j < ConstUdpArg.ORIG_TIME_NUMS; j++) {
-                                 udpCommand.WriteOrigChannel(j);
-                                 Thread.Sleep(1000);
-                             }
-                         }
+                               for(int i = 0; i < ConstUdpArg.ORIG_CHANNEL_NUMS; i++) {
+                                   udpCommand.WriteOrigChannel(i);
+                                   for(int j = 0; j < ConstUdpArg.ORIG_TIME_NUMS; j++) {
+                                       udpCommand.WriteOrigTDiv(j);
+                                       Thread.Sleep(200);
+                                   }
+                               }
+                         Thread.Sleep(1000);
+                         blistBox.Dispatcher.Invoke(() => {
+                                                        blistBox.Items.Clear();
+                                                        foreach(float bvalue in Bvalues) {
+                                                            blistBox.Items.Add(bvalue);
+                                                        }
+                                                    });
+                         MessageBox.Show("B值计算成功");
+                         IsGetBvalue = true;
                      });
-
+            
 
         }
 
@@ -387,26 +425,69 @@ namespace ArrayDisplay.UI {
             StateWindow win = new StateWindow();
             win.ShowDialog();
         }
+
         /// <summary>
-        /// 计算C值
+        ///     计算C值
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void CalCanCvalue_OnClick(object sender, RoutedEventArgs e) {
-            var daclen = 0;
+            int daclen = 0;
             int.TryParse(tb_dacLen.Text, out daclen);
-            if (daclen!=0) {
-                var tmp = daclen * 0.754;
-                var result = Math.Round(tmp, MidpointRounding.AwayFromZero);//实现四舍五入
+            if (daclen != 0) {
+                double tmp = daclen * 0.754;
+                double result = Math.Round(tmp, MidpointRounding.AwayFromZero); //实现四舍五入
                 tb_dacCvalue.Text = result.ToString();
+            }
+        }
+        /// <summary>
+        ///     计算B值
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void GetBvalue_OnClick(object sender, RoutedEventArgs e) {
+
+            if (!timer_bvalue.IsEnabled) {
+                timer_bvalue.Interval = new TimeSpan(0, 0, 1);
+                Dataproc.IsBavlueReaded = true;
+                timer_bvalue.Start();
+                timer_bvalue.Tick += TimerTick_Bvalue;
+            }
+            else {
+                timer_bvalue.Stop();
+                Dataproc.IsBavlueReaded = false;
+            }
+        }
+
+        void TimerTick_Bvalue(object sender, EventArgs e) {
+            var value = Bvalues[OrigChannel * 8 + OrigTiv];
+            if (Math.Abs(value) > float.Epsilon)
+            {
+                tb_bValue.Text = value.ToString();
+            }
+        }
+
+        /// <summary>
+        /// 发送B值
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void SendBvalue_OnClick(object sender, RoutedEventArgs e) {
+            var resultvalue = new float[Bvalues.Length];
+            if (IsGetBvalue)
+            {
+                for(int i = 0; i < resultvalue.Length; i++) {
+                    if (Math.Abs(Bvalues[i]) > float.Epsilon) {
+                        resultvalue[i] = 1 / Bvalues[i];
+                    }
+                }
             }
             
         }
+
         #endregion
 
         #region 控件响应函数
-
-        
 
         /// <summary>
         ///     可调整值的TextBox上滚轮动作响应(整数)
@@ -536,15 +617,15 @@ namespace ArrayDisplay.UI {
             TextBox tb = sender as TextBox;
             int workchNum = 1;
             if (tb != null) {
-                int.TryParse(tb.Text,out workchNum);
+                int.TryParse(tb.Text, out workchNum);
             }
             if (e.Key == Key.Enter) {
                 try {
                     if (workchNum < 1 || workchNum > 256) {
                         tb_workChNum.Text = "1";
-                        SelectdInfo.WorkWaveChannel = 1;
+                        selectdInfo.WorkWaveChannel = 1;
                     }
-                    SelectdInfo.WorkWaveChannel = workchNum;
+                    selectdInfo.WorkWaveChannel = workchNum;
                 }
                 catch(Exception) {
                     // ignored
@@ -562,19 +643,18 @@ namespace ArrayDisplay.UI {
                 TextBox tb = sender as TextBox;
                 int num = 1;
                 if (tb != null) {
-                    int.TryParse(tb.Text,out num);
+                    int.TryParse(tb.Text, out num);
                 }
                 try {
                     if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS) {
-                        num = 1;
                         tb_origChannel.Text = "1";
-                        return;
                     }
+                    OrigChannel = num - 1;
                 }
                 catch(Exception) {
                     // ignored
                 }
-                udpCommand.WriteOrigChannel(num);
+                udpCommand.WriteOrigChannel(num - 1);
             }
         }
 
@@ -586,21 +666,22 @@ namespace ArrayDisplay.UI {
         void Tb_orgiTdiv_OnKeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter) {
                 TextBox tb = sender as TextBox;
-                int num = 1;
+                int num = 0;
                 if (tb != null) {
                     int.TryParse(tb.Text, out num);
                 }
                 try {
-                    if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS) {
+                    if (num < 1 || num > ConstUdpArg.ORIG_TIME_NUMS) {
                         num = 1;
                         tb_orgiTdiv.Text = "1";
-                        return;
                     }
+                    OrigTiv = num - 1;
                 }
                 catch(Exception) {
                     // ignored
                 }
-                udpCommand.WriteOrigTDiv(num);
+
+                udpCommand.WriteOrigTDiv(num-1);
             }
         }
 
@@ -609,24 +690,17 @@ namespace ArrayDisplay.UI {
         void Tb_deleyChannel_OnKeyDown(object sender, KeyEventArgs e) {
             TextBox tb = sender as TextBox;
             int channel = 1;
-            if (tb != null)
-            {
+            if (tb != null) {
                 int.TryParse(tb.Text, out channel);
             }
-            if (e.Key == Key.Enter)
-            {
-                try
-                {
-                    if (channel < 1 || channel > 8)
-                    {
-                        tb_workChNum.Text = "1";
-                        delayChannel =1;
+            if (e.Key == Key.Enter) {
+                try {
+                    if (channel < 1 || channel > 8) {
+                        tb_deleyChannel.Text = "1";
                     }
-                    delayChannel = channel - 1;
-
+                    DelayChannel = channel - 1;
                 }
-                catch (Exception)
-                {
+                catch(Exception) {
                     // ignored
                 }
             }
@@ -639,31 +713,38 @@ namespace ArrayDisplay.UI {
 
         #region Property
 
-        public int DelayChannel {
-            get {
-                return delayChannel;
-            }
-            set {
-                value = delayChannel;
-            }
-        }
-
-        public int OrigChannel
-        {
-            get
-            {
-                return origChannel;
-            }
-            set
-            {
-                value = origChannel;
-            }
-        }
-
-        public static OnSelectdInfo SelectdInfo {
+        int DelayChannel {
             get;
             set;
         }
+
+        int OrigChannel {
+            get;
+            set;
+        }
+
+        public static OnSelectdInfo selectdInfo {
+            get;
+            set;
+        }
+
+        public int OrigTiv {
+            get;
+            set;
+        }
+
+        public float[] Bvalues {
+            get;
+            set;
+        }
+
+        public bool IsGetBvalue {
+            get;
+            set;
+        }
+
+       
+
 
         #endregion
 
@@ -678,13 +759,15 @@ namespace ArrayDisplay.UI {
         public static int sndCoefficent = 50;
         static DxPlaySound dxplaysnd; //播放声音对象
         UdpWaveData capudp; //波形数据对象
-        ConstUdpArg constUdpArg; //
-        UdpCommand udpCommand;
+        readonly UdpCommand udpCommand;
         //public ConstUdpArg ConstUdpArg;
         bool isworkSaveFlag;
         bool isorigSaveFlag;
-        int delayChannel;
         int origChannel;
+
+       readonly DispatcherTimer timer_bvalue;
+      readonly  DispatcherTimer timer_blist;
+
         #endregion
 
         //BindingSource dtBindingSource = new BindingSource();
@@ -701,7 +784,6 @@ namespace ArrayDisplay.UI {
         bool isTabAutoGotFocus;
         //标记,当前界面,多通道显示
         bool isTabMultGotFocus;
-        
 
         //Tab切换,延时校准
         void TabDelayOnGotFocus(object sender, RoutedEventArgs e) {
@@ -977,8 +1059,7 @@ namespace ArrayDisplay.UI {
 
         void DacLenWrite_OnClick(object sender, RoutedEventArgs e) {
             string strT = tb_dacLen.Text;
-            if (string.IsNullOrEmpty(strT))
-            {
+            if (string.IsNullOrEmpty(strT)) {
                 return;
             }
             int t = int.Parse(strT);
@@ -988,8 +1069,7 @@ namespace ArrayDisplay.UI {
 
         void DacLenSave_OnClick(object sender, RoutedEventArgs e) {
             string strT = tb_deleyTime.Text;
-            if (string.IsNullOrEmpty(strT))
-            {
+            if (string.IsNullOrEmpty(strT)) {
                 return;
             }
             int intT = int.Parse(strT);
@@ -997,14 +1077,13 @@ namespace ArrayDisplay.UI {
             int b = intT - a * 256;
 
             var data = new byte[2];
-            data.SetValue((byte)a, 0);
-            data.SetValue((byte)b, 1);
+            data.SetValue((byte) a, 0);
+            data.SetValue((byte) b, 1);
 
             udpCommand.SaveDelayTime(data);
         }
-        #endregion
 
-        
+        #endregion
 
         #endregion
 
@@ -1032,20 +1111,6 @@ namespace ArrayDisplay.UI {
 
         #endregion
 
-        void SaveOrigData_OnClick(object sender, RoutedEventArgs e) {
-            isorigSaveFlag = !isorigSaveFlag;
-            if (isorigSaveFlag)
-            {
-                btn_origsave.Content = "正在保存";
-                dataFile.EnableOrigSaveFile();
-                SelectdInfo.IsSaveData = true;
-            }
-
-            else
-            {
-                btn_origsave.Content = "保存数据";
-                dataFile.DisableSaveFile();
-            }
-        }
+        
     }
 }
