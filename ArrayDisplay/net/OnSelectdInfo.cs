@@ -12,6 +12,8 @@ namespace ArrayDisplay.net {
 
         int workWaveChannel = 0;
         bool isSaveData;
+        int daclen = 3000;
+        int dacChannel = 2;
 
         #endregion
 
@@ -36,6 +38,32 @@ namespace ArrayDisplay.net {
             set
             {
                 isSaveData = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int DacLenth
+        {
+            get
+            {
+                return daclen;
+            }
+            set
+            {
+                daclen = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int DacChannel
+        {
+            get
+            {
+                return dacChannel;
+            }
+            set
+            {
+                dacChannel = value;
                 OnPropertyChanged();
             }
         }
