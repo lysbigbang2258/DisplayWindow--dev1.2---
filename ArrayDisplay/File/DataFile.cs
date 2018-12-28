@@ -48,7 +48,7 @@ namespace ArrayDisplay.DataFile {
                 DateTime dt = DateTime.Now;
                 StringBuilder sb = new StringBuilder();
                 sb.Append("file_");
-                sb.Append(DisPlayWindow.selectdInfo.WorkWaveChannel.ToString("d3"));
+                sb.Append(DisPlayWindow.SelectdInfo.WorkWaveChannel.ToString("d3"));
                 sb.Append("_");
                 sb.Append(dt.Year.ToString("d4"));
                 sb.Append("-");

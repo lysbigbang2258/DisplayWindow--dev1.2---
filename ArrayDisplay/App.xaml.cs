@@ -11,7 +11,6 @@ namespace ArrayDisplay {
     /// </summary>
     public class App : Application {
         public static ILog log = LogManager.GetLogger("MyLogger");
-        public Dataproc proc;
 
         protected override void OnStartup(StartupEventArgs e) {
             RelativeDirectory rd = new RelativeDirectory();
