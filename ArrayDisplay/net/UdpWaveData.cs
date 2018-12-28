@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Windows;
+using ArrayDisplay.UI;
 using NationalInstruments.Controls;
 
 // ReSharper disable StringIndexOfIsCultureSpecific.1
@@ -107,7 +108,7 @@ namespace ArrayDisplay.net {
         void OrigInit() {
             waveSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH *
                                            ConstUdpArg.ORIG_FRAME_NUMS * 2;
-            frameNums = ConstUdpArg.ORIG_FRAME_NUMS;
+            frameNums =DisPlayWindow.SelectdInfo.OrigFramNums;
             rcvBuf = new byte[ConstUdpArg.ORIG_FRAME_LENGTH];
             Normalthread = new Thread(WaveThreadStart) {
                 IsBackground = true,
@@ -158,7 +159,7 @@ namespace ArrayDisplay.net {
                             if (Equals(senderRemote, ConstUdpArg.Dst_WorkDatIp)) offset += ret;
                         }
                         catch(Exception e) {
-//                            Console.WriteLine(e);
+                            Console.WriteLine(e);
                         }
                         switch(WaveType) {
                             case ConstUdpArg.WaveType.Normal:
@@ -243,7 +244,7 @@ namespace ArrayDisplay.net {
                 len = 0;
             }
             Array.Copy(buf, offset, wavaDataproc.OrigWaveBytes[channel * 8 + timdiv], len, buf.Length - 2);
-           
+            wavaDataproc.IsRcvChanneldata[channel * 8 + timdiv] = 1;
             origchannelOffsets[channel * 8 + timdiv] += data.Length;
             if (OrigSaveDataEventHandler!=null) {    //发送给保存线程
                 OrigSaveDataEventHandler(null, data);

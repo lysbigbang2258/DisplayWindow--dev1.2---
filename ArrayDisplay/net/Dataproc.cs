@@ -63,16 +63,15 @@ namespace ArrayDisplay.net {
             WorkBytesEvent = new AutoResetEvent(false);
             OrigBvalueEvent = new AutoResetEvent(false);
 
+            IsRcvChanneldata = new int[64]; //8时分8空分
             new Thread(ThreadOrigWaveStart) {IsBackground = true}.Start();
             new Thread(ThreadWorkWaveStart) {IsBackground = true}.Start();
             new Thread(ThreadEnergyStart) {IsBackground = true}.Start();
             new Thread(ThreadDelayWaveStart) {IsBackground = true}.Start();
             new Thread(ThreadFreqWaveStart) {IsBackground = true}.Start();
 
-
             IsBavlueReaded = false;
-
-
+           
         }
 
         public static AutoResetEvent OrigBvalueEvent {
@@ -124,18 +123,26 @@ namespace ArrayDisplay.net {
                 {
                     OrigGraphEventHandler.Invoke(null, OrigWaveFloats);
                 }
-                if (IsBavlueReaded) {
-                    float[] bValues = new float[OrigWaveFloats.Length];
+                var nums = 0;
+                foreach(int i in IsRcvChanneldata) {
+                    nums += i;
+                }
+
+                if (IsBavlueReaded && nums == 64) {
                     for (int i = 0; i < OrigWaveFloats.Length; i++) {
                         float[] query =( from s in OrigWaveFloats[i] orderby s select s).ToArray();
                         var min = query[1];
                         var max = query[query.Length - 1];
-                        bValues[i] = (max-min) / 2.0f;
+                        mianWindow.Bvalues[i] = (max-min) / 2.0f;
                     }
-                    OrigBvalueEventHandler(null, bValues);   
+                    IsGetBvalue = true;
+                    IsRcvChanneldata = new int[64];
                 }
             }
         }
+
+        
+
         /// <summary>
         ///线程处理函数：能量数据处理
         /// </summary>
@@ -198,7 +205,7 @@ namespace ArrayDisplay.net {
                         Array.Copy(x, 0, PlayWaveBytes[i], j * 2, 2);
                     }
                 }
-                var offset = ConstUdpArg.offsetArray[DisPlayWindow.selectdInfo.WorkWaveChannel];
+                var offset = ConstUdpArg.offsetArray[DisPlayWindow.SelectdInfo.WorkWaveChannel];
                 WorkWavefdatas = WorkWaveFloats[offset];
                 //            WorkWaveTwo = WorkWaveFloats[DisPlayWindow.onSelectdInfo.WorkWaveChannel+1];
 
@@ -210,7 +217,7 @@ namespace ArrayDisplay.net {
 
                 if (SoundEventHandler != null)
                 {
-                    int channel = DisPlayWindow.selectdInfo.WorkWaveChannel;
+                    int channel = DisPlayWindow.SelectdInfo.WorkWaveChannel;
                     if (channel > 0)
                     {
                         SoundEventHandler.Invoke(null, PlayWaveBytes[channel]);
@@ -418,11 +425,6 @@ namespace ArrayDisplay.net {
             set;
         }
 
-        public static EventHandler<float[]> OrigBvalueEventHandler {
-            get;
-            set;
-        }
-
         /// <summary>
         ///     外界数据
         /// </summary>
@@ -516,6 +518,18 @@ namespace ArrayDisplay.net {
 
         public static bool IsBavlueReaded {
             get;
+            set;
+        }
+
+        public int[] IsRcvChanneldata {
+            get;
+            set;
+        }
+
+        
+        public bool IsGetBvalue {
+            get;
+
             set;
         }
         #endregion

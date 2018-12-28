@@ -14,7 +14,7 @@ namespace ArrayDisplay.net {
         bool isSaveData;
         int daclen = 3000;
         int dacChannel = 2;
-
+        int origFrams = 20;
         #endregion
 
         #region Property 
@@ -66,6 +66,18 @@ namespace ArrayDisplay.net {
                 dacChannel = value;
                 OnPropertyChanged();
             }
+        }
+
+        public int OrigFramNums {
+            get
+            {
+                return origFrams;
+            }
+            set
+            {
+                origFrams = value;
+                OnPropertyChanged();
+            } 
         }
 
         #endregion

@@ -138,7 +138,7 @@ namespace ArrayDisplay.net {
 
         #region Field
 
-        int adcNum = -1;
+        int adcNum = 1;
         string adcOffset = string.Empty;
         int channelDelayNums = 1;
         int channelDelayTime = 0;

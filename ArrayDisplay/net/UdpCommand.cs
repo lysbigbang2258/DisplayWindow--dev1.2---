@@ -15,6 +15,7 @@ namespace ArrayDisplay.net {
             rcvsocket.ReceiveTimeout = 5000;
             sedsocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             sedsocket.SendTimeout = 5000;
+            Init();
         }
 
         /// <summary>
@@ -22,6 +23,8 @@ namespace ArrayDisplay.net {
         /// </summary>
         public void Init() {
             try {
+                SedIp = ConstUdpArg.Src_ComMsgIp;
+                RcvIp = ConstUdpArg.Src_ComDatIp;
                 rcvsocket.Bind(RcvIp);
                 sedsocket.Bind(SedIp);
 
@@ -36,8 +39,6 @@ namespace ArrayDisplay.net {
         /// <summary>///切换功能窗口（波形或命令）/// </summary>
         public void SwitchWindow(byte[] cmdBytes) {
             if (!isSocketInit) {
-                SedIp = ConstUdpArg.Src_ComMsgIp;
-                RcvIp = ConstUdpArg.Src_ComDatIp;
                 Init();
             }
             var tempBytes = new byte[8];
@@ -172,7 +173,7 @@ namespace ArrayDisplay.net {
         /// <summary>///读取延时信息/// </summary>
         public void ReadCanChannelLen()
         {
-            var sedip = ConstUdpArg.GetCanChannelReadCommand(DisPlayWindow.selectdInfo.DacChannel);
+            var sedip = ConstUdpArg.GetDacChannelReadCommand(DisPlayWindow.SelectdInfo.DacChannel-1);
             Send(sedip, ConstUdpArg.Dst_ComMsgIp);
             ReceiveCanChannelLen(20);
         }
@@ -201,8 +202,7 @@ namespace ArrayDisplay.net {
         /// <summary>写:ADC偏移</summary>
         /// <param name="data">数据8bit,[(配置值+1.2)/1.2]*128</param>
         public void WriteAdcOffset(byte data) {
-            int adcNum = int.Parse(DisPlayWindow.hMainWindow.setting_adc_num.Text);
-            var addr = ConstUdpArg.GetAdcOffsetWrite(adcNum);
+            var addr = ConstUdpArg.GetAdcOffsetWrite(DisPlayWindow.systemInfo.AdcNum);
             var sendData = new byte[addr.Length + 1];
             Array.Copy(addr, sendData, addr.Length);
 
@@ -215,7 +215,7 @@ namespace ArrayDisplay.net {
         /// <summary>写:脉冲宽度</summary>
         /// <param name="data">数据,16bit,配置值/5</param>
         public void WriteDelayTime(byte[] data) {
-            var tmp = ConstUdpArg.GetDelayTimeWriteCommand(int.Parse(DisPlayWindow.hMainWindow.tb_deleyChannel.Text) - 1);
+            var tmp = ConstUdpArg.GetDelayTimeWriteCommand(int.Parse(DisPlayWindow.hMainWindow.tb_deleyChannel.Text)-1);
             WriteData(tmp, data);
         }
 
@@ -286,8 +286,8 @@ namespace ArrayDisplay.net {
         /// <summary>存:ADC偏移</summary>
         /// <param name="data">数据8bit,[(配置值+1.2)/1.2]*128</param>
         public void SaveAdcOffset(byte data) {
-            int adcNum = int.Parse(DisPlayWindow.hMainWindow.setting_adc_num.Text);
-            var addr = ConstUdpArg.GetAdcOffsetSave(adcNum);
+           
+            var addr = ConstUdpArg.GetAdcOffsetSave(DisPlayWindow.systemInfo.AdcNum);
             var sendData = new byte[addr.Length + 1];
             Array.Copy(addr, sendData, addr.Length);
 
@@ -366,7 +366,7 @@ namespace ArrayDisplay.net {
                                       }
                                       catch(Exception e) {
                                           Console.WriteLine(e);
-                                          throw;
+                                         
                                       }
                                       Console.WriteLine("发送数据:{0}", BitConverter.ToString(sendbytes, 0, sendbytes.Length));
 
@@ -381,7 +381,7 @@ namespace ArrayDisplay.net {
                                               }
                                               catch(Exception e) {
                                                   Console.WriteLine(e);
-                                                  throw;
+                                                  
                                               }
                                           var flagBytes = new byte[8];
                                           Array.Copy(rcvUdpBuffer, 0, flagBytes, 0, 8);
@@ -390,7 +390,7 @@ namespace ArrayDisplay.net {
                                       }
                                       catch(Exception e) {
                                           Console.WriteLine(e);
-                                          throw;
+                                        
                                       }
                                   });
         }
@@ -456,9 +456,8 @@ namespace ArrayDisplay.net {
         }
      
         public void ReceivePulsePeriod(int bufferLength) {
-            var rcvUdpBuffer = ReadRemote(bufferLength);
-
             Task.Factory.StartNew(() => {
+                                      var rcvUdpBuffer = ReadRemote(bufferLength);
                                       //返回数据以指令为开头
                                       var cmd = new byte[6];
                                       Array.Copy(rcvUdpBuffer, 0, cmd, 0, 6);
@@ -559,7 +558,7 @@ namespace ArrayDisplay.net {
             }
             catch(Exception e) {
                 Console.WriteLine(e);
-                throw;
+                return null;
             }
 
             return rcvUdpBuffer;
@@ -605,11 +604,11 @@ namespace ArrayDisplay.net {
                 int delaytime = BitConverter.ToUInt16(data, 0);
                 DisPlayWindow.systemInfo.ChannelDelayTime = delaytime;
             }
-            else if (Encoding.ASCII.GetString(ConstUdpArg.GetCanChannelReadCommand(DisPlayWindow.selectdInfo.DacChannel), 0, 6).Equals(cmd)) //Dac数据
+            else if (Encoding.ASCII.GetString(ConstUdpArg.GetDacChannelReadCommand(DisPlayWindow.SelectdInfo.DacChannel-1), 0, 6).Equals(cmd)) //Dac数据
             {
                 int result =  data[0] * 256;
                 result += data[1];
-                DisPlayWindow.selectdInfo.DacLenth = result;
+                DisPlayWindow.SelectdInfo.DacLenth = result;
             }
             else {
 //其他,未定义

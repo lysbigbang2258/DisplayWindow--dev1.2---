@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -33,13 +32,14 @@ namespace ArrayDisplay.UI {
 //          Dataproc.FrapGraphEventHandler += OnFrapGraph; //Work频域波形事件处理方法
             Dataproc.EnergyArrayEventHandler += OnEnergyArrayGraph; //能量图事件处理方法
             Dataproc.FrapPointGraphEventHandler += OnFrapPointGraph; //使用新FFT频域事件处理
-            Dataproc.OrigBvalueEventHandler += OnBvalueMethod;  //获取B值
+
             hMainWindow = this;
 
             systemInfo = new SystemInfo();
-            selectdInfo = new OnSelectdInfo();
+            SelectdInfo = new OnSelectdInfo();
             dataFile = new DataFile.DataFile();
             udpCommand = new UdpCommand();
+            
 
             #region UI绑定
 
@@ -50,14 +50,16 @@ namespace ArrayDisplay.UI {
             tb_setting_pulse_delay.SetBinding(TextBox.TextProperty, new Binding("PulseDelay") {Source = systemInfo});
             tb_setting_pulse_width.SetBinding(TextBox.TextProperty, new Binding("PulseWidth") {Source = systemInfo});
             tb_setting_adc_offset.SetBinding(TextBox.TextProperty, new Binding("AdcOffset") {Source = systemInfo});
+            tb_setting_adc_num.SetBinding(TextBox.TextProperty, new Binding("AdcNum") {Source = systemInfo});
 
+            tb_origFram.SetBinding(TextBox.TextProperty, new Binding("OrigFramNums") {Source = SelectdInfo});
             tb_deleyTime.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayTime") {Source = systemInfo});
             tb_deleyChannel.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayNums") {Source = systemInfo});
 
-            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") { Source = selectdInfo });
-            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") { Source = selectdInfo });
+            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") {Source = SelectdInfo});
+            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") {Source = SelectdInfo});
 
-            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") {Source = selectdInfo, Mode = BindingMode.TwoWay});
+            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") {Source = SelectdInfo, Mode = BindingMode.TwoWay});
 
             #endregion
 
@@ -65,21 +67,20 @@ namespace ArrayDisplay.UI {
             DelayChannel = 0;
             OrigTiv = 0;
 
+            Bvalues = new float[ConstUdpArg.ORIG_TIME_NUMS * ConstUdpArg.ORIG_CHANNEL_NUMS];
+
             timer_bvalue = new DispatcherTimer();
             timer_blist = new DispatcherTimer();
-            Bvalues = new float[ConstUdpArg.ORIG_CHANNEL_NUMS * ConstUdpArg.ORIG_TIME_NUMS];
             led_normaldata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
             isTabWorkGotFocus = true;
             //测试,关闭数据接收
-            udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+//            udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
             //isTabWorkGotFocus = true;
             //启动后等待0.5秒 自动加载一次系统状态参数
             //new Thread(LoadSystemInfo).Start();
             //Thread.Sleep(500);
             //UdpCommand.GetDeviceState();
         }
-
-        
 
         #region  基础功能
 
@@ -102,7 +103,7 @@ namespace ArrayDisplay.UI {
             if (isorigSaveFlag) {
                 btn_origsave.Content = "正在保存";
                 dataFile.EnableOrigSaveFile();
-                selectdInfo.IsSaveData = true;
+                SelectdInfo.IsSaveData = true;
             }
 
             else {
@@ -162,7 +163,7 @@ namespace ArrayDisplay.UI {
             }
             orige_graph.Dispatcher.Invoke(() => {
                                               orige_graph.DataSource = 0;
-                                              orige_graph.DataSource = e[OrigChannel * ConstUdpArg.ORIG_CHANNEL_NUMS +OrigTiv];
+                                              orige_graph.DataSource = e[OrigChannel * ConstUdpArg.ORIG_CHANNEL_NUMS + OrigTiv];
                                           });
         }
 
@@ -196,12 +197,6 @@ namespace ArrayDisplay.UI {
                                                     });
         }
 
-        void OnBvalueMethod(object sender, float[] e) {
-            if (e!=null && e.Length == Bvalues.Length) {
-                e.CopyTo(Bvalues, 0);
-            }            
-        }
-
         #endregion
 
         #region 点击响应函数
@@ -214,14 +209,17 @@ namespace ArrayDisplay.UI {
         /// <param name="e"></param>
         void GetState_OnClick(object sender, RoutedEventArgs e) {
             //切换到系统设置状态
-            //UdpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
-            try {
-                //发送查询指令
-                udpCommand.GetDeviceState();
-            }
-            catch(Exception exception) {
-                Console.WriteLine(exception);
-            }
+            Task.Run(() => {
+                         udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+                         try {
+                             //发送查询指令
+                             udpCommand.GetDeviceState();
+                             Thread.Sleep(1000);
+                         }
+                         catch(Exception exception) {
+                             Console.WriteLine(exception);
+                         }
+                     });
         }
 
         /// <summary>
@@ -234,7 +232,7 @@ namespace ArrayDisplay.UI {
             if (isworkSaveFlag) {
                 btnSave.Content = "开始保存";
                 dataFile.EnableWorkSaveFile();
-                selectdInfo.IsSaveData = true;
+                SelectdInfo.IsSaveData = true;
             }
 
             else {
@@ -395,25 +393,26 @@ namespace ArrayDisplay.UI {
             Dataproc.IsBavlueReaded = true;
 //            OrigDataStart_OnClick(null,null);
             Task.Run(() => {
-                               for(int i = 0; i < ConstUdpArg.ORIG_CHANNEL_NUMS; i++) {
-                                   udpCommand.WriteOrigChannel(i);
-                                   for(int j = 0; j < ConstUdpArg.ORIG_TIME_NUMS; j++) {
-                                       udpCommand.WriteOrigTDiv(j);
-                                       Thread.Sleep(200);
-                                   }
-                               }
+                         for(int i = 0; i < ConstUdpArg.ORIG_CHANNEL_NUMS; i++) {
+                             udpCommand.WriteOrigChannel(i);
+                             for(int j = 0; j < ConstUdpArg.ORIG_TIME_NUMS; j++) {
+                                 udpCommand.WriteOrigTDiv(j);
+                                 Thread.Sleep(200);
+                             }
+                         }
                          Thread.Sleep(1000);
                          blistBox.Dispatcher.Invoke(() => {
-                                                        blistBox.Items.Clear();
-                                                        foreach(float bvalue in Bvalues) {
-                                                            blistBox.Items.Add(bvalue);
+                                                        if (true) {
+                                                            blistBox.Items.Clear();
+                                                            foreach(float bvalue in Bvalues) {
+                                                                blistBox.Items.Add(bvalue);
+                                                            }
+                                                            
+                                                            MessageBox.Show("B值计算成功");
+                                                            IsGetBvalue = true;
                                                         }
                                                     });
-                         MessageBox.Show("B值计算成功");
-                         IsGetBvalue = true;
                      });
-            
-
         }
 
         /// <summary>
@@ -440,13 +439,13 @@ namespace ArrayDisplay.UI {
                 tb_dacCvalue.Text = result.ToString();
             }
         }
+
         /// <summary>
         ///     计算B值
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void GetBvalue_OnClick(object sender, RoutedEventArgs e) {
-
             if (!timer_bvalue.IsEnabled) {
                 timer_bvalue.Interval = new TimeSpan(0, 0, 1);
                 Dataproc.IsBavlueReaded = true;
@@ -460,29 +459,24 @@ namespace ArrayDisplay.UI {
         }
 
         void TimerTick_Bvalue(object sender, EventArgs e) {
-            var value = Bvalues[OrigChannel * 8 + OrigTiv];
-            if (Math.Abs(value) > float.Epsilon)
-            {
+            float value = Bvalues[OrigChannel * 8 + OrigTiv];
+            if (Math.Abs(value) > float.Epsilon) {
                 tb_bValue.Text = value.ToString();
             }
         }
 
         /// <summary>
-        /// 发送B值
+        ///     发送B值
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void SendBvalue_OnClick(object sender, RoutedEventArgs e) {
             var resultvalue = new float[Bvalues.Length];
-            if (IsGetBvalue)
-            {
+            if (IsGetBvalue) {
                 for(int i = 0; i < resultvalue.Length; i++) {
-                    if (Math.Abs(Bvalues[i]) > float.Epsilon) {
-                        resultvalue[i] = 1 / Bvalues[i];
-                    }
+                    if (Math.Abs(Bvalues[i]) > float.Epsilon) { }
                 }
             }
-            
         }
 
         #endregion
@@ -623,9 +617,9 @@ namespace ArrayDisplay.UI {
                 try {
                     if (workchNum < 1 || workchNum > 256) {
                         tb_workChNum.Text = "1";
-                        selectdInfo.WorkWaveChannel = 1;
+                        SelectdInfo.WorkWaveChannel = 1;
                     }
-                    selectdInfo.WorkWaveChannel = workchNum;
+                    SelectdInfo.WorkWaveChannel = workchNum;
                 }
                 catch(Exception) {
                     // ignored
@@ -681,7 +675,7 @@ namespace ArrayDisplay.UI {
                     // ignored
                 }
 
-                udpCommand.WriteOrigTDiv(num-1);
+                udpCommand.WriteOrigTDiv(num - 1);
             }
         }
 
@@ -723,7 +717,7 @@ namespace ArrayDisplay.UI {
             set;
         }
 
-        public static OnSelectdInfo selectdInfo {
+        public static OnSelectdInfo SelectdInfo {
             get;
             set;
         }
@@ -743,9 +737,6 @@ namespace ArrayDisplay.UI {
             set;
         }
 
-       
-
-
         #endregion
 
         #region 字段
@@ -760,13 +751,14 @@ namespace ArrayDisplay.UI {
         static DxPlaySound dxplaysnd; //播放声音对象
         UdpWaveData capudp; //波形数据对象
         readonly UdpCommand udpCommand;
+        readonly Dataproc dataproc;
         //public ConstUdpArg ConstUdpArg;
         bool isworkSaveFlag;
         bool isorigSaveFlag;
         int origChannel;
 
-       readonly DispatcherTimer timer_bvalue;
-      readonly  DispatcherTimer timer_blist;
+        readonly DispatcherTimer timer_bvalue;
+        readonly DispatcherTimer timer_blist;
 
         #endregion
 
@@ -1110,7 +1102,5 @@ namespace ArrayDisplay.UI {
         }
 
         #endregion
-
-        
     }
 }

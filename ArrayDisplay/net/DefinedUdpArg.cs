@@ -310,12 +310,12 @@ namespace ArrayDisplay.net {
             channel.SetValue((byte) (channel[5] + (idcNum - 1) * 2), 5);
             return channel;
         }
-        /// <summary>读指令:延时通道</summary>
-        public static byte[] GetCanChannelReadCommand(int idcNum)
+        /// <summary>读指令:DacChannel</summary>
+        public static byte[] GetDacChannelReadCommand(int idcNum)
         {
             var channel = new byte[dacChannel_Read.Length];
             Array.Copy(dacChannel_Read, 0, channel, 0, dacChannel_Read.Length);
-            channel.SetValue((byte)(channel[5] + (idcNum - 1)*2), 5);
+            channel.SetValue((byte)(channel[5] + (idcNum)*2), 5);
             return channel;
         }
 
@@ -324,7 +324,7 @@ namespace ArrayDisplay.net {
         public static byte[] GetDelayTimeWriteCommand(int idcNum) {
             var channel = new byte[DelayChannel_Write.Length];
             Array.Copy(DelayChannel_Write, 0, channel, 0, DelayChannel_Write.Length);
-            channel.SetValue((byte) (channel[5] + (idcNum - 1) * 2), 5);
+            channel.SetValue((byte) (channel[5] + idcNum * 2), 5);
             return channel;
         }
 

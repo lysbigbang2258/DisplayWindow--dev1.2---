@@ -106,18 +106,19 @@
                     <Grid Grid.Row="2" Margin="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="89*" />
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="154*" />
+                            <ColumnDefinition Width="48*"/>
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="脉冲延时：" HorizontalAlignment="Left" />
                         <TextBox Grid.Column="1" x:Name="tb_setting_pulse_delay" HorizontalAlignment="Left"
                                  MinWidth="100"
                                  TextWrapping="Wrap" Text="" VerticalAlignment="Center"
                                  PreviewTextInput="InputIntegerOnly" MouseWheel="TextboxOnMouseWheel"
-                                 input:InputMethod.IsInputMethodEnabled="False" />
-                        <Label Content="ns" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" />
-                        <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="5" HorizontalAlignment="Right">
+                                 input:InputMethod.IsInputMethodEnabled="False" Grid.ColumnSpan="2" Margin="0,2,0,1" />
+                        <Label Content="ns" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.ColumnSpan="2" Margin="0.25,0,0,0" />
+                        <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="0,5,4.75,5" HorizontalAlignment="Right" Grid.ColumnSpan="2">
                             <Button Content="读" HorizontalAlignment="Left" VerticalAlignment="Center"
                                     Width="30" Height="30" Click="OnPulseDelayRead_OnClick" />
                             <Button Content="写" HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -167,17 +168,11 @@
                                  input:InputMethod.IsInputMethodEnabled="False" />
                         <Label Grid.Column="2" Content="V" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <Label Grid.Column="3" Content="ADC：" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        <ComboBox Grid.Column="4" x:Name="setting_adc_num" HorizontalAlignment="Center"
-                                  VerticalAlignment="Center" Width="60" SelectedIndex="0">
-                            <ComboBoxItem Content="1" HorizontalAlignment="Left" Width="50" />
-                            <ComboBoxItem Content="2" HorizontalAlignment="Left" Width="50" />
-                            <ComboBoxItem Content="3" HorizontalAlignment="Left" Width="50" />
-                            <ComboBoxItem Content="4" HorizontalAlignment="Left" Width="50" />
-                            <ComboBoxItem Content="5" HorizontalAlignment="Left" Width="50" />
-                            <ComboBoxItem Content="6" HorizontalAlignment="Left" Width="50" />
-                            <ComboBoxItem Content="7" HorizontalAlignment="Left" Width="50" />
-                            <ComboBoxItem Content="8" HorizontalAlignment="Left" Width="50" />
-                        </ComboBox>
+
+                        <TextBox Grid.Column="4" x:Name="tb_setting_adc_num" HorizontalAlignment="Left"
+                                 TextWrapping="Wrap" Text="1" VerticalAlignment="Center" MinWidth="100" 
+                                 input:InputMethod.IsInputMethodEnabled="False"/>
+                        
                         <StackPanel Grid.Column="5" Orientation="Horizontal" Margin="5" HorizontalAlignment="Right">
                             <Button Content="读" HorizontalAlignment="Left" VerticalAlignment="Center" Width="30"
                                     Height="30" Click="OnAdcOffsetRead_OnClick" />
@@ -280,85 +275,85 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition/>
+                            </Grid.RowDefinitions>
+
+                            <Grid Height="100" Grid.Row="0" Grid.Column="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="224*" />
+                                    <ColumnDefinition Width="25*" />
+                                    <ColumnDefinition Width="1613*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                          
-                                <Grid Height="100" Grid.Row="0" Grid.Column="0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="224*" />
-                                        <ColumnDefinition Width="25*" />
-                                        <ColumnDefinition Width="1613*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <WrapPanel Grid.ColumnSpan="3" Grid.Row="0">
-                                        <Label Width="100" Height="40" HorizontalContentAlignment="Center" >帧数：</Label>
-                                        <TextBox Width="100" Height="32" Name="tb_origFram" FontFamily="18" TextAlignment="Center" Text="20" />
-                                        <Label Width="100" Height="40">测试通道：</Label>
-                                        <TextBox Width="100" Height="32" Name="tb_origChannel" FontFamily="18" Margin="0,0,5,0"
+                                <WrapPanel Grid.ColumnSpan="3" Grid.Row="0">
+                                    <Label Width="100" Height="40" HorizontalContentAlignment="Center" >帧数：</Label>
+                                    <TextBox Width="100" Height="32" Name="tb_origFram" FontFamily="18" TextAlignment="Center" Text="20" />
+                                    <Label Width="100" Height="40">测试通道：</Label>
+                                    <TextBox Width="100" Height="32" Name="tb_origChannel" FontFamily="18" Margin="0,0,5,0"
                                              TextAlignment="Center" Text="1" PreviewTextInput="InputIntegerOnly" KeyDown="Tb_origChannel_OnKeyDown" />
-                                        <Label Width="100" Height="40" Margin="0,0,5,0">测试时分：</Label>
-                                        <TextBox Width="100" Height="32" Name="tb_orgiTdiv" FontFamily="18" Margin="0,0,5,0"
+                                    <Label Width="100" Height="40" Margin="0,0,5,0">测试时分：</Label>
+                                    <TextBox Width="100" Height="32" Name="tb_orgiTdiv" FontFamily="18" Margin="0,0,5,0"
                                              TextAlignment="Center" Text="1" PreviewTextInput="InputIntegerOnly" KeyDown="Tb_orgiTdiv_OnKeyDown" />
-                                        <Button Content="保存数据"  Width="100" Height="32" FontFamily="18" Margin="15,0,0,0"
+                                    <Button Content="保存数据"  Width="100" Height="32" FontFamily="18" Margin="15,0,0,0"
                                             Click="SaveOrigData_OnClick" x:Name="btn_origsave"/>
-                                        <Button Width="100" Height="32" FontFamily="18" x:Name="btn_origstart"  
+                                    <Button Width="100" Height="32" FontFamily="18" x:Name="btn_origstart"  
                                             Click="OrigDataStart_OnClick" Background="#FF66EE66" Content="启动"  Margin="15,0,0,0"/>
 
-                                    </WrapPanel>
-                                    <WrapPanel Grid.ColumnSpan="3" Grid.Row="1" >
-                                        <Label Width="100" Height="40">DAC幅值：</Label>
-                                        <TextBox Width="100" Height="32" Name="tb_dacLen" FontFamily="18" TextAlignment="Center"  Text="3000"/>
-                                        <Label Width="100" Height="40">DAC通道：</Label>
-                                        <TextBox Width="100" Height="32" Name="tb_dacChannel" FontFamily="18" Text="1" TextAlignment="Center" />
-                                        <Button Content="读" Width="100" Height="40" 
+                                </WrapPanel>
+                                <WrapPanel Grid.ColumnSpan="3" Grid.Row="1" >
+                                    <Label Width="100" Height="40">DAC幅值：</Label>
+                                    <TextBox Width="100" Height="32" Name="tb_dacLen" FontFamily="18" TextAlignment="Center"  Text="3000"/>
+                                    <Label Width="100" Height="40">DAC通道：</Label>
+                                    <TextBox Width="100" Height="32" Name="tb_dacChannel" FontFamily="18" Text="1" TextAlignment="Center" />
+                                    <Button Content="读" Width="100" Height="40" 
                                     	VerticalContentAlignment="Center" Margin="5,0,5,0" Click="DacLenRead_OnClick" />
-                                        <Button Content="写" Width="100" Height="40" 
+                                    <Button Content="写" Width="100" Height="40" 
                                             VerticalContentAlignment="Center" Margin="0,0,5,0" Click="DacLenWrite_OnClick" />
-                                        <Button Content="存" Width="100" Height="40"  Margin="0,0,5,0" Click="DacLenSave_OnClick" /> 
-                                        
-                                    </WrapPanel>
-                                </Grid >  
-                                <Grid Height="100" Grid.Row="0" Grid.Column="1">
-                                    <StackPanel>
+                                    <Button Content="存" Width="100" Height="40"  Margin="0,0,5,0" Click="DacLenSave_OnClick" />
+
+                                </WrapPanel>
+                            </Grid >
+                            <Grid Height="100" Grid.Row="0" Grid.Column="1">
+                                <StackPanel>
                                     <WrapPanel HorizontalAlignment="Right">
-                                            <Label Width="140" Height="40" Margin="5"  Content="C值DAC幅度："/>
+                                        <Label Width="140" Height="40" Margin="5"  Content="C值DAC幅度："/>
                                         <TextBox Width="100" Height="32" FontFamily="18" TextAlignment="Center"  Name="tb_dacCvalue" IsReadOnly="True" Background="Azure"/>
-                                            <Button Content="计算" Width="100" Height="40" Margin="5"  Click="CalCanCvalue_OnClick"/>
-                                        </WrapPanel>
-                                        <WrapPanel HorizontalAlignment="Right">
-                                            <Label Width="140" Height="40" Margin="5"  Content="B值："/>
+                                        <Button Content="计算" Width="100" Height="40" Margin="5"  Click="CalCanCvalue_OnClick"/>
+                                    </WrapPanel>
+                                    <WrapPanel HorizontalAlignment="Right">
+                                        <Label Width="140" Height="40" Margin="5"  Content="B值："/>
                                         <TextBox Width="100" Height="32" FontFamily="18" TextAlignment="Center" Name="tb_bValue" IsReadOnly="True" Background="Azure"/>
-                                            <Button Content="计算" Width="100" Height="40" Margin="5"  Click="GetBvalue_OnClick"/>
-                                        </WrapPanel>
+                                        <Button Content="计算" Width="100" Height="40" Margin="5"  Click="GetBvalue_OnClick"/>
+                                    </WrapPanel>
                                 </StackPanel>
-                               
+
                             </Grid>
-                                <ni:WritableGraph Grid.Row="1" Grid.Column="0" x:Name="orige_graph" HorizontalAlignment="Left" Height="606"
+                            <ni:WritableGraph Grid.Row="1" Grid.Column="0" x:Name="orige_graph" HorizontalAlignment="Left" Height="606"
                                               VerticalAlignment="Center" Width="1000" Foreground="{x:Null}"
                                               Background="{x:Null}" >
-                                    <ni:WritableGraph.Axes>
-                                        <ni:AxisDouble Range="0,200" Orientation="Horizontal"
+                                <ni:WritableGraph.Axes>
+                                    <ni:AxisDouble Range="0,200" Orientation="Horizontal"
                                                    MinorDivisions="{x:Null}" Adjuster="None"  />
-                                        <ni:AxisDouble Range="-1,1" Orientation="Vertical"
+                                    <ni:AxisDouble Range="-1,1" Orientation="Vertical"
                                                    MinorDivisions="{x:Null}" Adjuster="None"
                                                    >
-                                            <ni:AxisDouble.MajorDivisions>
-                                                <ni:RangeLabeledDivisions />
-                                            </ni:AxisDouble.MajorDivisions>
-                                            <ni:AxisDouble.MajorGridLines>
-                                                <ni:GridLines />
-                                            </ni:AxisDouble.MajorGridLines>
-                                        </ni:AxisDouble>
-                                    </ni:WritableGraph.Axes>
-                                    <ni:WritableGraph.Plots>
-                                        <ni:Plot>
-                                            <ni:LinePlotRenderer Stroke="Green" />
-                                        </ni:Plot>
-                                    </ni:WritableGraph.Plots>
-                                </ni:WritableGraph>
-                        </Grid>  
+                                        <ni:AxisDouble.MajorDivisions>
+                                            <ni:RangeLabeledDivisions />
+                                        </ni:AxisDouble.MajorDivisions>
+                                        <ni:AxisDouble.MajorGridLines>
+                                            <ni:GridLines />
+                                        </ni:AxisDouble.MajorGridLines>
+                                    </ni:AxisDouble>
+                                </ni:WritableGraph.Axes>
+                                <ni:WritableGraph.Plots>
+                                    <ni:Plot>
+                                        <ni:LinePlotRenderer Stroke="Green" />
+                                    </ni:Plot>
+                                </ni:WritableGraph.Plots>
+                            </ni:WritableGraph>
+                        </Grid>
                     </TabItem>
                     <TabItem Header="正常工作" Name="normalItems" MouseDoubleClick="NormalWave_OnMouseDoubleClick">
                         <Grid Background="#FFE5E5E5" ShowGridLines="True">
@@ -555,7 +550,7 @@
                             <StackPanel Grid.Row="1">
                                 <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Height="464" Width="464" HorizontalAlignment="Left">
                                     <ListBox Name="blistBox" Width="464" HorizontalAlignment="Left" >
-                                        
+
                                     </ListBox>
                                 </ScrollViewer>
                             </StackPanel>
