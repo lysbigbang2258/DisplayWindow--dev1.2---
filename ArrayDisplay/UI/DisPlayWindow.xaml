@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ni="http://schemas.ni.com/controls/2009/xaml/presentation"
         xmlns:input="clr-namespace:System.Windows.Input;assembly=PresentationCore"
+        xmlns:ui="clr-namespace:ArrayDisplay.UI"
         Height="1080" Width="1920"
         WindowState="Maximized"
         WindowStyle="None"
@@ -10,6 +11,9 @@
         Topmost="False"
         Title="水声信号分析系统 - 调试中心"
         Background="#FFE5E5E5">
+    <Window.Resources>
+        <ui:IndexConver x:Key="MyIndexConverter" />
+    </Window.Resources>
     <Viewbox>
         <Grid ShowGridLines="False" Height="1105" Width="1977">
             <Grid.RowDefinitions>
@@ -543,17 +547,28 @@
                                 	VerticalContentAlignment="Center" Margin="5,0,5,0" />
                                 <Button Name="btn_calBvalue" Click="CalBvalue_OnClick" Content="求B"  Width="100" Height="32" FontFamily="18"
                                         VerticalContentAlignment="Center" Margin="5,0,5,0" />
+                                <ProgressBar Name="bvaulue_pgbar" HorizontalAlignment="Left" Height="20" Margin="10" VerticalAlignment="Top" Width="100"
+                                             Minimum="0" Maximum="100">
+                                </ProgressBar>
                                 <Button Content="发送参数" Width="100" Height="32" FontFamily="18"
                                         VerticalContentAlignment="Center" Margin="0,0,5,0" Click="SendBvalue_OnClick"/>
                                 <Button Content="保留参数" Width="100" Height="32" FontFamily="18" Margin="0,0,5,0" Click="SaveBvalue_OnClick" />
                             </WrapPanel>
-                            <StackPanel Grid.Row="1">
-                                <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Height="464" Width="464" HorizontalAlignment="Left">
-                                    <ListBox Name="blistBox" Width="464" HorizontalAlignment="Left" >
-
-                                    </ListBox>
-                                </ScrollViewer>
-                            </StackPanel>
+                            <WrapPanel Grid.Row="1" Margin="10">
+                                    <ListView Name="blistview" Width="464" Height="500" HorizontalAlignment="Left" >
+                                             <ListView.View>
+                                                  
+                                                 <GridView>
+                                            <GridViewColumn Header="序号" Width="200"
+                                                            DisplayMemberBinding="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ListViewItem}},Converter={StaticResource MyIndexConverter}}" />
+                                            <GridViewColumn Header="B值" Width="200" DisplayMemberBinding="{Binding ChannelBvalue}"></GridViewColumn>
+                                          
+                                                 </GridView>
+                                             </ListView.View>
+                                    </ListView>
+                                
+                            </WrapPanel>
+                            
 
                         </Grid>
 

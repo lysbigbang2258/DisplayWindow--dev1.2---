@@ -36,7 +36,7 @@ namespace ArrayDisplay.net {
             OrigWaveFloats = new float[oNums][];
             OrigChannnel = 0;
             OrigTimeDiv = 0;
-            int oFrime = ConstUdpArg.ORIG_FRAME_NUMS; //原始数据帧数
+            int oFrime = DisPlayWindow.SelectdInfo.OrigFramNums; //原始数据帧数
             Origdata = new byte[oFrime * arryNum];
             int olength = ConstUdpArg.ORIG_FRAME_LENGTH-2; //每帧长度
             for (int i = 0; i < oNums; i++)

@@ -1,20 +1,29 @@
 ﻿using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using ArrayDisplay.net;
 using ArrayDisplay.sound;
 using Binding = System.Windows.Data.Binding;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using ListView = System.Windows.Controls.ListView;
+using ListViewItem = System.Windows.Controls.ListViewItem;
 using MessageBox = System.Windows.MessageBox;
+using Orientation = System.Windows.Controls.Orientation;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace ArrayDisplay.UI {
@@ -39,8 +48,9 @@ namespace ArrayDisplay.UI {
             SelectdInfo = new OnSelectdInfo();
             dataFile = new DataFile.DataFile();
             udpCommand = new UdpCommand();
-            
 
+            observableCollection = new ObservableCollection<UIBValue>();
+            blistview.ItemsSource = observableCollection;
             #region UI绑定
 
             tb_state_mc_type.SetBinding(TextBox.TextProperty, new Binding("McType") {Source = systemInfo});
@@ -73,6 +83,9 @@ namespace ArrayDisplay.UI {
             timer_blist = new DispatcherTimer();
             led_normaldata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
             isTabWorkGotFocus = true;
+
+
+            stopwatch = new Stopwatch();
             //测试,关闭数据接收
 //            udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
             //isTabWorkGotFocus = true;
@@ -367,32 +380,56 @@ namespace ArrayDisplay.UI {
         }
 
         void SaveBvalue_OnClick(object sender, RoutedEventArgs e) {
+            string dirpath = tb_filePath.Text;
+            string filename = "B值.txt";
+            string filepath = dirpath + "\\" + filename;
+            using (FileStream fs = new FileStream(filepath, FileMode.Create, FileAccess.Write)) {
+                using (StreamWriter sw = new StreamWriter(fs, Encoding.GetEncoding("gb2312")))
+                {
+                    if (Bvalues == null) {
+                        return;
+                    }
+                    for(int i = 0; i < Bvalues.Length; i++) {
+                        string tmp = string.Format("第{0}个探头值为：{1}", i+1, Bvalues[i]);
+                        sw.WriteLine(tmp);
+                    }
+                }
+               
+                
+            }
+        }
+
+        void readBvalue() {
             string filepath = tb_filePath.Text;
             string filename = "Test.txt";
             string filedata = filepath + "\\" + filename;
-            using(FileStream fs = new FileStream(filedata, FileMode.Open, FileAccess.Read)) {
-                using(StreamReader sr = new StreamReader(fs, Encoding.GetEncoding("gb2312"))) {
+            using (FileStream fs = new FileStream(filedata, FileMode.Open, FileAccess.Read))
+            {
+                using (StreamReader sr = new StreamReader(fs, Encoding.GetEncoding("gb2312")))
+                {
                     string line;
                     string pattern = @"[+-]?\d+[\.]?\d*"; //包括带小数点的数字和整数
 
-                    while((line = sr.ReadLine()) != null) {
+                    while ((line = sr.ReadLine()) != null)
+                    {
                         Console.WriteLine(line);
                         MatchCollection matchCollection = Regex.Matches(line, pattern);
                         Match newMatch = matchCollection[1];
                         Console.WriteLine(newMatch.Value);
-                        //                        foreach(Match match in matchCollection) {
-                        //                            Console.WriteLine(match.Value);
-                        //                        }
                     }
                 }
             }
         }
 
+
         /// <summary>///计算B值 /// </summary>
         void CalBvalue_OnClick(object sender, RoutedEventArgs e) {
             Dataproc.IsBavlueReaded = true;
-//            OrigDataStart_OnClick(null,null);
+            stopwatch.Start();
+           
+
             Task.Run(() => {
+                         Thread.Sleep(3000);
                          for(int i = 0; i < ConstUdpArg.ORIG_CHANNEL_NUMS; i++) {
                              udpCommand.WriteOrigChannel(i);
                              for(int j = 0; j < ConstUdpArg.ORIG_TIME_NUMS; j++) {
@@ -401,18 +438,21 @@ namespace ArrayDisplay.UI {
                              }
                          }
                          Thread.Sleep(1000);
-                         blistBox.Dispatcher.Invoke(() => {
+                         blistview.Dispatcher.Invoke(() => {
                                                         if (true) {
-                                                            blistBox.Items.Clear();
+                                                            observableCollection.Clear();
                                                             foreach(float bvalue in Bvalues) {
-                                                                blistBox.Items.Add(bvalue);
+                                                                observableCollection.Add(new UIBValue(bvalue));
                                                             }
-                                                            
+                                                            stopwatch.Stop();
+                                                            Console.WriteLine(stopwatch.ElapsedMilliseconds/1000);
                                                             MessageBox.Show("B值计算成功");
                                                             IsGetBvalue = true;
                                                         }
                                                     });
+
                      });
+            
         }
 
         /// <summary>
@@ -471,11 +511,8 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void SendBvalue_OnClick(object sender, RoutedEventArgs e) {
-            var resultvalue = new float[Bvalues.Length];
-            if (IsGetBvalue) {
-                for(int i = 0; i < resultvalue.Length; i++) {
-                    if (Math.Abs(Bvalues[i]) > float.Epsilon) { }
-                }
+            for(int i = 0; i < 64; i++) {
+                observableCollection.Add(new UIBValue(i));
             }
         }
 
@@ -732,6 +769,7 @@ namespace ArrayDisplay.UI {
             set;
         }
 
+        
         public bool IsGetBvalue {
             get;
             set;
@@ -760,6 +798,8 @@ namespace ArrayDisplay.UI {
         readonly DispatcherTimer timer_bvalue;
         readonly DispatcherTimer timer_blist;
 
+        ObservableCollection<UIBValue> observableCollection;
+        Stopwatch stopwatch;
         #endregion
 
         //BindingSource dtBindingSource = new BindingSource();
@@ -982,6 +1022,9 @@ namespace ArrayDisplay.UI {
             }
 
             float floatT = float.Parse(strT);
+            if (floatT > 0.5) {
+                floatT = 0.5f;
+            }
             int tmpT = (int) ((floatT + 1.2) * 128 / 1.2);
 
             udpCommand.WriteAdcOffset((byte) tmpT);
@@ -1103,4 +1146,28 @@ namespace ArrayDisplay.UI {
 
         #endregion
     }
+
+    [ValueConversion(typeof(Int32), typeof(System.Windows.Controls.ListViewItem))]
+    public class IndexConver : IValueConverter
+    {
+        #region Implementation of IValueConverter
+
+        /// <inheritdoc />
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            System.Windows.Controls.ListViewItem item = value as ListViewItem;
+            System.Windows.Controls.ListView listView = ItemsControl.ItemsControlFromItemContainer(item) as ListView;
+
+            return listView != null && item != null ? (object)(listView.ItemContainerGenerator.IndexFromContainer(item) + 1) : null;
+        }
+
+        /// <inheritdoc />
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+    }
+
 }
