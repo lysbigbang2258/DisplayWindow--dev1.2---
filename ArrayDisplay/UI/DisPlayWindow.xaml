@@ -99,7 +99,7 @@
 
                         <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="5" HorizontalAlignment="Right">
                             <Button Content="读" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                    Width="30" Height="30" Click="OnPulsePeriodRead_OnClick" />
+                                    Width="30" Height="30" Click="OnPulsePeriodRead_OnClick" Name="btn_readpluseperiod" />
                             <Button Content="写" HorizontalAlignment="Left" VerticalAlignment="Center"
                                     Width="30" Height="30" Click="OnPulsePeriodWrite_OnClick" />
                             <Button Content="存" HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -176,7 +176,7 @@
                         <TextBox Grid.Column="4" x:Name="tb_setting_adc_num" HorizontalAlignment="Left"
                                  TextWrapping="Wrap" Text="1" VerticalAlignment="Center" MinWidth="100" 
                                  input:InputMethod.IsInputMethodEnabled="False"/>
-                        
+
                         <StackPanel Grid.Column="5" Orientation="Horizontal" Margin="5" HorizontalAlignment="Right">
                             <Button Content="读" HorizontalAlignment="Left" VerticalAlignment="Center" Width="30"
                                     Height="30" Click="OnAdcOffsetRead_OnClick" />
@@ -192,7 +192,7 @@
                     <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right"
                                 VerticalAlignment="Top">
                         <Button VerticalAlignment="Center" HorizontalAlignment="Center" Width="36" Height="36"
-                                ToolTip="加载系统状态参数" Click='GetState_OnClick'>
+                                ToolTip="加载系统状态参数" Click='GetState_OnClick' Name="btn_getState">
                             <Button.Background>
                                 <ImageBrush ImageSource="/ArrayDisplay;component/Resource/刷新_黑.png" />
                             </Button.Background>
@@ -283,15 +283,16 @@
 
                             <Grid Height="100" Grid.Row="0" Grid.Column="0">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="224*" />
-                                    <ColumnDefinition Width="25*" />
-                                    <ColumnDefinition Width="1613*" />
+                                    <ColumnDefinition Width="282*" />
+                                    <ColumnDefinition Width="44*" />
+                                    <ColumnDefinition Width="237*"/>
+                                    <ColumnDefinition Width="446*" />
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                                <WrapPanel Grid.ColumnSpan="3" Grid.Row="0">
+                                <WrapPanel Grid.ColumnSpan="4" Grid.Row="0" Margin="0,0,0.334,0">
                                     <Label Width="100" Height="40" HorizontalContentAlignment="Center" >帧数：</Label>
                                     <TextBox Width="100" Height="32" Name="tb_origFram" FontFamily="18" TextAlignment="Center" Text="20" />
                                     <Label Width="100" Height="40">测试通道：</Label>
@@ -306,7 +307,7 @@
                                             Click="OrigDataStart_OnClick" Background="#FF66EE66" Content="启动"  Margin="15,0,0,0"/>
 
                                 </WrapPanel>
-                                <WrapPanel Grid.ColumnSpan="3" Grid.Row="1" >
+                                <WrapPanel Grid.ColumnSpan="4" Grid.Row="1" Margin="0,0,0.334,0" >
                                     <Label Width="100" Height="40">DAC幅值：</Label>
                                     <TextBox Width="100" Height="32" Name="tb_dacLen" FontFamily="18" TextAlignment="Center"  Text="3000"/>
                                     <Label Width="100" Height="40">DAC通道：</Label>
@@ -555,20 +556,20 @@
                                 <Button Content="保留参数" Width="100" Height="32" FontFamily="18" Margin="0,0,5,0" Click="SaveBvalue_OnClick" />
                             </WrapPanel>
                             <WrapPanel Grid.Row="1" Margin="10">
-                                    <ListView Name="blistview" Width="464" Height="500" HorizontalAlignment="Left" >
-                                             <ListView.View>
-                                                  
-                                                 <GridView>
+                                <ListView Name="blistview" Width="464" Height="500" HorizontalAlignment="Left" >
+                                    <ListView.View>
+
+                                        <GridView>
                                             <GridViewColumn Header="序号" Width="200"
                                                             DisplayMemberBinding="{Binding RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ListViewItem}},Converter={StaticResource MyIndexConverter}}" />
                                             <GridViewColumn Header="B值" Width="200" DisplayMemberBinding="{Binding ChannelBvalue}"></GridViewColumn>
-                                          
-                                                 </GridView>
-                                             </ListView.View>
-                                    </ListView>
-                                
+
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+
                             </WrapPanel>
-                            
+
 
                         </Grid>
 

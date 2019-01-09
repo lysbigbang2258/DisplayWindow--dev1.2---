@@ -10,11 +10,8 @@ namespace ArrayDisplay.net {
     ///     处理与分发网络数据
     /// </summary>
     public class Dataproc : IDisposable {
-        DisPlayWindow mianWindow = DisPlayWindow.hMainWindow;
-
         public Dataproc() {
             TransFormFft = new FFT_TransForm();
-
             int arryNum = ConstUdpArg.ARRAY_NUM; //探头个数
             WorkWaveBytes = new byte[arryNum][];
             WorkWaveFloats = new float[arryNum][];
@@ -36,6 +33,7 @@ namespace ArrayDisplay.net {
             OrigWaveFloats = new float[oNums][];
             OrigChannnel = 0;
             OrigTimeDiv = 0;
+           
             int oFrime = DisPlayWindow.SelectdInfo.OrigFramNums; //原始数据帧数
             Origdata = new byte[oFrime * arryNum];
             int olength = ConstUdpArg.ORIG_FRAME_LENGTH-2; //每帧长度
@@ -43,9 +41,8 @@ namespace ArrayDisplay.net {
             {
                 OrigWaveBytes[i] = new byte[olength * oFrime];
                 OrigWaveFloats[i] = new float[olength / 2 * oFrime];
+                
             }
-
-
             int dchannels = ConstUdpArg.DELAY_FRAME_CHANNELS;
             int dframeLen = ConstUdpArg.DELAY_FRAME_LENGTH-2;
             int dframeNum = ConstUdpArg.DELAY_FRAME_NUMS;
@@ -60,8 +57,8 @@ namespace ArrayDisplay.net {
             WorkEnergyEvent = new AutoResetEvent(false);
             DelayBytesEvent = new AutoResetEvent(false);
             OrigBytesEvent = new AutoResetEvent(false);
+            BvalueBytesEvent = new AutoResetEvent(false);
             WorkBytesEvent = new AutoResetEvent(false);
-            OrigBvalueEvent = new AutoResetEvent(false);
 
             IsRcvChanneldata = new int[64]; //8时分8空分
             new Thread(ThreadOrigWaveStart) {IsBackground = true}.Start();
@@ -73,6 +70,16 @@ namespace ArrayDisplay.net {
             IsBavlueReaded = false;
            
         }
+        public struct BvalueSturct
+        {
+          public  bool isRead;
+          public  float value;
+            public BvalueSturct(bool isRead, float value) : this() {
+                this.isRead = isRead;
+                this.value = value;
+            }
+        }
+      
 
         public static AutoResetEvent OrigBvalueEvent {
             get;
@@ -118,25 +125,9 @@ namespace ArrayDisplay.net {
                         OrigWaveFloats[i][j] = a / 8192.0f;
                     }
                 }
-
                 if (OrigGraphEventHandler != null)
                 {
                     OrigGraphEventHandler.Invoke(null, OrigWaveFloats);
-                }
-                var nums = 0;
-                foreach(int i in IsRcvChanneldata) {
-                    nums += i;
-                }
-
-                if (IsBavlueReaded && nums == 64) {
-                    for (int i = 0; i < OrigWaveFloats.Length; i++) {
-                        float[] query =( from s in OrigWaveFloats[i] orderby s select s).ToArray();
-                        var min = query[1];
-                        var max = query[query.Length - 1];
-                        mianWindow.Bvalues[i] = (max-min) / 2.0f;
-                    }
-                    IsGetBvalue = true;
-                    IsRcvChanneldata = new int[64];
                 }
             }
         }
@@ -366,6 +357,11 @@ namespace ArrayDisplay.net {
             get;
             set;
         }
+        public AutoResetEvent BvalueBytesEvent
+        {
+            get;
+            set;
+        }
 
         public AutoResetEvent DelayBytesEvent {
             get;
@@ -526,12 +522,6 @@ namespace ArrayDisplay.net {
             set;
         }
 
-        
-        public bool IsGetBvalue {
-            get;
-
-            set;
-        }
         #endregion
     }
 }

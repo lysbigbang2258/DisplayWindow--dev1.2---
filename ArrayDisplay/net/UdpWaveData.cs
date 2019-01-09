@@ -4,9 +4,8 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using System.Windows;
+using System.Windows;                                           
 using ArrayDisplay.UI;
-using NationalInstruments.Controls;
 
 // ReSharper disable StringIndexOfIsCultureSpecific.1
 
@@ -15,18 +14,16 @@ namespace ArrayDisplay.net {
         #region Field
 
         public static bool isBuilded; //UDP是否创建
+        public static bool IsBvalueCaling;//是否在计算B值
         static LinkedList<Array> linkbuffer = new LinkedList<Array>();//缓存数据buff
 //        public static EventHandler<byte[]> divDataEventHandler;
-        public static bool isReceived;
         public static int frameNums; //一帧数据长度
         public static ConstUdpArg.WaveType waveType;//波形数据类型
         int[] delaychannelOffsets = new int[8];
         int[] origchannelOffsets = new int[64];
-        public byte[][] detesBytes;
         byte[] rcvBuf;//接收数据缓存
         readonly Socket waveSocket;
-        public Dataproc wavaDataproc;
-        public byte[] saveBytes; 
+        Dataproc wavaDataproc;
         #endregion
 
         #region 属性
@@ -78,8 +75,6 @@ namespace ArrayDisplay.net {
         public UdpWaveData(IPEndPoint ip) {
             Ip = ip;
             wavaDataproc = new Dataproc();
-            saveBytes = new byte[ConstUdpArg.WORK_FRAME_LENGTH *
-                                 ConstUdpArg.WORK_FRAME_NUMS ];
             try {
                 waveSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
                                         ProtocolType.Udp);
@@ -170,9 +165,14 @@ namespace ArrayDisplay.net {
                                 wavaDataproc.WorkBytesEvent.Set();
                                 break;
                             case ConstUdpArg.WaveType.Orig:
-                                PutOrigData(rcvBuf);
+                                if (!IsBvalueCaling) {
+                                    PutOrigData(rcvBuf);
+                                    wavaDataproc.OrigBytesEvent.Set();
+                                }
+                                else {
+                                    wavaDataproc.BvalueBytesEvent.Set();
+                                }                               
                                 index++;
-                                wavaDataproc.OrigBytesEvent.Set();
                                 break;
                             case ConstUdpArg.WaveType.Delay:
                                 PutDelayData(rcvBuf);
@@ -192,7 +192,6 @@ namespace ArrayDisplay.net {
             catch(ThreadAbortException) {
                 isBuilded = false;
                 waveSocket.Close();
-                isReceived = false;
                 Console.WriteLine(@"关闭Socket...");
             }
         }
@@ -208,12 +207,12 @@ namespace ArrayDisplay.net {
             offset += head.Length;
             Array.Copy(buf, offset, temp, 0, temp.Length);
             if (delaychannelOffsets[channel] >= wavaDataproc.DelayWaveBytes[0].Length) {
-                origchannelOffsets[channel] = 0;
+                delaychannelOffsets[channel] = 0;
             }
 
                 Array.Copy(temp, 0, wavaDataproc.DelayWaveBytes[channel], delaychannelOffsets[channel],
                            temp.Length);
-                origchannelOffsets[channel] += temp.Length;         
+            delaychannelOffsets[channel] += temp.Length;         
         }
         /// <summary>
         /// 将原始数据保存到对应通道
@@ -235,8 +234,9 @@ namespace ArrayDisplay.net {
                 timdiv = 1;
             }
             offset += head.Length;
-            byte[] data = new byte[buf.Length-2];
-            Array.Copy(buf, offset,data , 0, buf.Length-2);
+           
+
+
             var len = origchannelOffsets[channel * 8 + timdiv];
             if (len >= wavaDataproc.OrigWaveBytes[0].Length)
             {
@@ -245,12 +245,17 @@ namespace ArrayDisplay.net {
             }
             Array.Copy(buf, offset, wavaDataproc.OrigWaveBytes[channel * 8 + timdiv], len, buf.Length - 2);
             wavaDataproc.IsRcvChanneldata[channel * 8 + timdiv] = 1;
+
+
+            byte[] data = new byte[buf.Length - 2];
+            Array.Copy(buf, offset, data, 0, buf.Length - 2);
             origchannelOffsets[channel * 8 + timdiv] += data.Length;
             if (OrigSaveDataEventHandler!=null) {    //发送给保存线程
                 OrigSaveDataEventHandler(null, data);
             }
         }
 
+     
         /// <summary>
         ///     将WorkWave数据导入Detect_Bytes
         /// </summary>
@@ -267,13 +272,15 @@ namespace ArrayDisplay.net {
 
         public void Close() {
             isBuilded = false;
-            isReceived = false;
+            
             linkbuffer.Clear();
             Console.WriteLine(@"关闭UDP线程...");
             if (Normalthread == null) return;
             Normalthread.Abort();
             Normalthread = null;
         }
+
+
 
         #region IDisposable
 

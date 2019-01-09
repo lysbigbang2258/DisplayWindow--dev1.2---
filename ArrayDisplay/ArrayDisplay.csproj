@@ -91,6 +91,7 @@
     </Compile>
     <Compile Include="MyUserControl\Axis.cs" />
     <Compile Include="MyUserControl\AxisPoint.cs" />
+    <Compile Include="net\WaveSocket.cs" />
     <Compile Include="UI\UIBValue.cs" />
     <Compile Include="UI\IndexConver.cs" />
     <Compile Include="MyUserControl\CutData.cs" />
