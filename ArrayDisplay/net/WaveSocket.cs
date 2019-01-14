@@ -10,10 +10,6 @@ using ArrayDisplay.UI;
 
 namespace ArrayDisplay.net {
     public class WaveSocket:IDisposable  {
-        public byte[] RcvBuf {
-            get;
-            private set;
-        }
 
         public Socket MSocket {
             get;
@@ -30,36 +26,34 @@ namespace ArrayDisplay.net {
             set;
         }
 
-        public  AutoResetEvent RcvResetEvent;
+        public AutoResetEvent RcvResetEvent {
+            get;
+            set;
+        }
+
         public WaveSocket() {
             MSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
                                     ProtocolType.Udp);
         }
 
-        public bool StartReceiveData(IPEndPoint ip) {
+        public void StartReceiveData(IPEndPoint ip) {
             try {
                 MSocket.Blocking = true;
-                MSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH;
-                RcvBuf = new byte[ConstUdpArg.ORIG_FRAME_LENGTH*100];
-                
+                MSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH;      
                 MSocket.Bind(ip);
                 RcvThread = new Thread(RcvUdpdata) {IsBackground = true};
                 RcvResetEvent = new AutoResetEvent(false);
                 BvalueData = new short[64][];
+                RcvThread.Start();
             }
             catch(Exception e) {
                 Console.WriteLine(e);
                 throw;
             }
-            finally {
-                RcvThread.Start();
-            }
-            return true;
-
         }
 
         void RcvUdpdata() {
-            List<ArraySegment<byte>> buffer = new List<ArraySegment<byte>>(2) {
+            List<ArraySegment<byte>> buffer = new List<ArraySegment<byte>> {
                 new ArraySegment<byte>(new byte[1282]),
             };
             int ret;
@@ -69,44 +63,46 @@ namespace ArrayDisplay.net {
                 try {
                     stopwatch.Start();
                     ret = MSocket.Receive(buffer);
+                    if (ret <= 0)
+                    {
+                        continue;
+                    }
+                    int offset = 0;
+                    var bytedata = buffer[0].Array;
+                    if (bytedata == null) {
+                        continue;
+                    }
+                    int tiv = bytedata[0];
+                    int chl = bytedata[1];                    
+                    int index = chl * 8 + tiv;
+                    offset += 2;
+                    short[] sbdata = new short[(bytedata.Length - offset) / 2];
+                    var purdata = new byte[bytedata.Length - offset];
+                    Array.Copy(bytedata, offset, purdata, 0, purdata.Length);
+                    for (int i = 0; i < sbdata.Length; i++)//大端数据
+                    {
+                        var t = new byte[2];
+                        t[0] = purdata[2 * i + 1];
+                        t[1] = purdata[2 * i];
+                        sbdata[i] = BitConverter.ToInt16(t, 0);
+                    }
+                    BvalueData[index] = new short[sbdata.Length];
+                    double progressvalue = (index + 1) * 100.0 / 64;
+                    Console.WriteLine("通道： " + index);
+                    Array.Copy(sbdata, BvalueData[index], sbdata.Length);
+                    DisPlayWindow.hMainWindow.bvaulue_pgbar.Dispatcher.Invoke(() =>
+                                                                              {
+                                                                                  DisPlayWindow.hMainWindow.bvaulue_pgbar.Value = progressvalue;
+                                                                              });//进度条
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                     throw;
                 }
-
-                if (ret <= 0)
-                {
-                    return;
-                }
-                int offset = 0;
-                var bytedata = buffer[0].Array;;
-                var head = new byte[2];
-                Array.Copy(bytedata, head, head.Length);
-                var tiv = head[0];
-                var chl = head[1];
-                int index = chl * 8 + tiv;
-                offset += 2;
-                short[] sbdata = new short[(bytedata.Length - offset) / 2];
-                var purdata = new byte[bytedata.Length - offset];
-                Array.Copy(bytedata, offset, purdata, 0,purdata.Length);
-                for (int i = 0; i < sbdata.Length; i++)
-                {
-                    var t = new byte[2];
-                    t[0] = bytedata[2*i + 1];
-                    t[1] = bytedata[2*i];
-                    sbdata[i] = BitConverter.ToInt16(t, 0);
-                }
-                BvalueData[index] = new short[sbdata.Length];
-                double progressvalue =(index + 1) * 100 / 64;
-                Console.WriteLine("通道： "+index);
-                Array.Copy(sbdata, BvalueData[index], sbdata.Length);
                 stopwatch.Stop();
                 Console.WriteLine("RCVTime:"+stopwatch.ElapsedMilliseconds);
-                DisPlayWindow.hMainWindow.bvaulue_pgbar.Dispatcher.Invoke(() => {
-                                                                              DisPlayWindow.hMainWindow.bvaulue_pgbar.Value = progressvalue;
-                                                                          });
+               
                 RcvResetEvent.Reset();
             }
             

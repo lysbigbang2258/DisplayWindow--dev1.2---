@@ -373,6 +373,16 @@ namespace ArrayDisplay.net {
             WriteData(addr, data);
         }
 
+        /// <summary>
+        ///     写入B值
+        /// </summary>
+        /// <param name="num"></param>
+        public void WriteBvalue(byte[] dataBytes)
+        {
+            var addr = ConstUdpArg.Bvalue_Write;
+            WriteData(addr, dataBytes);
+        }
+
         #endregion
 
         #region 存(发送指令及数据)

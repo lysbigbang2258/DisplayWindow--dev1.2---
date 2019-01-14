@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
 using ArrayDisplay.UI;
@@ -12,76 +12,133 @@ namespace ArrayDisplay.net {
     public class Dataproc : IDisposable {
         public Dataproc() {
             TransFormFft = new FFT_TransForm();
-            int arryNum = ConstUdpArg.ARRAY_NUM; //探头个数
-            WorkWaveBytes = new byte[arryNum][];
-            WorkWaveFloats = new float[arryNum][];
-            WorkWaveBytes = new byte[arryNum][];
-            PlayWaveBytes = new byte[arryNum][];
-            int frameNum = ConstUdpArg.WORK_FRAME_NUMS; //工作数据帧数
-            for(int i = 0; i < arryNum; i++) {
-                WorkWaveBytes[i] = new byte[frameNum * 4]; //避免数据为null
-                WorkWaveFloats[i] = new float[frameNum]; //避免数据为null 
-                PlayWaveBytes[i] = new byte[frameNum * 2]; //避免数据为null 
-            }
-            WorkWavefdatas = new float[frameNum]; //工作波形
-            EnergyFloats = new float[arryNum];
-            ListenCoefficent = (float) Math.Pow(10, 50 / 20.0F) * 100; //31622.78; //听音强度
-
-
-            int oNums = ConstUdpArg.ORIG_DETECT_LENGTH; //时分长度
-            OrigWaveBytes = new byte[oNums][];
-            OrigWaveFloats = new float[oNums][];
-            OrigChannnel = 0;
-            OrigTimeDiv = 0;
-           
-            int oFrime = DisPlayWindow.SelectdInfo.OrigFramNums; //原始数据帧数
-            Origdata = new byte[oFrime * arryNum];
-            int olength = ConstUdpArg.ORIG_FRAME_LENGTH-2; //每帧长度
-            for (int i = 0; i < oNums; i++)
-            {
-                OrigWaveBytes[i] = new byte[olength * oFrime];
-                OrigWaveFloats[i] = new float[olength / 2 * oFrime];
-                
-            }
-            int dchannels = ConstUdpArg.DELAY_FRAME_CHANNELS;
-            int dframeLen = ConstUdpArg.DELAY_FRAME_LENGTH-2;
-            int dframeNum = ConstUdpArg.DELAY_FRAME_NUMS;
-            DelayWaveBytes = new byte[dchannels][];
-            DelayWaveFloats = new float[dchannels][];
-            for(int i = 0; i < dchannels; i++) {
-                DelayWaveBytes[i] = new byte[dframeLen * dframeNum];
-                DelayWaveFloats[i] = new float[dframeLen * dframeNum / 2];
-            }
+            ArrayNums = ConstUdpArg.ARRAY_NUM; //探头个数
 
             FreqWaveEvent = new AutoResetEvent(false);
             WorkEnergyEvent = new AutoResetEvent(false);
             DelayBytesEvent = new AutoResetEvent(false);
             OrigBytesEvent = new AutoResetEvent(false);
-            BvalueBytesEvent = new AutoResetEvent(false);
             WorkBytesEvent = new AutoResetEvent(false);
-
-            IsRcvChanneldata = new int[64]; //8时分8空分
-            new Thread(ThreadOrigWaveStart) {IsBackground = true}.Start();
-            new Thread(ThreadWorkWaveStart) {IsBackground = true}.Start();
-            new Thread(ThreadEnergyStart) {IsBackground = true}.Start();
-            new Thread(ThreadDelayWaveStart) {IsBackground = true}.Start();
-            new Thread(ThreadFreqWaveStart) {IsBackground = true}.Start();
-
             IsBavlueReaded = false;
-           
         }
-        public struct BvalueSturct
-        {
-          public  bool isRead;
-          public  float value;
-            public BvalueSturct(bool isRead, float value) : this() {
-                this.isRead = isRead;
-                this.value = value;
+
+        public Thread FreqThread {
+            get;
+            set;
+        }
+
+        public int ArrayNums {
+            get;
+            set;
+        }
+
+        public void Init(ConstUdpArg.WaveType type) {
+            WaveType = type;
+            switch(type) {
+                case ConstUdpArg.WaveType.Delay:
+                    DelayInit();
+                    break;
+                case ConstUdpArg.WaveType.Normal:
+                    NormalInit();
+                    break;
+                case ConstUdpArg.WaveType.Orig:
+                    OrigInit();
+                    break;
+                 default:
+                    Console.WriteLine("初始化Dataproc出错");
+                    break;
             }
         }
-      
 
-        public static AutoResetEvent OrigBvalueEvent {
+        void OrigInit() {
+            int oNums = ConstUdpArg.ORIG_DETECT_LENGTH; //时分长度
+            OrigWaveBytes = new byte[oNums][];
+            OrigWaveFloats = new float[oNums][];
+            OrigChannnel = 0;
+            OrigTimeDiv = 0;
+
+            int oFrime = DisPlayWindow.SelectdInfo.OrigFramNums; //原始数据帧数
+            Origdata = new byte[oFrime * ArrayNums];
+            int olength = ConstUdpArg.ORIG_FRAME_LENGTH - 2; //每帧长度
+            for (int i = 0; i < oNums; i++)
+            {
+                OrigWaveBytes[i] = new byte[olength * oFrime];
+                OrigWaveFloats[i] = new float[olength / 2 * oFrime];
+
+            }
+            OrigThread = new Thread(ThreadOrigWaveStart) { IsBackground = true };
+            OrigThread.Start();
+        }
+
+        void NormalInit() {
+            TransFormFft = new FFT_TransForm();
+            WorkWaveBytes = new byte[ArrayNums][];
+            WorkWaveFloats = new float[ArrayNums][];
+            WorkWaveBytes = new byte[ArrayNums][];
+            PlayWaveBytes = new byte[ArrayNums][];
+
+            int frameNum = ConstUdpArg.WORK_FRAME_NUMS * 4; //工作数据帧数
+//            int frameNum = 2000 * ConstUdpArg.WORK_FRAME_LENGTH; //工作数据帧数
+            for (int i = 0; i < ArrayNums; i++)
+            {
+                WorkWaveBytes[i] = new byte[frameNum * 4]; //避免数据为null
+                WorkWaveFloats[i] = new float[frameNum]; //避免数据为null 
+                PlayWaveBytes[i] = new byte[frameNum * 2]; //避免数据为null 
+            }
+            WorkWavefdatas = new float[frameNum]; //工作波形
+            EnergyFloats = new float[ArrayNums];
+            ListenCoefficent = (float)Math.Pow(10, 50 / 20.0F) * 100; //31622.78; //听音强度
+
+            WorkThread = new Thread(ThreadWorkWaveStart) { IsBackground = true };
+            WorkThread.Start();
+            EnergyThread = new Thread(ThreadEnergyStart) { IsBackground = true };
+            EnergyThread.Start();
+            FreqThread = new Thread(ThreadFreqWaveStart) { IsBackground = true };
+            FreqThread.Start();
+        }
+
+        void DelayInit() {
+            int dchannels = ConstUdpArg.DELAY_FRAME_CHANNELS;
+            int dframeLen = ConstUdpArg.DELAY_FRAME_LENGTH - 2;
+            int dframeNum = ConstUdpArg.DELAY_FRAME_NUMS;
+            DelayWaveBytes = new byte[dchannels][];
+            DelayWaveFloats = new float[dchannels][];
+            for (int i = 0; i < dchannels; i++)
+            {
+                DelayWaveBytes[i] = new byte[dframeLen * dframeNum];
+                DelayWaveFloats[i] = new float[dframeLen * dframeNum / 2];
+            }
+            DelayThread = new Thread(ThreadDelayWaveStart) { IsBackground = true };
+            DelayThread.Start();
+            
+        }
+
+        /// <summary>
+        ///     正在传输波形
+        /// </summary>
+        public ConstUdpArg.WaveType WaveType {
+            get;
+            set;
+        }
+        public Thread EnergyThread {
+            get;
+            set;
+        }
+
+        public Thread WorkThread {
+            get;
+            set;
+        
+        }
+
+        public Thread DelayThread {
+            get;
+
+            set;
+
+        }
+
+        public Thread OrigThread {
             get;
             set;
         }
@@ -142,10 +199,8 @@ namespace ArrayDisplay.net {
                 WorkEnergyEvent.WaitOne();
                 double ftemp = 0;
                 for(int i = 0; i < WorkWaveFloats.Length; i++) {
-                    for(int j = 0; j < WorkWaveFloats[0].Length; j++) {
-                        float f = WorkWaveFloats[i][j];
-                        ftemp = Math.Abs(f);
-                    }
+                        float f = WorkWaveFloats[i].Max();
+                    ftemp = Math.Abs(f);
                     EnergyFloats[i] = (float) ftemp;
                 }
                 float max = EnergyFloats.Max();
@@ -158,8 +213,15 @@ namespace ArrayDisplay.net {
                     }
                     
                 }
+                List<float> rlist = new List<float>();
+                for(int i = 0; i < EnergyFloats.Length; i++) {
+                    if ((i%32)<8) {
+                        rlist.Add(EnergyFloats[i]);
+                    }
+                }
+                
                 if (EnergyArrayEventHandler != null) {
-                    EnergyArrayEventHandler.Invoke(null, EnergyFloats);
+                    EnergyArrayEventHandler.Invoke(null, rlist.ToArray());
                 }
             }
         }
@@ -178,7 +240,9 @@ namespace ArrayDisplay.net {
                         r[2] = WorkWaveBytes[i][j * 4 + 1];
                         r[3] = WorkWaveBytes[i][j * 4];
                         int a = BitConverter.ToInt32(r, 0);
-                        WorkWaveFloats[i][j] = a / 1048576.0f;
+                        float tmp = a / 1048576.0f;
+//                        float tmp = a / 2.0f;
+                        WorkWaveFloats[i][j] = tmp;
 
                         //听音数据处理
                         float f = WorkWaveFloats[i][j] * ListenCoefficent;
@@ -197,8 +261,11 @@ namespace ArrayDisplay.net {
                     }
                 }
                 var offset = ConstUdpArg.offsetArray[DisPlayWindow.SelectdInfo.WorkWaveChannel];
-                WorkWavefdatas = WorkWaveFloats[offset];
+                WorkWavefdatas = WorkWaveFloats[offset-1];
                 //            WorkWaveTwo = WorkWaveFloats[DisPlayWindow.onSelectdInfo.WorkWaveChannel+1];
+                WorkEnergyEvent.Set();
+                FreqWaveEvent.Set();
+
 
                 if (PreGraphEventHandler != null)
                 {
@@ -214,8 +281,7 @@ namespace ArrayDisplay.net {
                         SoundEventHandler.Invoke(null, PlayWaveBytes[channel]);
                     }
                 }
-                WorkEnergyEvent.Set();
-                FreqWaveEvent.Set();
+                
 
                 //求初始相位
 //                double[] phaseDoubles = Task<double[]>.Factory.StartNew(GetInitPhase).Result;
@@ -337,11 +403,7 @@ namespace ArrayDisplay.net {
             }
         }
 
-        /// <inheritdoc />
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        
 
         #region 变量
 
@@ -520,6 +582,38 @@ namespace ArrayDisplay.net {
         public int[] IsRcvChanneldata {
             get;
             set;
+        }
+
+        #endregion
+
+        #region IDisposable
+
+        /// <inheritdoc />
+        public void Dispose() {
+            if (WorkBytesEvent != null) WorkBytesEvent.Dispose();
+            if (OrigBytesEvent != null) OrigBytesEvent.Dispose();
+            if (DelayBytesEvent != null) DelayBytesEvent.Dispose();
+            if (WorkEnergyEvent != null) WorkEnergyEvent.Dispose();
+            if (FreqWaveEvent != null) FreqWaveEvent.Dispose();
+            if (OrigThread!=null) {
+                OrigThread.Abort();
+            }
+            if (DelayThread!=null) {
+                DelayThread.Abort();
+            }
+            if (OrigThread!=null) {
+                OrigThread.Abort();
+            }
+            if (WorkThread!=null) {
+                WorkThread.Abort();
+            }
+            if (EnergyThread!=null) {
+                EnergyThread.Abort();
+            }
+            if (FreqThread!=null) {
+                FreqThread.Abort();
+            }
+
         }
 
         #endregion

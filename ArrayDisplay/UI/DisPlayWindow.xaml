@@ -221,8 +221,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TabControl HorizontalAlignment="Left" Height="793" Margin="0,0,-50,0" VerticalAlignment="Center"
-                            Width="1970">
+                <TabControl HorizontalAlignment="Left" Height="793"  Width="1970" VerticalAlignment="Center"  Name="tabControl" SelectionChanged="TabControl_OnSelectionChanged" 
+                            >
                     <TabItem Header="延时校准" Width="100" Height="40" Name="delayItem">
                         <Grid Background="#FFE5E5E5" Name="delaygrid">
                             <StackPanel>
@@ -270,7 +270,7 @@
                             </StackPanel>
                         </Grid>
                     </TabItem>
-                    <TabItem Header="原始数据" Name="origItems" >
+                    <TabItem Header="原始数据" Name="origItem" >
                         <Grid Background="#FFE5E5E5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -360,7 +360,7 @@
                             </ni:WritableGraph>
                         </Grid>
                     </TabItem>
-                    <TabItem Header="正常工作" Name="normalItems" MouseDoubleClick="NormalWave_OnMouseDoubleClick">
+                    <TabItem Header="正常工作" Name="normalItem">
                         <Grid Background="#FFE5E5E5" ShowGridLines="True">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -535,7 +535,7 @@
                             </Grid>
                         </Grid>
                     </TabItem>
-                    <TabItem Header="自动标定" Name="configItems">
+                    <TabItem Header="自动标定" Name="configItem">
                         <Grid Background="#FFE5E5E5">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />

@@ -7,7 +7,7 @@ namespace ArrayDisplay.net {
 
         static ConstUdpArg() {
             Src_OrigWaveIp = new IPEndPoint(IPAddress.Parse("192.168.172.1"), 8974);
-            SrcNorm_WaveIp = new IPEndPoint(IPAddress.Parse("192.168.172.1"), 8975);
+            Src_NormWaveIp = new IPEndPoint(IPAddress.Parse("192.168.172.1"), 8975);
             Dst_WorkDatIp = new IPEndPoint(IPAddress.Parse("192.168.172.100"), 8976);
             Src_DelayWaveIp = new IPEndPoint(IPAddress.Parse("192.168.172.1"), 8973);
             Dst_ComMsgIp = new IPEndPoint(IPAddress.Parse("192.168.172.100"), 8972);
@@ -75,7 +75,7 @@ namespace ArrayDisplay.net {
         /// <summary>
         ///     src端延时波形数据
         /// </summary>
-        public static IPEndPoint SrcNorm_WaveIp {
+        public static IPEndPoint Src_NormWaveIp {
             get;
             private set;
         }
@@ -278,6 +278,15 @@ namespace ArrayDisplay.net {
             }
         }
 
+        public static byte[] Bvalue_Write {
+            get {
+                return bvalue_Write;
+            }
+            set {
+                bvalue_Write = value;
+            }
+        }
+
         #endregion
 
         #region 指令变量Method
@@ -313,8 +322,8 @@ namespace ArrayDisplay.net {
         /// <summary>读指令:DacChannel</summary>
         public static byte[] GetDacChannelReadCommand(int idcNum)
         {
-            var channel = new byte[dacChannel_Read.Length];
-            Array.Copy(dacChannel_Read, 0, channel, 0, dacChannel_Read.Length);
+            var channel = new byte[DacChannel_Read.Length];
+            Array.Copy(DacChannel_Read, 0, channel, 0, DacChannel_Read.Length);
             channel.SetValue((byte)(channel[5] + (idcNum)*2), 5);
             return channel;
         }
@@ -415,6 +424,7 @@ namespace ArrayDisplay.net {
         /// </summary>
         static  byte[] origChannel_Write = {1, 0, 1, 0,0, 7 };
         static  byte[] origTimDiv_Write = {1, 0, 1, 0,0, 8 };
+        static byte[] bvalue_Write = {1, 2, 0, 1, 48, 0};
 
         /// <summary>
         /// Dac操作
