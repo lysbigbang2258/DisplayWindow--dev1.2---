@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Forms;
 using ArrayDisplay.UI;
 
@@ -72,7 +72,7 @@ namespace ArrayDisplay.net {
         /// <summary>///切换功能窗口（波形或命令）/// </summary>
         public void SwitchWindow(byte[] cmdBytes) {
             if (!isSocketInit) {
-                Init();
+//                Init();
             }
             var tempBytes = new byte[8];
             cmdBytes.CopyTo(tempBytes, 0);
@@ -104,7 +104,7 @@ namespace ArrayDisplay.net {
                 catch(Exception e) {
                     Console.WriteLine(e);
                 }
-//                Console.WriteLine("发送数据:{0}", BitConverter.ToString(sendbytes, 0, sendbytes.Length));
+                Console.WriteLine("发送数据:{0}", BitConverter.ToString(sendbytes, 0, sendbytes.Length));
 
                 var rcvUdpBuffer = new byte[18];
                 try {
@@ -207,25 +207,24 @@ namespace ArrayDisplay.net {
             }
             //读取:设备类型
             ReadDeviceType();
-            Thread.Sleep(300);
+            Thread.Sleep(200);
             //读取:设备ID
             ReadDeviceId();
-            Thread.Sleep(300);
+            Thread.Sleep(200);
             //读取:设备MAC
             ReadDeviceMac();
-            Thread.Sleep(300);
-//            //读取:脉冲周期
-//            ReadPulsePeriod();
-//            Thread.Sleep(300);
-//            //读取:脉冲延时
-//            ReadPulseDelay();
-//            Thread.Sleep(300);
-//            //读取:脉冲宽度
-//            ReadPulseWidth();
-//            Thread.Sleep(300);
-//            //读取:ADC偏移
-//            ReadAdcOffset();
-//            Thread.Sleep(300);
+            Thread.Sleep(200);
+            //读取:脉冲周期
+            ReadPulsePeriod();
+            Thread.Sleep(200);
+            //读取:脉冲延时
+            ReadPulseDelay();
+            Thread.Sleep(200);
+            //读取:脉冲宽度
+            ReadPulseWidth();
+            Thread.Sleep(200);
+            //读取:ADC偏移
+            ReadAdcOffset();
         }
 
         #region 读(发送指令及数据)
@@ -382,7 +381,26 @@ namespace ArrayDisplay.net {
             var addr = ConstUdpArg.Bvalue_Write;
             WriteData(addr, dataBytes);
         }
+        public void WritePhase(byte[][] datalistBytes)
+        {
+            var bytelist = new List<byte>();
+            
+            Task.Run(() => {
+                         for(int i = 0; i < datalistBytes.Length; i++) {
+                             bytelist.AddRange(ConstUdpArg.Phase_Write);
+                             byte t1 = (byte) (8 + i / 4);
+                             byte t2 = (byte) (64 * (i % 4));
+                             bytelist.Add(t1);
+                             bytelist.Add(t2);
+                             WriteData(bytelist.ToArray(), datalistBytes[i]);
+                             
+                             bytelist.Clear();
 
+                         }
+                     });
+
+
+        }
         #endregion
 
         #region 存(发送指令及数据)
@@ -592,21 +610,19 @@ namespace ArrayDisplay.net {
         /// <param name="bufferLength">缓存区大小</param>
         /// <returns></returns>
         byte[] ReadRemote(int bufferLength) {
-            var result = Task<byte[]>.Run(() => {
-                             EndPoint senderRemote = new IPEndPoint(IPAddress.Any, 0);
-                             var rcvUdpBuffer = new byte[bufferLength * 4];
-                             int offset = 0;
-                             try {
-                                 rcvsocket.ReceiveFrom(rcvUdpBuffer, offset, rcvUdpBuffer.Length - offset, SocketFlags.None, ref senderRemote);
-                             }
-                             catch(Exception e) {
-                                 Console.WriteLine(e);
-                                 return null;
-                             }
-                             return rcvUdpBuffer;
-                         });
-            return result.Result;
-
+            EndPoint senderRemote = new IPEndPoint(IPAddress.Any, 0);
+            var rcvUdpBuffer = new byte[bufferLength * 4];
+            int offset = 0;
+            try
+            {
+                rcvsocket.ReceiveFrom(rcvUdpBuffer, offset, rcvUdpBuffer.Length - offset, SocketFlags.None, ref senderRemote);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return null;
+            }
+            return rcvUdpBuffer;
         }
 
         /// 将接收到的数据显示到对应的界面上

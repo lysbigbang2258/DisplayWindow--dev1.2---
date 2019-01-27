@@ -260,9 +260,8 @@ namespace ArrayDisplay.net {
                         Array.Copy(x, 0, PlayWaveBytes[i], j * 2, 2);
                     }
                 }
-                var offset = ConstUdpArg.offsetArray[DisPlayWindow.SelectdInfo.WorkWaveChannel];
+                var offset = ConstUdpArg.offsetArray[DisPlayWindow.SelectdInfo.WorkWaveChannel-1];
                 WorkWavefdatas = WorkWaveFloats[offset-1];
-                //            WorkWaveTwo = WorkWaveFloats[DisPlayWindow.onSelectdInfo.WorkWaveChannel+1];
                 WorkEnergyEvent.Set();
                 FreqWaveEvent.Set();
 
@@ -281,14 +280,7 @@ namespace ArrayDisplay.net {
                         SoundEventHandler.Invoke(null, PlayWaveBytes[channel]);
                     }
                 }
-                
-
-                //求初始相位
-//                double[] phaseDoubles = Task<double[]>.Factory.StartNew(GetInitPhase).Result;
-//                foreach (double phaseDouble in phaseDoubles)
-//                {
-//                    Console.WriteLine(phaseDouble);
-//                }
+               
             }
         }
 
@@ -383,25 +375,7 @@ namespace ArrayDisplay.net {
             return phase;
         }
 
-        protected virtual void Dispose(bool disposing) {
-            if (disposing) {
-                if (DelayBytesEvent != null) {
-                    DelayBytesEvent.Dispose();
-                }
-                if (FreqWaveEvent != null) {
-                    FreqWaveEvent.Dispose();
-                }
-                if (OrigBytesEvent != null) {
-                    OrigBytesEvent.Dispose();
-                }
-                if (WorkBytesEvent != null) {
-                    WorkBytesEvent.Dispose();
-                }
-                if (WorkEnergyEvent != null) {
-                    WorkEnergyEvent.Dispose();
-                }
-            }
-        }
+        
 
         
 
@@ -416,11 +390,6 @@ namespace ArrayDisplay.net {
         }
 
         public AutoResetEvent OrigBytesEvent {
-            get;
-            set;
-        }
-        public AutoResetEvent BvalueBytesEvent
-        {
             get;
             set;
         }
@@ -586,34 +555,62 @@ namespace ArrayDisplay.net {
 
         #endregion
 
+
         #region IDisposable
 
+        void ReleaseUnmanagedResources() {
+            // TODO release unmanaged resources here
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            ReleaseUnmanagedResources();
+            if (disposing)
+            {
+                if (WorkBytesEvent != null) WorkBytesEvent.Dispose();
+                if (OrigBytesEvent != null) OrigBytesEvent.Dispose();
+                if (DelayBytesEvent != null) DelayBytesEvent.Dispose();
+                if (WorkEnergyEvent != null) WorkEnergyEvent.Dispose();
+                if (FreqWaveEvent != null) FreqWaveEvent.Dispose();
+                if (OrigThread != null)
+                {
+                    OrigThread.Abort();
+                    if (OrigThread.ThreadState!=ThreadState.Aborted) {
+                        Thread.Sleep(100);
+                    }
+                }
+                if (DelayThread != null)
+                {
+                    DelayThread.Abort();
+                }
+                if (WorkThread != null)
+                {
+                    WorkThread.Abort();
+                    if (WorkThread.ThreadState != ThreadState.Aborted)
+                    {
+                        Thread.Sleep(100);
+                    }
+                    
+                }
+                if (EnergyThread != null)
+                {
+                    EnergyThread.Abort();
+                }
+                if (FreqThread != null)
+                {
+                    FreqThread.Abort();
+                }
+            }
+        }
         /// <inheritdoc />
         public void Dispose() {
-            if (WorkBytesEvent != null) WorkBytesEvent.Dispose();
-            if (OrigBytesEvent != null) OrigBytesEvent.Dispose();
-            if (DelayBytesEvent != null) DelayBytesEvent.Dispose();
-            if (WorkEnergyEvent != null) WorkEnergyEvent.Dispose();
-            if (FreqWaveEvent != null) FreqWaveEvent.Dispose();
-            if (OrigThread!=null) {
-                OrigThread.Abort();
-            }
-            if (DelayThread!=null) {
-                DelayThread.Abort();
-            }
-            if (OrigThread!=null) {
-                OrigThread.Abort();
-            }
-            if (WorkThread!=null) {
-                WorkThread.Abort();
-            }
-            if (EnergyThread!=null) {
-                EnergyThread.Abort();
-            }
-            if (FreqThread!=null) {
-                FreqThread.Abort();
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
+            
+        }
 
+        /// <inheritdoc />
+        ~Dataproc() {
+            Dispose(false);
         }
 
         #endregion

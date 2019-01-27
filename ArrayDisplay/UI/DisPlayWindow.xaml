@@ -321,13 +321,13 @@
                                 </WrapPanel>
                             </Grid >
                             <Grid Height="100" Grid.Row="0" Grid.Column="1">
-                                <StackPanel>
+                                <StackPanel Visibility="Visible">
                                     <WrapPanel HorizontalAlignment="Right">
-                                        <Label Width="140" Height="40" Margin="5"  Content="C值DAC幅度："/>
+                                        <Label Width="140" Height="40" Margin="5"  Content="C值DAC幅度：" />
                                         <TextBox Width="100" Height="32" FontFamily="18" TextAlignment="Center"  Name="tb_dacCvalue" IsReadOnly="True" Background="Azure"/>
                                         <Button Content="计算" Width="100" Height="40" Margin="5"  Click="CalCanCvalue_OnClick"/>
                                     </WrapPanel>
-                                    <WrapPanel HorizontalAlignment="Right">
+                                    <WrapPanel HorizontalAlignment="Right" Visibility="Hidden">
                                         <Label Width="140" Height="40" Margin="5"  Content="B值："/>
                                         <TextBox Width="100" Height="32" FontFamily="18" TextAlignment="Center" Name="tb_bValue" IsReadOnly="True" Background="Azure"/>
                                         <Button Content="计算" Width="100" Height="40" Margin="5"  Click="GetBvalue_OnClick"/>
@@ -548,12 +548,16 @@
                                 	VerticalContentAlignment="Center" Margin="5,0,5,0" />
                                 <Button Name="btn_calBvalue" Click="CalBvalue_OnClick" Content="求B"  Width="100" Height="32" FontFamily="18"
                                         VerticalContentAlignment="Center" Margin="5,0,5,0" />
+                                <Button Name="btn_calPhase" Click="CalPhase_OnClick" Content="求初始相位"  Width="120" Height="32" FontFamily="18"
+                                        VerticalContentAlignment="Center" Margin="5,0,5,0" />
                                 <ProgressBar Name="bvaulue_pgbar" HorizontalAlignment="Left" Height="20" Margin="10" VerticalAlignment="Top" Width="100"
                                              Minimum="0" Maximum="100">
                                 </ProgressBar>
-                                <Button Content="发送参数" Width="100" Height="32" FontFamily="18"
+                                <Button Content="发送B值" Width="100" Height="32" FontFamily="18"
                                         VerticalContentAlignment="Center" Margin="0,0,5,0" Click="SendBvalue_OnClick"/>
                                 <Button Content="保留参数" Width="100" Height="32" FontFamily="18" Margin="0,0,5,0" Click="SaveBvalue_OnClick" />
+                                <Button Content="发送初相位" FontFamily="18"
+                                	VerticalContentAlignment="Center" Click="SendPhase_OnClick" Height="32" Width="100"/>
                             </WrapPanel>
                             <WrapPanel Grid.Row="1" Margin="10">
                                 <ListView Name="blistview" Width="464" Height="500" HorizontalAlignment="Left" >

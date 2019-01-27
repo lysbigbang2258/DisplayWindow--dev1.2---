@@ -8,7 +8,7 @@ namespace ArrayDisplay.net {
         static ConstUdpArg() {
             Src_OrigWaveIp = new IPEndPoint(IPAddress.Parse("192.168.172.1"), 8974);
             Src_NormWaveIp = new IPEndPoint(IPAddress.Parse("192.168.172.1"), 8975);
-            Dst_WorkDatIp = new IPEndPoint(IPAddress.Parse("192.168.172.100"), 8976);
+            Dst_NormWaveIp = new IPEndPoint(IPAddress.Parse("192.168.172.100"), 8976);
             Src_DelayWaveIp = new IPEndPoint(IPAddress.Parse("192.168.172.1"), 8973);
             Dst_ComMsgIp = new IPEndPoint(IPAddress.Parse("192.168.172.100"), 8972);
             Dst_ComDatIp = new IPEndPoint(IPAddress.Parse("192.168.172.100"), 8973);
@@ -67,7 +67,7 @@ namespace ArrayDisplay.net {
         /// <summary>
         ///     dst端波形数据
         /// </summary>
-        public static IPEndPoint Dst_WorkDatIp {
+        public static IPEndPoint Dst_NormWaveIp {
             get;
             private set;
         }
@@ -287,6 +287,15 @@ namespace ArrayDisplay.net {
             }
         }
 
+        public static byte[] Phase_Write {
+            get {
+                return phase_Write;
+            }
+            set {
+                phase_Write = value;
+            }
+        }
+
         #endregion
 
         #region 指令变量Method
@@ -425,6 +434,7 @@ namespace ArrayDisplay.net {
         static  byte[] origChannel_Write = {1, 0, 1, 0,0, 7 };
         static  byte[] origTimDiv_Write = {1, 0, 1, 0,0, 8 };
         static byte[] bvalue_Write = {1, 2, 0, 1, 48, 0};
+        static byte[] phase_Write = {1, 0, 64, 0};
 
         /// <summary>
         /// Dac操作
@@ -458,7 +468,7 @@ namespace ArrayDisplay.net {
         public const int ARRAY_USED = 64; //阵元数
         //Buffer设置
 //        public const int WORK_FRAME_NUMS = 31250; //正常工作波形同时显示帧数
-        public const int WORK_FRAME_NUMS = 1024*16 *2; //正常工作波形同时显示帧数
+        public const int WORK_FRAME_NUMS = 1024*16; //正常工作波形同时显示帧数
         public const int WORK_FRAME_LENGTH = 1024; // 正常工作波形帧长
         //能量图像素长度
         public const int MAX_ENERGY_PIXELS_LENGTH = 70;

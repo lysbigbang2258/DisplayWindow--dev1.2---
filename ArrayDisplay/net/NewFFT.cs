@@ -28,7 +28,7 @@ namespace ArrayDisplay.net {
             double scalingFactor = 1.0 / datasize;
 
 //            double deltaFreq = samplingRateNumericEdit.Value * scalingFactor;
-            double deltaFreq = dstfrom.Length * scalingFactor;
+            double deltaFreq = 31250 * scalingFactor;
             double[] subsetOfMagnitudes = new double[fftnumofSamples];
             subsetOfMagnitudes[0] = magnitudes[0] * scalingFactor;
             Point[] resultPoints = new Point[xwaveform.Length];

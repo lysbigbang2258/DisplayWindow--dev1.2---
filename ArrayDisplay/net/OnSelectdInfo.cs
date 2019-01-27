@@ -10,7 +10,7 @@ namespace ArrayDisplay.net {
     {
         #region field
 
-        int workWaveChannel = 0;
+        int workWaveChannel = 1;
         bool isSaveData;
         int daclen = 3000;
         int dacChannel = 2;
