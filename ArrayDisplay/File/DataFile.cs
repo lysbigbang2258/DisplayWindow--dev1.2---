@@ -11,27 +11,22 @@ using ArrayDisplay.UI;
 
 namespace ArrayDisplay.DataFile {
     public class DataFile : IDisposable {
-        readonly List<byte[]> workSavelist; //保存接收数据
-        readonly List<byte[]> origSavelist; //保存接收数据
         ConcurrentQueue<byte[]> origRcvQueue;
-        ConcurrentQueue<byte[]> origReadQueue;
+        ConcurrentQueue<byte[]> workRcvQueue;
         readonly string filepath;
-        readonly Semaphore sem_work;
-        readonly Semaphore sem_orig;
-        readonly AutoResetEvent origResetEvent;
+        AutoResetEvent origResetEvent;
+        AutoResetEvent workResetEvent;
         BinaryWriter br_work;
         BinaryWriter br_orig;
         FileStream fs_work;
         FileStream fs_orig;
+        
 
         public DataFile() {
-            workSavelist = new List<byte[]>(ConstUdpArg.WORK_FRAME_NUMS * 50);
-            origSavelist = new List<byte[]>(ConstUdpArg.ORIG_FRAME_NUMS * 50);
             origRcvQueue = new ConcurrentQueue<byte[]>();
-            origReadQueue = new ConcurrentQueue<byte[]>();
-            sem_work = new Semaphore(0, 10);
-            sem_orig = new Semaphore(0, 10);
+            workRcvQueue = new ConcurrentQueue<byte[]>();
             origResetEvent = new AutoResetEvent(false);
+            workResetEvent = new AutoResetEvent(false);
             Thread hthread = new Thread(Thread_WorkDataSave) {IsBackground = true};
             hthread.Start();
             RelativeDirectory rd = new RelativeDirectory();
@@ -40,16 +35,14 @@ namespace ArrayDisplay.DataFile {
 
         }
 
-        void Thread_WorkDataSave() {
-            while(true) {
-                sem_work.WaitOne();
-                if (fs_work != null) continue;
-
+        void Thread_WorkDataSave()
+        {
+            while (true)
+            {
+                workResetEvent.WaitOne();
                 DateTime dt = DateTime.Now;
                 StringBuilder sb = new StringBuilder();
-                sb.Append("file_");
-                sb.Append(DisPlayWindow.SelectdInfo.WorkWaveChannel.ToString("d3"));
-                sb.Append("_");
+                sb.Append("WorkFile_");
                 sb.Append(dt.Year.ToString("d4"));
                 sb.Append("-");
                 sb.Append(dt.Month.ToString("d2"));
@@ -62,37 +55,41 @@ namespace ArrayDisplay.DataFile {
                 sb.Append("-");
                 sb.Append(dt.Second.ToString("d2"));
                 sb.Append(".bin");
-                if (workSavelist.Count >= (ConstUdpArg.WORK_FRAME_NUMS * 5)) {
-                    fs_work = new FileStream(filepath + sb, FileMode.Create, FileAccess.Write);
-                    br_work = new BinaryWriter(fs_work);
-
-                    for(int i = 0; i < (ConstUdpArg.WORK_FRAME_NUMS * 5); i++)
-                        br_work.Write(workSavelist[i]); // 保存数据于磁盘
-                    workSavelist.RemoveRange(0, ConstUdpArg.WORK_FRAME_NUMS * 5 - 1);
-                    br_work.Flush();
-                    br_work.Close();
-                    fs_work.Close();
-                    fs_work = null;
+                var str = sb.ToString();
+                if (workRcvQueue.Count >= 1024 * 100 * 4)
+                {
+                    try
+                    {
+                        fs_work = new FileStream(filepath + str, FileMode.CreateNew, FileAccess.Write);
+                        br_work = new BinaryWriter(fs_work);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        throw;
+                    }
+                    byte[] temp;
+                    for (int i = 0; i <= 1024 * 100 * 4; i++)
+                    {
+                        workRcvQueue.TryDequeue(out temp);
+                        br_work.Write(temp);
+                    }
+                    workResetEvent.Set();
                 }
             }
         }
+        
 
         void Thread_OrigDataSave()
         {
             while (true)
             {
-//                sem_orig.WaitOne();
                 origResetEvent.WaitOne();
                
 
                 DateTime dt = DateTime.Now;
                 StringBuilder sb = new StringBuilder();
                 sb.Append("Origfile_");
-//                sb.Append("Chl:");
-//                sb.Append(DisPlayWindow.hMainWindow.tb_origChannel.Text);
-//                sb.Append("Div:");
-//                sb.Append(DisPlayWindow.hMainWindow.tb_orgiTdiv.Text);
-//                sb.Append("_");
                 sb.Append(dt.Year.ToString("d4"));
                 sb.Append("-");
                 sb.Append(dt.Month.ToString("d2"));
@@ -134,7 +131,7 @@ namespace ArrayDisplay.DataFile {
         }
 
         public void EnableWorkSaveFile() {
-            UdpWaveData.WorkSaveDataEventHandler += WriteOrigData;
+            UdpWaveData.WorkSaveDataEventHandler += WriteWorkData;
         }
         public void EnableOrigSaveFile()
         {
@@ -145,14 +142,11 @@ namespace ArrayDisplay.DataFile {
             UdpWaveData.WorkSaveDataEventHandler = null;
         }
 
-        void WriteSaveData(object sender, byte[] data) {
-            var buffer = new byte[data.Length];
-            Array.Copy(data, 0, buffer, 0, data.Length);
-            if (workSavelist.Count < (ConstUdpArg.WORK_FRAME_NUMS * 50)) {
-                workSavelist.Add(buffer);
-                if (0 == workSavelist.Count % ConstUdpArg.WORK_FRAME_NUMS * 5)
-                    sem_work.Release();
-            }
+        void WriteWorkData(object sender, byte[] data)
+        {
+            
+            workRcvQueue.Enqueue(data);
+            workResetEvent.Set();
         }
 
         void WriteOrigData(object sender, byte[] data)
@@ -167,10 +161,8 @@ namespace ArrayDisplay.DataFile {
             if (disposing) {
                 if (fs_work != null) fs_work.Dispose();
                 if (br_work != null) br_work.Dispose();
-                if (sem_work != null) sem_work.Dispose();
                 if (fs_orig != null) fs_orig.Dispose();
                 if (br_orig != null) br_orig.Dispose();
-                if (sem_orig != null) sem_orig.Dispose();
             }
         }
 

@@ -44,7 +44,7 @@ namespace ArrayDisplay.UI {
             systemInfo = new SystemInfo();
             SelectdInfo = new OnSelectdInfo();
             dataFile = new DataFile.DataFile();
-            udpCommand = new UdpCommand();
+            udpCommandSocket = new UdpCommandSocket();
 
             observableCollection = new ObservableCollection<UIBValue>();
             blistview.ItemsSource = observableCollection;
@@ -225,10 +225,10 @@ namespace ArrayDisplay.UI {
                                            });
             //切换到系统设置状态
             Task.Run(() => {
-                         udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+                         udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
                          try {
                              //发送查询指令
-                             udpCommand.GetDeviceState();
+                             udpCommandSocket.GetDeviceState();
 
                          }
                          catch(Exception exception) {
@@ -273,7 +273,7 @@ namespace ArrayDisplay.UI {
         /// <param name="e"></param>
         void WorkDataStart_OnClick(object sender, RoutedEventArgs e) {
             try {
-                udpCommand.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
+                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
                 if (NormWaveData==null) {
                     NormWaveData = new UdpWaveData();
                     NormWaveData.StartReceiveData(ConstUdpArg.Src_NormWaveIp);
@@ -316,12 +316,12 @@ namespace ArrayDisplay.UI {
         /// <param name="e"></param>
         void OrigDataStart_OnClick(object sender, RoutedEventArgs e) {
             try {
-                udpCommand.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
+                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
                 if (OrigWaveData==null) {
                     OrigWaveData = new UdpWaveData();
                     OrigWaveData.StartReceiveData(ConstUdpArg.Src_OrigWaveIp);
-                    udpCommand.WriteOrigChannel(OrigChannel);
-                    udpCommand.WriteOrigTDiv(OrigTiv);
+                    udpCommandSocket.WriteOrigChannel(OrigChannel);
+                    udpCommandSocket.WriteOrigTDiv(OrigTiv);
                     btn_origstart.Content = "停止";
                     OrigWaveData.StartRcvEvent.Set();
                 }
@@ -349,7 +349,7 @@ namespace ArrayDisplay.UI {
         /// <param name="e"></param>
         void DelayDataStart_OnClick(object sender, RoutedEventArgs e) {
             try {
-                udpCommand.SwitchWindow(ConstUdpArg.SwicthToDeleyWindow);
+                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToDeleyWindow);
                 if (DelayWaveData==null)
                 {
                     DelayWaveData = new UdpWaveData();
@@ -431,7 +431,7 @@ namespace ArrayDisplay.UI {
             var socket = new WaveSocket();
             var result = socket.GetSendBvalues(bfloats);
 
-            udpCommand.WriteBvalue(result);
+            udpCommandSocket.WriteBvalue(result);
         }
 
 
@@ -448,7 +448,7 @@ namespace ArrayDisplay.UI {
             var socket = new WaveSocket();
 //            var bfloats = new float[8];
             var result = socket.GetSendPhases(bfloats);
-            udpCommand.WritePhase(result);
+            udpCommandSocket.WritePhase(result);
         }
 
         void SaveBvalue_OnClick(object sender, RoutedEventArgs e) {
@@ -563,7 +563,7 @@ namespace ArrayDisplay.UI {
             Task.Run(() =>
             {
                 WaveSocket waveSocket = new WaveSocket();
-                waveSocket.StartCaclPhase(ConstUdpArg.Src_OrigWaveIp, udpCommand);
+                waveSocket.StartCaclPhase(ConstUdpArg.Src_OrigWaveIp, udpCommandSocket);
                 waveSocket.SendOrigSwitchCommand(8, 1);//八个通道一个时分
                 waveSocket.RcvResetEvent.Set();
                 Phases = waveSocket.CalToPhase();    
@@ -612,7 +612,7 @@ namespace ArrayDisplay.UI {
             Bvalues = new float[ConstUdpArg.ORIG_TIME_NUMS * ConstUdpArg.ORIG_CHANNEL_NUMS];
             Task.Run(() => {
                          WaveSocket waveSocket = new WaveSocket();
-                         waveSocket.StartCaclBvalue(ConstUdpArg.Src_OrigWaveIp,udpCommand);
+                         waveSocket.StartCaclBvalue(ConstUdpArg.Src_OrigWaveIp,udpCommandSocket);
                          waveSocket.SendOrigSwitchCommand(8,8);
                          waveSocket.RcvResetEvent.Set();
                          for (int i = 0; i <waveSocket.BvalueData.Length ; i++)
@@ -792,7 +792,7 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void OnBtnWindowShutDownClick(object sender, RoutedEventArgs e) {
-            udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+            udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
 //            Dispose();
             Close();
         }
@@ -876,7 +876,7 @@ namespace ArrayDisplay.UI {
                 catch(Exception) {
                     // ignored
                 }
-                udpCommand.WriteOrigChannel(num - 1);
+                udpCommandSocket.WriteOrigChannel(num - 1);
             }
         }
 
@@ -903,7 +903,7 @@ namespace ArrayDisplay.UI {
                     // ignored
                 }
 
-                udpCommand.WriteOrigTDiv(num - 1);
+                udpCommandSocket.WriteOrigTDiv(num - 1);
             }
         }
 
@@ -943,7 +943,7 @@ namespace ArrayDisplay.UI {
             {
                 case "delayItem":
                     {
-                    udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+                    udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
                         if (DelayWaveData != null) {
                             Task.Run(() => {
                                          btn_delaystart.Dispatcher.Invoke(() => {
@@ -958,7 +958,7 @@ namespace ArrayDisplay.UI {
                     }
                 case "origItem":
                     {
-                    udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+                    udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
                     if (OrigWaveData!=null) {
                         Task.Run(() => {
                                      btn_origstart.Dispatcher.Invoke(() => {
@@ -972,7 +972,7 @@ namespace ArrayDisplay.UI {
                 case "normalItem":
                     {
                     if (NormWaveData != null) {
-                        udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+                        udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
                         Task.Run(() => {
                                      btn_normalstart.Dispatcher.Invoke(() => {
                                                                            WorkDataStart_OnClick(null, null);
@@ -1058,7 +1058,7 @@ namespace ArrayDisplay.UI {
         readonly DataFile.DataFile dataFile;
         public static int sndCoefficent = 50;
         static DxPlaySound dxplaysnd; //播放声音对象
-        readonly UdpCommand udpCommand;
+        readonly UdpCommandSocket udpCommandSocket;
         readonly Dataproc dataproc;
         //public ConstUdpArg ConstUdpArg;
         bool isworkSaveFlag;
@@ -1091,7 +1091,7 @@ namespace ArrayDisplay.UI {
         void TabDelayOnGotFocus(object sender, RoutedEventArgs e) {
             if (!isTabDelayGotFocus) {
                 //切换到'延时校准'状态
-                udpCommand.SwitchWindow(ConstUdpArg.SwicthToDeleyWindow);
+                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToDeleyWindow);
                 isTabDelayGotFocus = true;
             }
         }
@@ -1100,7 +1100,7 @@ namespace ArrayDisplay.UI {
         void TabOranOnGotFocus(object sender, RoutedEventArgs e) {
             if (!isTabOranGotFocus) {
                 //切换到'原始数据'状态
-                udpCommand.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
+                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
                 isTabOranGotFocus = true;
             }
         }
@@ -1109,7 +1109,7 @@ namespace ArrayDisplay.UI {
         void TabWorkOnGotFocus(object sender, RoutedEventArgs e) {
             if (!isTabWorkGotFocus) {
                 //切换到'正常工作'状态
-                udpCommand.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
+                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
                 isTabWorkGotFocus = true;
             }
         }
@@ -1118,7 +1118,7 @@ namespace ArrayDisplay.UI {
         void TabAutoOnGotFocus(object sender, RoutedEventArgs e) {
             if (!isTabAutoGotFocus) {
                 //切换到'自动标定'状态
-                udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
                 isTabAutoGotFocus = true;
             }
         }
@@ -1127,7 +1127,7 @@ namespace ArrayDisplay.UI {
         void TabMultOnGotFocus(object sender, RoutedEventArgs e) {
             if (!isTabMultGotFocus) {
                 //切换到'多通道显示'状态
-                udpCommand.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
+                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
                 isTabMultGotFocus = true;
             }
         }
@@ -1135,7 +1135,7 @@ namespace ArrayDisplay.UI {
         /// <summary>载入系统信息 </summary>
         void LoadSystemInfo() {
             Thread.Sleep(500);
-            udpCommand.GetDeviceState();
+            udpCommandSocket.GetDeviceState();
         }
 
         #endregion
@@ -1146,7 +1146,7 @@ namespace ArrayDisplay.UI {
 
         /// <summary>脉冲周期.读.按钮响应</summary>
         void OnPulsePeriodRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommand.ReadPulsePeriod();
+            udpCommandSocket.ReadPulsePeriod();
             Task.Run(() => {
                          btn_readpluseperiod.Dispatcher.Invoke(() => {
                                                                         btn_readpluseperiod.IsEnabled = false; 
@@ -1175,7 +1175,7 @@ namespace ArrayDisplay.UI {
             var data = new byte[2];
             data.SetValue((byte) a, 0);
             data.SetValue((byte) b, 1);
-            udpCommand.WritePulsePeriod(data);
+            udpCommandSocket.WritePulsePeriod(data);
         }
 
         /// <summary>脉冲周期.存.按钮响应</summary>
@@ -1193,7 +1193,7 @@ namespace ArrayDisplay.UI {
             var data = new byte[2];
             data.SetValue((byte) a, 0);
             data.SetValue((byte) b, 1);
-            udpCommand.SavePulsePeriod(data);
+            udpCommandSocket.SavePulsePeriod(data);
         }
 
         #endregion
@@ -1202,7 +1202,7 @@ namespace ArrayDisplay.UI {
 
         /// <summary>脉冲延时.读.按钮响应</summary>
         void OnPulseDelayRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommand.ReadPulseDelay();
+            udpCommandSocket.ReadPulseDelay();
         }
 
         /// <summary>脉冲延时.写.按钮响应</summary>
@@ -1220,7 +1220,7 @@ namespace ArrayDisplay.UI {
             var data = new byte[2];
             data.SetValue((byte) a, 0);
             data.SetValue((byte) b, 1);
-            udpCommand.WritePulseDelay(data);
+            udpCommandSocket.WritePulseDelay(data);
         }
 
         /// <summary>脉冲延时.存.按钮响应</summary>
@@ -1238,7 +1238,7 @@ namespace ArrayDisplay.UI {
             var data = new byte[2];
             data.SetValue((byte) a, 0);
             data.SetValue((byte) b, 1);
-            udpCommand.SavePulseDelay(data);
+            udpCommandSocket.SavePulseDelay(data);
         }
 
         #endregion
@@ -1247,7 +1247,7 @@ namespace ArrayDisplay.UI {
 
         /// <summary>脉冲宽度.读.按钮响应</summary>
         void OnPulseWidthRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommand.ReadPulseWidth();
+            udpCommandSocket.ReadPulseWidth();
         }
 
         /// <summary>脉冲宽度.写.按钮响应</summary>
@@ -1265,7 +1265,7 @@ namespace ArrayDisplay.UI {
             var data = new byte[2];
             data.SetValue((byte) a, 0);
             data.SetValue((byte) b, 1);
-            udpCommand.WritePulseWidth(data);
+            udpCommandSocket.WritePulseWidth(data);
         }
 
         /// <summary>脉冲宽度.存.按钮响应</summary>
@@ -1283,7 +1283,7 @@ namespace ArrayDisplay.UI {
             var data = new byte[2];
             data.SetValue((byte) a, 0);
             data.SetValue((byte) b, 1);
-            udpCommand.SavePulseWidth(data);
+            udpCommandSocket.SavePulseWidth(data);
         }
 
         #endregion
@@ -1292,7 +1292,7 @@ namespace ArrayDisplay.UI {
 
         /// <summary>ADC偏移.读.按钮响应</summary>
         void OnAdcOffsetRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommand.ReadAdcOffset();
+            udpCommandSocket.ReadAdcOffset();
         }
 
         /// <summary>ADC偏移.写.按钮响应</summary>
@@ -1308,7 +1308,7 @@ namespace ArrayDisplay.UI {
             }
             int tmpT = (int) ((floatT + 1.2) * 128 / 1.2);
 
-            udpCommand.WriteAdcOffset((byte) tmpT);
+            udpCommandSocket.WriteAdcOffset((byte) tmpT);
         }
 
         /// <summary>ADC偏移.存.按钮响应</summary>
@@ -1320,7 +1320,7 @@ namespace ArrayDisplay.UI {
 
             float floatT = float.Parse(strT);
             int tmpT = (int) ((floatT + 1.2) * 128 / 1.2);
-            udpCommand.SaveAdcOffset((byte) tmpT);
+            udpCommandSocket.SaveAdcOffset((byte) tmpT);
         }
 
         #endregion
@@ -1329,7 +1329,7 @@ namespace ArrayDisplay.UI {
 
         /// <summary>///延时信息.读.按钮响应 /// </summary>
         void OnDelayTimeRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommand.ReadDelyTime();
+            udpCommandSocket.ReadDelyTime();
         }
 
         /// <summary>///延时信息.写.按钮响应 /// </summary>
@@ -1345,7 +1345,7 @@ namespace ArrayDisplay.UI {
                 data[0] = temp[1];
                 data[1] = temp[0];
             }
-            udpCommand.WriteDelayTime(data);
+            udpCommandSocket.WriteDelayTime(data);
         }
 
         /// <summary>///延时信息.存.按钮响应 /// </summary>
@@ -1362,7 +1362,7 @@ namespace ArrayDisplay.UI {
             data.SetValue((byte) a, 0);
             data.SetValue((byte) b, 1);
 
-            udpCommand.SaveDelayTime(data);
+            udpCommandSocket.SaveDelayTime(data);
         }
 
         #endregion
@@ -1370,7 +1370,7 @@ namespace ArrayDisplay.UI {
         #region Dac信息.(读/写/存).按钮响应
 
         void DacLenRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommand.ReadCanChannelLen();
+            udpCommandSocket.ReadCanChannelLen();
         }
 
         void DacLenWrite_OnClick(object sender, RoutedEventArgs e) {
@@ -1380,7 +1380,7 @@ namespace ArrayDisplay.UI {
             }
             int t = int.Parse(strT);
 
-            udpCommand.WriteDacChannel(t);
+            udpCommandSocket.WriteDacChannel(t);
         }
 
         void DacLenSave_OnClick(object sender, RoutedEventArgs e) {
@@ -1396,7 +1396,7 @@ namespace ArrayDisplay.UI {
             data.SetValue((byte) a, 0);
             data.SetValue((byte) b, 1);
 
-            udpCommand.SaveDelayTime(data);
+            udpCommandSocket.SaveDelayTime(data);
         }
 
         #endregion
@@ -1408,7 +1408,7 @@ namespace ArrayDisplay.UI {
         /// <inheritdoc />
         public void Dispose() {
             if (dataFile != null) dataFile.Dispose();
-            if (udpCommand != null) udpCommand.Dispose();
+            if (udpCommandSocket != null) udpCommandSocket.Dispose();
             if (dataproc != null) dataproc.Dispose();
             if (NormWaveData != null) NormWaveData.Dispose();
             if (OrigWaveData != null) OrigWaveData.Dispose();

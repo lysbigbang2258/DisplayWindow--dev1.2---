@@ -9,12 +9,13 @@ using System.Windows.Forms;
 using ArrayDisplay.UI;
 
 namespace ArrayDisplay.net {
-    public class UdpCommand : IDisposable {
-        public UdpCommand() {
+    public class UdpCommandSocket : IDisposable {
+        public UdpCommandSocket() {
             rcvsocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            rcvsocket.ReceiveTimeout = 5000;
+            rcvsocket.ReceiveTimeout = 2000;
             sedsocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            sedsocket.SendTimeout = 5000;
+            sedsocket.SendTimeout = 1000;
+            sedsocket.ReceiveTimeout = 2000;
             Init();
         }
 
@@ -72,7 +73,6 @@ namespace ArrayDisplay.net {
         /// <summary>///切换功能窗口（波形或命令）/// </summary>
         public void SwitchWindow(byte[] cmdBytes) {
             if (!isSocketInit) {
-//                Init();
             }
             var tempBytes = new byte[8];
             cmdBytes.CopyTo(tempBytes, 0);
@@ -109,7 +109,6 @@ namespace ArrayDisplay.net {
                 var rcvUdpBuffer = new byte[18];
                 try {
                     int offset = 0;
-                    while(offset < rcvUdpBuffer.Length) {
                         try
                         {
                             int ret = sedsocket.ReceiveFrom(rcvUdpBuffer, offset, rcvUdpBuffer.Length - offset, SocketFlags.None, ref senderRemote);
@@ -120,7 +119,6 @@ namespace ArrayDisplay.net {
                         {
                             Console.WriteLine(e);
                         }
-                    }    
                     var flagBytes = new byte[8];
                     Array.Copy(rcvUdpBuffer, 0, flagBytes, 0, 8);
                     string temp = BitConverter.ToString(flagBytes);
@@ -492,9 +490,14 @@ namespace ArrayDisplay.net {
         /// <param name="bufferLength">buffer大小</param>
         public void ReceiveDeviceType(int bufferLength) {
             var rcvUdpBuffer = ReadRemote(bufferLength);
-            string mcType = Encoding.ASCII.GetString(rcvUdpBuffer, 6, 8);
-            Console.WriteLine("mc_type={0}", mcType);
-            DisPlayWindow.systemInfo.McType = mcType;
+            if (rcvUdpBuffer == null) {
+                Console.WriteLine("接收设备类型数据错误");
+                return;
+            }
+                string mcType = Encoding.ASCII.GetString(rcvUdpBuffer, 6, 8);
+                Console.WriteLine("mc_type={0}", mcType);
+                DisPlayWindow.systemInfo.McType = mcType;
+            
         }
 
         /// <summary>
@@ -503,46 +506,74 @@ namespace ArrayDisplay.net {
         /// <param name="bufferLength">buffer大小</param>
         public void ReceiveDeviceId(int bufferLength) {
             var rcvUdpBuffer = ReadRemote(bufferLength);
-            string mcId = "";
-            for(int i = 0; i < 8; i++) {
-                mcId += BitConverter.ToString(rcvUdpBuffer, 6 + i, 1);
+            if (rcvUdpBuffer == null) {
+                Console.WriteLine("接收设备ID数据错误");
+                return;
             }
-            Console.WriteLine("mc_id={0}", mcId);
-            DisPlayWindow.systemInfo.McId = mcId;
+            string mcId = "";
+                for(int i = 0; i < 8; i++) {
+                    mcId += BitConverter.ToString(rcvUdpBuffer, 6 + i, 1);
+                }
+                Console.WriteLine("mc_id={0}", mcId);
+                DisPlayWindow.systemInfo.McId = mcId;
+            
         }
 
         /// <summary>
-        ///     接收设备ID数据
+        ///     接收设备Mac数据
         /// </summary>
         /// <param name="bufferLength">buffer大小</param>
         public void ReceiveDeviceMac(int bufferLength) {
             var rcvUdpBuffer = ReadRemote(bufferLength);
-            string mcMac = "";
-            for(int i = 0; i < 6; i++) {
-                if (i > 0) {
-                    mcMac += ":" + BitConverter.ToString(rcvUdpBuffer, 6 + i, 1);
-                }
-                else {
-                    mcMac += BitConverter.ToString(rcvUdpBuffer, 6 + i, 1);
-                }
+            if (rcvUdpBuffer == null) {
+                Console.WriteLine("接收设备Mac数据错误");
+                return;
             }
-            Console.WriteLine("mc_mac={0}", mcMac);
-            DisPlayWindow.systemInfo.McMac = mcMac;
+                string mcMac = "";
+                for(int i = 0; i < 6; i++) {
+                    if (i > 0) {
+                        mcMac += ":" + BitConverter.ToString(rcvUdpBuffer, 6 + i, 1);
+                    }
+                    else {
+                        mcMac += BitConverter.ToString(rcvUdpBuffer, 6 + i, 1);
+                    }
+                }
+                Console.WriteLine("mc_mac={0}", mcMac);
+                DisPlayWindow.systemInfo.McMac = mcMac;
+            
+            
+           
         }
-
+        /// <summary>
+        ///    接收脉冲周期数据
+        /// </summary>
+        /// <param name="bufferLength"></param>
         public void ReceivePulsePeriod(int bufferLength) {
             var rcvUdpBuffer = ReadRemote(bufferLength);
-            //返回数据以指令为开头
-            var cmd = new byte[6];
-            Array.Copy(rcvUdpBuffer, 0, cmd, 0, 6);
-            var data = new byte[2];
-            Array.Copy(rcvUdpBuffer, 6, data, 0, 2);
-            SetData(Encoding.ASCII.GetString(cmd, 0, 6), data);
+            if (rcvUdpBuffer == null) {
+                Console.WriteLine("接收脉冲周期数据错误");
+                return;
+            }
+                //返回数据以指令为开头
+                var cmd = new byte[6];
+                Array.Copy(rcvUdpBuffer, 0, cmd, 0, 6);
+                var data = new byte[2];
+                Array.Copy(rcvUdpBuffer, 6, data, 0, 2);
+                SetData(Encoding.ASCII.GetString(cmd, 0, 6), data);
+            
         }
-
+        /// <summary>
+        ///    接收脉冲延迟数据
+        /// </summary>
+        /// <param name="bufferLength"></param>
         public void ReceivePulseDelay(int bufferLength) {
             var rcvUdpBuffer = ReadRemote(bufferLength);
             //返回数据以指令为开头
+            if (rcvUdpBuffer == null)
+            {
+                Console.WriteLine("脉冲延迟错误");
+                return;
+            }
             var cmd = new byte[6];
             Array.Copy(rcvUdpBuffer, 0, cmd, 0, 6);
             var temp = new byte[2];
@@ -553,6 +584,11 @@ namespace ArrayDisplay.net {
         public void ReceivePulseWidth(int bufferLength) {
             var rcvUdpBuffer = ReadRemote(bufferLength);
             //返回数据以指令为开头
+            if (rcvUdpBuffer == null)
+            {
+                Console.WriteLine("脉冲延迟错误");
+                return;
+            }
             var cmd = new byte[6];
             Array.Copy(rcvUdpBuffer, 0, cmd, 0, 6);
             var temp = new byte[2];
@@ -563,6 +599,11 @@ namespace ArrayDisplay.net {
         public void ReceiveAdcOffset(int bufferLength) {
             var rcvUdpBuffer = ReadRemote(bufferLength);
             //返回数据以指令为开头
+            if (rcvUdpBuffer == null)
+            {
+                Console.WriteLine("脉冲延迟错误");
+                return;
+            }
             var cmd = new byte[6];
             Array.Copy(rcvUdpBuffer, 0, cmd, 0, 6);
             var temp = new byte[1];
@@ -573,6 +614,11 @@ namespace ArrayDisplay.net {
         public void ReceiveChannelDeleyTime(int bufferLength) {
             var rcvUdpBuffer = ReadRemote(bufferLength);
             //返回数据以指令为开头
+            if (rcvUdpBuffer == null)
+            {
+                Console.WriteLine("脉冲延迟错误");
+                return;
+            }
             var cmd = new byte[6];
             Array.Copy(rcvUdpBuffer, 0, cmd, 0, 6);
             var temp = new byte[2];
@@ -582,6 +628,11 @@ namespace ArrayDisplay.net {
 
         public void ReceiveCanChannelLen(int bufferLength) {
             var rcvUdpBuffer = ReadRemote(bufferLength);
+            if (rcvUdpBuffer == null)
+            {
+                Console.WriteLine("脉冲延迟错误");
+                return;
+            }
             //返回数据以指令为开头
             var cmd = new byte[6];
             Array.Copy(rcvUdpBuffer, 0, cmd, 0, 6);

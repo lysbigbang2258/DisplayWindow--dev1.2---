@@ -10,55 +10,78 @@ using System.Threading;
 using ArrayDisplay.UI;
 
 namespace ArrayDisplay.net {
+    /// <summary>
+    /// 计算需连续发送命令的变量
+    /// </summary>
     public class WaveSocket:IDisposable  {
-
+        /// <summary>
+        /// 主Socket
+        /// </summary>
         public Socket MSocket {
             get;
             set;
         }
-
+        /// <summary>
+        /// 接收线程
+        /// </summary>
         public Thread RcvThread {
             get;
             set;
         }
-
+        /// <summary>
+        /// B值数组，通道*多帧数据
+        /// </summary>
         public short[][] BvalueData {
             get;
             set;
         }
 
-
+        /// <summary>
+        /// 初始相位数组，通道*多帧数据
+        /// </summary>
         public short[][] RcvPhaseData {
             get;
             set;
         }
-
+        /// <summary>
+        /// 计算得到的各通道初始相位
+        /// </summary>
         public float[] PhaseFloats {
             get;
             set;
         }
-
+        /// <summary>
+        /// 接收数据通知开关
+        /// </summary>
         public AutoResetEvent RcvResetEvent {
             get;
             set;
         }
-
-        public UdpCommand UCommand {
+        /// <summary>
+        /// 发送指令变量，
+        /// </summary>
+        public UdpCommandSocket UCommandSocket {
             get;
             set;
         }
-
+        /// <summary>
+        /// 初始化一个Udp的Socket
+        /// </summary>
         public WaveSocket() {
             MSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
                                     ProtocolType.Udp);
         }
-
-        public void StartCaclBvalue(IPEndPoint ip,UdpCommand udpCommand) {
+        /// <summary>
+        /// 开启计算B值流程
+        /// </summary>
+        /// <param name="ip">绑定本地节点</param>
+        /// <param name="udpCommandSocket">接收发送命令socket</param>
+        public void StartCaclBvalue(IPEndPoint ip,UdpCommandSocket udpCommandSocket) {
             try {
-                UCommand = udpCommand;
+                UCommandSocket = udpCommandSocket;
                 MSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH;      
                 MSocket.Bind(ip);
-                RcvThread = new Thread(RcvUdpdataToBvalue) {IsBackground = true};
+                RcvThread = new Thread(RcvUdpdataToBvalue_ThreatStart) {IsBackground = true};
                 RcvResetEvent = new AutoResetEvent(false);
                 BvalueData = new short[64][];
                 RcvThread.Start();
@@ -68,15 +91,19 @@ namespace ArrayDisplay.net {
                 throw;
             }
         }
-
-        public void StartCaclPhase(IPEndPoint ip, UdpCommand udpCommand)
+        /// <summary>
+        /// 开启计算初始相位流程
+        /// </summary>
+        /// <param name="ip">绑定本地节点</param>
+        /// <param name="udpCommandSocket">接收发送命令socket</param>
+        public void StartCaclPhase(IPEndPoint ip, UdpCommandSocket udpCommandSocket)
         {
             try {
-                UCommand = udpCommand;
+                UCommandSocket = udpCommandSocket;
                 MSocket.Blocking = true;
                 MSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH;
                 MSocket.Bind(ip);
-                RcvThread = new Thread(RcvUdpdataToPhase) { IsBackground = true };
+                RcvThread = new Thread(RcvUdpdataToPhase_ThreatStart) { IsBackground = true };
                 RcvResetEvent = new AutoResetEvent(false);
                 RcvPhaseData = new short[8][]; 
                 PhaseFloats = new float[8];
@@ -89,9 +116,9 @@ namespace ArrayDisplay.net {
             }
         }
         /// <summary>
-        /// 接收网络流相位信号
+        /// 接收网络流相位信号线程函数
         /// </summary>
-        void RcvUdpdataToPhase()
+        void RcvUdpdataToPhase_ThreatStart()
         {
             List<ArraySegment<byte>> buffer = new List<ArraySegment<byte>> {
                 new ArraySegment<byte>(new byte[1282])
@@ -115,23 +142,23 @@ namespace ArrayDisplay.net {
                     {
                         continue;
                     }
-                    int chl = bytedata[0];
-                    int tiv = bytedata[1];
+                    int chl = bytedata[0]; //通道号
+                    int tiv = bytedata[1]; //时分
 
-                    int index = tiv * 8 + chl;
+                    int index = tiv * 8 + chl; //1时分表示8通道
                     offset += 2;
-                    short[] sbdata = new short[(bytedata.Length - offset) / 2];
-                    var purdata = new byte[bytedata.Length - offset];
+                    short[] sbdata = new short[(bytedata.Length - offset) / 2]; //2byte转short数据
+                    var purdata = new byte[bytedata.Length - offset];//接收byte数组
                     Array.Copy(bytedata, offset, purdata, 0, purdata.Length);
                     for (int i = 0; i < sbdata.Length; i++)//大端数据
                     {
-                        var t = new byte[2];
+                        var t = new byte[2];          // 大端转小端
                         t[0] = purdata[2 * i + 1];
                         t[1] = purdata[2 * i];
                         sbdata[i] = BitConverter.ToInt16(t, 0);
                     }
                     if (index<0 || index>31) {
-                        Console.WriteLine("Why");
+                        Console.WriteLine("Index Error！");
                     }
                     RcvPhaseData[index] = new short[sbdata.Length];
                     Console.WriteLine("通道： " + index);
@@ -144,14 +171,14 @@ namespace ArrayDisplay.net {
                 }
                 stopwatch.Stop();
                 Console.WriteLine("RCVTime:" + stopwatch.ElapsedMilliseconds);
-                RcvResetEvent.Reset();
+                RcvResetEvent.Reset(); // 线程继续等待
             }
 
         }
         /// <summary>
         /// 采集信号保存到Bvalue[]数组
         /// </summary>
-        void RcvUdpdataToBvalue() {
+        void RcvUdpdataToBvalue_ThreatStart() {
             List<ArraySegment<byte>> buffer = new List<ArraySegment<byte>> {
                 new ArraySegment<byte>(new byte[1282]),
             };
@@ -171,15 +198,15 @@ namespace ArrayDisplay.net {
                     if (bytedata == null) {
                         continue;
                     }
-                    int tiv = bytedata[0];
-                    int chl = bytedata[1];                    
-                    int index = chl * 8 + tiv;
+                    int chl = bytedata[0];    //通道
+                    int tiv = bytedata[1];    //时分                
+                    int index = tiv * 8 + chl;  // 1时分8通道
                     offset += 2;
                     short[] sbdata = new short[(bytedata.Length - offset) / 2];
                     var purdata = new byte[bytedata.Length - offset];
                     
                     Array.Copy(bytedata, offset, purdata, 0, purdata.Length);
-                    for (int i = 0; i < sbdata.Length; i++)//大端数据
+                    for (int i = 0; i < sbdata.Length; i++)//大端数据转小端
                     {
                         var t = new byte[2];
                         t[0] = purdata[2 * i + 1];
@@ -187,7 +214,7 @@ namespace ArrayDisplay.net {
                         sbdata[i] = BitConverter.ToInt16(t, 0);
                     }
                     BvalueData[index] = new short[sbdata.Length];
-                    double progressvalue = (index + 1) * 100.0 / 64;
+                    double progressvalue = (index + 1) * 100.0 / 64; //进度条
                     Console.WriteLine("通道： " + index);
                     Array.Copy(sbdata, BvalueData[index], sbdata.Length);
                     DisPlayWindow.hMainWindow.bvaulue_pgbar.Dispatcher.Invoke(() =>
@@ -214,7 +241,7 @@ namespace ArrayDisplay.net {
         /// <param name="timenum">时分个数</param>
         public void SendOrigSwitchCommand(int chinum,int timenum)
         {
-            UCommand.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
+            UCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
 //            UCommand.WriteOrigTDiv(0);
 //            Console.WriteLine("发送时分0");
 //            UCommand.WriteOrigChannel(0);
@@ -224,9 +251,9 @@ namespace ArrayDisplay.net {
             {
                 for (int j = 0; j < chinum; j++)
                 {
-                    UCommand.WriteOrigTDiv(i);
+                    UCommandSocket.WriteOrigTDiv(i);
                     Console.WriteLine("发送时分{0}", i);
-                    UCommand.WriteOrigChannel(j);
+                    UCommandSocket.WriteOrigChannel(j);
                     Console.WriteLine("发送通道{0}", j);
                     Thread.Sleep(15);
                     RcvResetEvent.Set();
@@ -234,12 +261,16 @@ namespace ArrayDisplay.net {
                 }
             }
             Thread.Sleep(100);
-            UCommand.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
-            UCommand.WriteOrigChannel(0);
-            UCommand.WriteOrigTDiv(0);
-            UCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+            UCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
+            UCommandSocket.WriteOrigChannel(0);
+            UCommandSocket.WriteOrigTDiv(0);
+            UCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
         }
 
+        /// <summary>
+        /// 计算初始相位
+        /// </summary>
+        /// <returns>各个通道相位值</returns>
         public float[] CalToPhase() {
            return CalToPhase(RcvPhaseData);
         }
@@ -268,7 +299,7 @@ namespace ArrayDisplay.net {
 
             for (int index = 0; index < rcvPahseArray.Length; index++) {
                 var array = rcvPahseArray[index];
-                for (int i = 0; i < array.Length; i++)
+                for (int i = 0; i < array.Length; i++) // 16个采样点表示1周期，
                 {
                     var frams = i / 16;
                     var num = i % 16;
@@ -297,29 +328,33 @@ namespace ArrayDisplay.net {
             return caltin;
 
         }
-
+       /// <summary>
+       /// 将计算得到的初始相位混频
+       /// </summary>
+       /// <param name="caltin"></param>
+       /// <returns></returns>
        public byte[][] GetSendPhases(float[] caltin) {
-            List<float> list1;
-            List<float> list2;
-            List<List<float>> oneLists = new List<List<float>>();
+            List<float> list1; 
+           List<List<float>> oneLists = new List<List<float>>();
             List<float[]> doublelist = new List<float[]>();
             for(int index = 0; index < caltin.Length; index++) {
                 list1 = new List<float>();
                 for(int i = 0; i < 16; i++) {
-                    var tmp1 = Math.Cos(Math.PI / 8 * i + caltin[index]);
-                    var tmp2 = Math.Cos(Math.PI / 4 * i + 2*caltin[index]);
+                    var tmp1 = Math.Cos(Math.PI / 8 * i + caltin[index]); //一倍频混
+                    var tmp2 = Math.Cos(Math.PI / 4 * i + 2*caltin[index]);//二倍频混
                     list1.Add((float)tmp1);
                     list1.Add((float)tmp2);
                 }
-                oneLists.Add(list1);
+                oneLists.Add(list1);//
             }
-            for(int i = 0; i < 8; i++) {
+            for (int i = 0; i < oneLists.Count; i++)
+            {
                 var tmplist = new List<float>();
                     tmplist.AddRange(oneLists[i]);
                 doublelist.Add(tmplist.ToArray());
             }
             
-            var shortlist = doublelist.ConvertAll(FloatsToshorts);
+            var shortlist = doublelist.ConvertAll(FloatsToshorts); 
             var bytelist = shortlist.ConvertAll(ShortTobytes);
             var sendbytes = bytelist.ToArray();
             return sendbytes;
@@ -340,9 +375,9 @@ namespace ArrayDisplay.net {
         {
             List<byte> list = new List<byte>();
             var tmp =new byte[2];
-            for (int i = input.Length-1; i >= 0; i--)
+            for (int i = input.Length-1; i >= 0; i--)  // 行列转换，这样数据才对
             {
-                var t = BitConverter.GetBytes(input[i]);
+                var t = BitConverter.GetBytes(input[i]);  // 大小端转换
                 tmp[0] = t[1];
                 tmp[1] = t[0];
                 list.AddRange(tmp);
@@ -366,17 +401,17 @@ namespace ArrayDisplay.net {
             for (int i = 0; i < bfloats.Length; i++)
             {
                 short x;
-                if (bfloats[i] < 0.271)
+                if (bfloats[i] < 0.271)   //实际计算值最小值
                 {
-                    x = 32767;
+                    x = 32767;   // 最小值
                 }
-                else if (bfloats[i] > 17712)
+                else if (bfloats[i] > 17712)  // 实际计算值最大值
                 {
                     x = 0;
                 }
                 else
                 {
-                    x = (short)(8856 / bfloats[i]);
+                    x = (short)(8856 / bfloats[i]); // bfloats为1时，x为8856
                 }
 
                 var tmp = BitConverter.GetBytes(x);
@@ -384,14 +419,14 @@ namespace ArrayDisplay.net {
                 blist[i % 8].AddRange(tmp);
             }
             var package = new List<byte>();
-            short t = 32767;
-            for (int i = 0; i < 24; i++)
+            short t = 32767; // 最小值
+            for (int i = 0; i < 24; i++) //补充剩余的24个通道
             {
                 var tmp = BitConverter.GetBytes(t);
                 package.AddRange(tmp);
             }
 
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 8; i++)  // 8个时分
             {
                 blist[i].AddRange(package);
             }
