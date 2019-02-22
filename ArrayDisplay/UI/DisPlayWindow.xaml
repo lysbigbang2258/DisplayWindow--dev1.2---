@@ -4,6 +4,7 @@
         xmlns:ni="http://schemas.ni.com/controls/2009/xaml/presentation"
         xmlns:input="clr-namespace:System.Windows.Input;assembly=PresentationCore"
         xmlns:ui="clr-namespace:ArrayDisplay.UI"
+        Loaded="DisPlayWindow_OnLoaded"
         Height="1080" Width="1920"
         WindowState="Maximized"
         WindowStyle="None"
@@ -378,7 +379,7 @@
                                 <Grid Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,32">
                                     <Grid.RowDefinitions>
                                         <RowDefinition />
-                                        <RowDefinition />
+                                        <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
                                     <WrapPanel Grid.Row="0" VerticalAlignment="Center">
                                         <WrapPanel Margin="10" HorizontalAlignment="Center">
@@ -405,20 +406,28 @@
 
                                     </WrapPanel>
 
+<!--                                    <WrapPanel Grid.Row="1">-->
+<!--                                        <Label Content="音量" FontSize="18" Margin="10,0,0,0" Height="32" />-->
+<!--                                        <Slider x:Name="sl_soundValue" HorizontalAlignment="Left"-->
+<!--                                                VerticalAlignment="Center"-->
+<!--                                                Width="200"-->
+<!--                                                Margin="30,0,0,0" Height="23" Maximum="100" Value="50"-->
+<!--                                                ValueChanged="SoundValueChanged" />-->
+<!--                                        <TextBlock x:Name="tb_soundValue" Width="82" Height="19" Margin="20,0,0,0"-->
+<!--                                                   Text="50"-->
+<!--                                                   VerticalAlignment="Center" TextAlignment="Center" FontSize="16" />-->
+<!--                                        <Button x:Name="btnlisten" Content="开始听音" HorizontalAlignment="Left"-->
+<!--                                                Margin="5,0,0,0" Width="100" Height="32"-->
+<!--                                                VerticalAlignment="Center"-->
+<!--                                                FontSize="18" Click="OnSound_OnClick" />-->
+<!--                                    </WrapPanel>-->
                                     <WrapPanel Grid.Row="1">
-                                        <Label Content="音量" FontSize="18" Margin="10,0,0,0" Height="32" />
-                                        <Slider x:Name="sl_soundValue" HorizontalAlignment="Left"
-                                                VerticalAlignment="Center"
-                                                Width="200"
-                                                Margin="30,0,0,0" Height="23" Maximum="100" Value="50"
-                                                ValueChanged="SoundValueChanged" />
-                                        <TextBlock x:Name="tb_soundValue" Width="82" Height="19" Margin="20,0,0,0"
-                                                   Text="50"
-                                                   VerticalAlignment="Center" TextAlignment="Center" FontSize="16" />
-                                        <Button x:Name="btnlisten" Content="开始听音" HorizontalAlignment="Left"
-                                                Margin="5,0,0,0" Width="100" Height="32"
-                                                VerticalAlignment="Center"
-                                                FontSize="18" Click="OnSound_OnClick" />
+                                        <Label Content="频率" FontSize="18" Margin="10,0,0,0" Height="32" />
+                                        <TextBox x:Name="tb_frqValue" Width="98" Height="32" Margin="20,0,0,0"
+                                        Text="5" VerticalAlignment="Center" TextAlignment="Center" FontSize="18" />
+                                        <Label Content="幅值" FontSize="18" Margin="10,0,0,0" Height="32" />
+                                        <TextBox x:Name="tb_ampValue" Width="98" Height="32" Margin="20,0,0,0"
+                                                 Text="5" VerticalAlignment="Center" TextAlignment="Center" FontSize="18" />
                                     </WrapPanel>
                                 </Grid>
                             </Grid>
@@ -431,6 +440,8 @@
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto" />
                                         <RowDefinition />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
                                     <Grid Row="0">
                                         <Grid.RowDefinitions>
@@ -468,9 +479,14 @@
                                                 </ni:Plot>
 
                                             </ni:Graph.Plots>
+                                            
                                         </ni:Graph>
                                     </Grid>
-                                    <Grid Row="1">
+                                    <GridSplitter Grid.Row="1" Height="100">
+                                        
+                                    </GridSplitter>
+
+                                    <Grid Row="2">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition />
@@ -479,11 +495,18 @@
                                                    TextAlignment="Left" Margin="30,0,0,0">
                                             <Run Text="频域波形图(纵坐标" /><Run Text="单位：" /><Run Text="dB 横坐标单位：Hz)" />
                                         </TextBlock>
-                                        <ni:Graph Grid.Row="0" x:Name="graph_normalFrequency"
+                                        <ni:WritableGraph Grid.Row="0" x:Name="graph_normalFrequency"
                                                           HorizontalAlignment="Left" Height="204"  Width="886"
-                                                          VerticalAlignment="Top" Foreground="{x:Null}"
-                                                          Background="{x:Null}"  Margin="5,5,0,0" >
-                                            <ni:Graph.Axes>
+                                                          VerticalAlignment="Top" 
+                                                          Margin="5,5,0,0" >
+                                            <ni:WritableGraph.Children>
+                                                <ni:Cursor>
+                                                    <ni:Cursor.ValuePresenter >
+                                                        <ni:ValueFormatterGroup  DefaultFormatter="0" Background="Yellow" />
+                                                    </ni:Cursor.ValuePresenter>
+                                                </ni:Cursor>
+                                            </ni:WritableGraph.Children> 
+                                            <ni:WritableGraph.Axes>
                                                 <ni:AxisDouble x:Name="xScale1" Range="0,5000" Orientation="Horizontal"
                                                                 Adjuster="None" >
                                                     <ni:AxisDouble.MajorDivisions>
@@ -500,14 +523,16 @@
                                                         <ni:GridLines />
                                                     </ni:AxisDouble.MajorGridLines>
                                                 </ni:AxisDouble>
-                                            </ni:Graph.Axes>
-                                            <ni:Graph.Plots>
+                                            </ni:WritableGraph.Axes>
+                                            <ni:WritableGraph.Plots>
                                                 <ni:Plot>
                                                     <ni:LinePlotRenderer Stroke="Green" />
                                                 </ni:Plot>
-                                            </ni:Graph.Plots>
-                                        </ni:Graph>
+                                            </ni:WritableGraph.Plots>
+                                            
+                                        </ni:WritableGraph>
                                     </Grid>
+                                    <GridSplitter Grid.Row="3" Height="100"/>
                                 </Grid>
                                 <Grid Column="1">
 

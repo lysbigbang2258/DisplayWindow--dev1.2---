@@ -32,41 +32,48 @@ namespace ArrayDisplay.UI {
         public DisPlayWindow() {
             InitializeComponent();
 
+           
+  
+        }
+        /// <summary>
+        /// 界面载入后
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void DisPlayWindow_OnLoaded(object sender, RoutedEventArgs e)
+        {
             Dataproc.PreGraphEventHandler += OnWorkGraph; // Work时域波形事件处理方法连接到事件
+            Dataproc.PreGraphEventHandler += OnMaxWorkValue; // Work时域波形最大值
             Dataproc.OrigGraphEventHandler += OnOrigGraph; // Orig波形事件处理方法连接到事件
             Dataproc.DelayGraphEventHandler += OnDelayWaveGraph; // Delay波形事件处理方法连接到事件
-//          Dataproc.FrapGraphEventHandler += OnFrapGraph; //Work频域波形事件处理方法
+            //          Dataproc.FrapGraphEventHandler += OnFrapGraph; //Work频域波形事件处理方法
             Dataproc.EnergyArrayEventHandler += OnEnergyArrayGraph; //能量图事件处理方法
             Dataproc.FrapPointGraphEventHandler += OnFrapPointGraph; //使用新FFT频域事件处理
-
+            Dataproc.FrapPointGraphEventHandler += OnMaxFrapPoint; //频率最大值
             hMainWindow = this;
 
             systemInfo = new SystemInfo();
             SelectdInfo = new OnSelectdInfo();
             dataFile = new DataFile.DataFile();
             udpCommandSocket = new UdpCommandSocket();
-
             observableCollection = new ObservableCollection<UIBValue>();
             blistview.ItemsSource = observableCollection;
             #region UI绑定
 
-            tb_state_mc_type.SetBinding(TextBox.TextProperty, new Binding("McType") {Source = systemInfo});
-            tb_state_mc_id.SetBinding(TextBox.TextProperty, new Binding("McId") {Source = systemInfo});
-            tb_state_mc_mac.SetBinding(TextBox.TextProperty, new Binding("McMac") {Source = systemInfo});
-            tb_setting_pulse_period.SetBinding(TextBox.TextProperty, new Binding("PulsePeriod") {Source = systemInfo});
-            tb_setting_pulse_delay.SetBinding(TextBox.TextProperty, new Binding("PulseDelay") {Source = systemInfo});
-            tb_setting_pulse_width.SetBinding(TextBox.TextProperty, new Binding("PulseWidth") {Source = systemInfo});
-            tb_setting_adc_offset.SetBinding(TextBox.TextProperty, new Binding("AdcOffset") {Source = systemInfo});
-            tb_setting_adc_num.SetBinding(TextBox.TextProperty, new Binding("AdcNum") {Source = systemInfo});
-
-            tb_origFram.SetBinding(TextBox.TextProperty, new Binding("OrigFramNums") {Source = SelectdInfo});
-            tb_deleyTime.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayTime") {Source = systemInfo});
-            tb_deleyChannel.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayNums") {Source = systemInfo});
-
-            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") {Source = SelectdInfo});
-            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") {Source = SelectdInfo});
-
-            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") {Source = SelectdInfo, Mode = BindingMode.TwoWay});
+            tb_state_mc_type.SetBinding(TextBox.TextProperty, new Binding("McType") { Source = systemInfo });
+            tb_state_mc_id.SetBinding(TextBox.TextProperty, new Binding("McId") { Source = systemInfo });
+            tb_state_mc_mac.SetBinding(TextBox.TextProperty, new Binding("McMac") { Source = systemInfo });
+            tb_setting_pulse_period.SetBinding(TextBox.TextProperty, new Binding("PulsePeriod") { Source = systemInfo });
+            tb_setting_pulse_delay.SetBinding(TextBox.TextProperty, new Binding("PulseDelay") { Source = systemInfo });
+            tb_setting_pulse_width.SetBinding(TextBox.TextProperty, new Binding("PulseWidth") { Source = systemInfo });
+            tb_setting_adc_offset.SetBinding(TextBox.TextProperty, new Binding("AdcOffset") { Source = systemInfo });
+            tb_setting_adc_num.SetBinding(TextBox.TextProperty, new Binding("AdcNum") { Source = systemInfo });
+            tb_origFram.SetBinding(TextBox.TextProperty, new Binding("OrigFramNums") { Source = SelectdInfo });
+            tb_deleyTime.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayTime") { Source = systemInfo });
+            tb_deleyChannel.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayNums") { Source = systemInfo });
+            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") { Source = SelectdInfo });
+            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") { Source = SelectdInfo });
+            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") { Source = SelectdInfo, Mode = BindingMode.TwoWay });
 
             #endregion
 
@@ -74,8 +81,6 @@ namespace ArrayDisplay.UI {
             DelayChannel = 0;
             OrigTiv = 0;
 
-            
-            
             timer_bvalue = new DispatcherTimer();
             timer_blist = new DispatcherTimer();
             led_normaldata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
@@ -83,15 +88,9 @@ namespace ArrayDisplay.UI {
 
 
             stopwatch = new Stopwatch();
-  
-            //测试,关闭数据接收
-//            udpCommand.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
-            //isTabWorkGotFocus = true;
-            //启动后等待0.5秒 自动加载一次系统状态参数
-            //new Thread(LoadSystemInfo).Start();
-            //Thread.Sleep(500);
-            //UdpCommand.GetDeviceState();
         }
+
+        
 
         #region  基础功能
 
@@ -151,7 +150,7 @@ namespace ArrayDisplay.UI {
                 dataPoints1[i] = new Point(xnums[i], graphdata[i]);
             }
             graph_energyFirst.Dispatcher.Invoke(() => {
-                                                    graph_energyFirst.DataSource = 0;
+                                                    graph_energyFirst.Refresh();
                                                     graph_energyFirst.DataSource = dataPoints1;
                                                 });
         }
@@ -162,7 +161,7 @@ namespace ArrayDisplay.UI {
                 return;
             }
             delay_graph.Dispatcher.Invoke(() => {
-                                              delay_graph.DataSource = 0;
+                                              delay_graph.Refresh();
                                               delay_graph.DataSource = e[DelayChannel];
                                           });
         }
@@ -173,7 +172,7 @@ namespace ArrayDisplay.UI {
                 return;
             }
             orige_graph.Dispatcher.Invoke(() => {
-                                              orige_graph.DataSource = 0;
+                                              orige_graph.Refresh();
                                               orige_graph.DataSource = e[OrigChannel * ConstUdpArg.ORIG_CHANNEL_NUMS + OrigTiv];
                                           });
         }
@@ -184,30 +183,44 @@ namespace ArrayDisplay.UI {
                 return;
             }
             graph_normalTime.Dispatcher.Invoke(() => {
-                                                   graph_normalTime.DataSource = 0;
+                                                   graph_normalTime.Refresh(); ;
                                                    graph_normalTime.DataSource = e;
                                                });
         }
-
-        /// <summary>///控件读入工作频率波形/// </summary>
-        void OnFrapGraph(object sender, float[] e) {
-            if (e == null) {
-                return;
-            }
-            graph_normalFrequency.Dispatcher.Invoke(() => {
-                                                        graph_normalFrequency.DataSource = 0;
-                                                        graph_normalFrequency.DataSource = e;
-                                                    });
+        /// <summary>
+        /// 控件读入时域最大值
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnMaxWorkValue(object sender, float[] e) {
+            var maxtmp = e.Max();
+            tb_ampValue.Dispatcher.Invoke(() =>
+                                          {
+                                              tb_ampValue.Text = maxtmp.ToString();
+                                          }); 
         }
-
         /// <summary>///控件读入工作频率波形/// </summary>
         void OnFrapPointGraph(object sender, Point[] e) {
             graph_normalFrequency.Dispatcher.Invoke(() => {
-                                                        graph_normalFrequency.DataSource = 0;
+                                                        graph_normalFrequency.Refresh();
                                                         graph_normalFrequency.DataSource = e;
                                                     });
         }
 
+        void OnMaxFrapPoint(object sender, Point[] e) {
+            Point maxPoint = new Point(0, 0);
+            foreach (Point dPoint in e)
+            {
+                if (maxPoint.Y < dPoint.Y)
+                {
+                    maxPoint = dPoint;
+                }
+            }
+            tb_frqValue.Dispatcher.Invoke(() =>
+                                     {
+                                          tb_frqValue.Text = maxPoint.X.ToString();
+                                     });
+        }
         #endregion
 
         #region 点击响应函数
@@ -421,6 +434,10 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void SendBvalue_OnClick(object sender, RoutedEventArgs e) {
+            if (!udpCommandSocket.IsSocketConnect)
+            {
+                return;
+            }
             string dirpath;
             string inipath = Environment.CurrentDirectory + "\\data";
             dirpath = tb_filePath.Text == "" ? inipath : tb_filePath.Text;
@@ -438,6 +455,10 @@ namespace ArrayDisplay.UI {
         
 
         void SendPhase_OnClick(object sender, RoutedEventArgs e) {
+            if (!udpCommandSocket.IsSocketConnect)
+            {
+                return;
+            }
             string dirpath;
             string inipath = Environment.CurrentDirectory + "\\data";
             dirpath = tb_filePath.Text == "" ? inipath : tb_filePath.Text;
@@ -452,6 +473,10 @@ namespace ArrayDisplay.UI {
         }
 
         void SaveBvalue_OnClick(object sender, RoutedEventArgs e) {
+            if (!udpCommandSocket.IsSocketConnect)
+            {
+                return;
+            }
             NormalBValueSave();
             PhaseSave();
         }
@@ -558,6 +583,10 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void CalPhase_OnClick(object sender, RoutedEventArgs e) {
+            if (!udpCommandSocket.IsSocketConnect)
+            {
+                return;
+            }
             btn_calPhase.IsEnabled = false;
             Phases = new float[ConstUdpArg.ORIG_TIME_NUMS];
             Task.Run(() =>
@@ -608,6 +637,10 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void CalBvalue_OnClick(object sender, RoutedEventArgs e) {
+            if (!udpCommandSocket.IsSocketConnect)
+            {
+                return;
+            }
             btn_calBvalue.IsEnabled = false;
             Bvalues = new float[ConstUdpArg.ORIG_TIME_NUMS * ConstUdpArg.ORIG_CHANNEL_NUMS];
             Task.Run(() => {
@@ -810,7 +843,7 @@ namespace ArrayDisplay.UI {
                 dxplaysnd.WriteOneTimData(buffer);
                 dxplaysnd.WriteOneTimData(buffer);
                 Dataproc.SoundEventHandler += OnSndData;
-                btnlisten.Content = "停止听音";
+//                btnlisten.Content = "停止听音";
             }
             else {
                 if (Dataproc.SoundEventHandler != null) {
@@ -818,7 +851,7 @@ namespace ArrayDisplay.UI {
                 }
                 dxplaysnd.Close();
                 dxplaysnd = null;
-                btnlisten.Content = "开始听音";
+//                btnlisten.Content = "开始听音";
             }
         }
 
@@ -941,26 +974,24 @@ namespace ArrayDisplay.UI {
             HeaderedContentControl arg = slcArg.RemovedItems[0] as HeaderedContentControl;
             switch (arg.Name)
             {
-                case "delayItem":
-                    {
-                    udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
-                        if (DelayWaveData != null) {
-                            Task.Run(() => {
-                                         btn_delaystart.Dispatcher.Invoke(() => {
-                                                                              DelayDataStart_OnClick(null, null);
-                                                                          });
-                                     });
-                          
-                            Console.WriteLine("关闭延时波形");
-                            
-                        }
+                case "delayItem": {
+                    Task.Run(() => {
+                                 udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+                                 if (DelayWaveData!=null) {
+                                     btn_delaystart.Dispatcher.Invoke(() =>
+                                                                      {
+                                                                          DelayDataStart_OnClick(null, null);
+                                                                      });
+                                 }
+                                 Console.WriteLine("关闭延时波形");
+                             });
                         break;
                     }
                 case "origItem":
                     {
-                    udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
                     if (OrigWaveData!=null) {
                         Task.Run(() => {
+                                     udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
                                      btn_origstart.Dispatcher.Invoke(() => {
                                                                          OrigDataStart_OnClick(null, null);
                                                                      });
@@ -1055,18 +1086,18 @@ namespace ArrayDisplay.UI {
         //Udp_Data _capudp;
         //string _ip;
         //int _port;
-        readonly DataFile.DataFile dataFile;
+         DataFile.DataFile dataFile;
         public static int sndCoefficent = 50;
         static DxPlaySound dxplaysnd; //播放声音对象
-        readonly UdpCommandSocket udpCommandSocket;
-        readonly Dataproc dataproc;
+        UdpCommandSocket udpCommandSocket;
+        Dataproc dataproc;
         //public ConstUdpArg ConstUdpArg;
         bool isworkSaveFlag;
         bool isorigSaveFlag;
         int origChannel;
 
-        readonly DispatcherTimer timer_bvalue;
-        readonly DispatcherTimer timer_blist;
+        DispatcherTimer timer_bvalue;
+        DispatcherTimer timer_blist;
 
         ObservableCollection<UIBValue> observableCollection;
         Stopwatch stopwatch;
