@@ -16,7 +16,7 @@ namespace ArrayDisplay.net {
             rcvsocket.ReceiveTimeout = 2000;
             sedsocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             sedsocket.SendTimeout = 1000;
-            sedsocket.ReceiveTimeout = 2000;
+            sedsocket.ReceiveTimeout = 1000;
             Init();
         }
 

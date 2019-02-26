@@ -252,11 +252,13 @@
                                     <Button Content="启动" Margin="0,0,5,0" HorizontalAlignment="Left" Name="btn_delaystart"
                                             VerticalAlignment="Center" 
                                             Width="100" Height="40" Background="#FF66EE66" Click="DelayDataStart_OnClick" />
+                                    <Button Content="暂停波形" Width="100" Height="32" Margin="10,0,0,0" FontSize="18"
+                                            Click="BtnPauseWorkGraph_OnClick" x:Name="btnPauseDelayGraph" />
                                 </WrapPanel>
                                 <ni:Graph x:Name="delay_graph" Height="635"  Width="1000"
                                           VerticalAlignment="Top" Foreground="{x:Null}"
                                           Background="{x:Null}" 
-                                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                          HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="480,5">
                                     <ni:Graph.Axes>
                                         <ni:AxisDouble Range="-1,1" Adjuster="None" Orientation="Vertical" Label="频率"
                                     		LabelVisibility="Visible" />
@@ -306,6 +308,8 @@
                                             Click="SaveOrigData_OnClick" x:Name="btn_origsave"/>
                                     <Button Width="100" Height="32" FontFamily="18" x:Name="btn_origstart"  
                                             Click="OrigDataStart_OnClick" Background="#FF66EE66" Content="启动"  Margin="15,0,0,0"/>
+                                    <Button Content="暂停波形" Width="100" Height="32" Margin="10,0,0,0" FontSize="18"
+                                            Click="BtnPauseWorkGraph_OnClick" x:Name="btnPauseOrigGraph" />
 
                                 </WrapPanel>
                                 <WrapPanel Grid.ColumnSpan="4" Grid.Row="1" Margin="0,0,0.334,0" >
@@ -403,7 +407,8 @@
 
                                         <Button Content="保存数据" Width="100" Height="32" Margin="10,0,0,0" FontSize="18"
                                                 Click="SaveData_OnClick" x:Name="btnSave" />
-
+                                        <Button Content="暂停波形" Width="100" Height="32" Margin="10,0,0,0" FontSize="18"
+                                                Click="BtnPauseWorkGraph_OnClick" x:Name="btnPauseWorkGraph" />
                                     </WrapPanel>
 
 <!--                                    <WrapPanel Grid.Row="1">-->

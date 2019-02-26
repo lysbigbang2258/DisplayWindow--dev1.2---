@@ -31,17 +31,14 @@ namespace ArrayDisplay.UI {
         //界面初始化
         public DisPlayWindow() {
             InitializeComponent();
-
-           
-  
         }
+
         /// <summary>
-        /// 界面载入后
+        ///     界面载入后
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void DisPlayWindow_OnLoaded(object sender, RoutedEventArgs e)
-        {
+        void DisPlayWindow_OnLoaded(object sender, RoutedEventArgs e) {
             Dataproc.PreGraphEventHandler += OnWorkGraph; // Work时域波形事件处理方法连接到事件
             Dataproc.PreGraphEventHandler += OnMaxWorkValue; // Work时域波形最大值
             Dataproc.OrigGraphEventHandler += OnOrigGraph; // Orig波形事件处理方法连接到事件
@@ -58,39 +55,36 @@ namespace ArrayDisplay.UI {
             udpCommandSocket = new UdpCommandSocket();
             observableCollection = new ObservableCollection<UIBValue>();
             blistview.ItemsSource = observableCollection;
+
             #region UI绑定
 
-            tb_state_mc_type.SetBinding(TextBox.TextProperty, new Binding("McType") { Source = systemInfo });
-            tb_state_mc_id.SetBinding(TextBox.TextProperty, new Binding("McId") { Source = systemInfo });
-            tb_state_mc_mac.SetBinding(TextBox.TextProperty, new Binding("McMac") { Source = systemInfo });
-            tb_setting_pulse_period.SetBinding(TextBox.TextProperty, new Binding("PulsePeriod") { Source = systemInfo });
-            tb_setting_pulse_delay.SetBinding(TextBox.TextProperty, new Binding("PulseDelay") { Source = systemInfo });
-            tb_setting_pulse_width.SetBinding(TextBox.TextProperty, new Binding("PulseWidth") { Source = systemInfo });
-            tb_setting_adc_offset.SetBinding(TextBox.TextProperty, new Binding("AdcOffset") { Source = systemInfo });
-            tb_setting_adc_num.SetBinding(TextBox.TextProperty, new Binding("AdcNum") { Source = systemInfo });
-            tb_origFram.SetBinding(TextBox.TextProperty, new Binding("OrigFramNums") { Source = SelectdInfo });
-            tb_deleyTime.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayTime") { Source = systemInfo });
-            tb_deleyChannel.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayNums") { Source = systemInfo });
-            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") { Source = SelectdInfo });
-            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") { Source = SelectdInfo });
-            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") { Source = SelectdInfo, Mode = BindingMode.TwoWay });
+            tb_state_mc_type.SetBinding(TextBox.TextProperty, new Binding("McType") {Source = systemInfo});
+            tb_state_mc_id.SetBinding(TextBox.TextProperty, new Binding("McId") {Source = systemInfo});
+            tb_state_mc_mac.SetBinding(TextBox.TextProperty, new Binding("McMac") {Source = systemInfo});
+            tb_setting_pulse_period.SetBinding(TextBox.TextProperty, new Binding("PulsePeriod") {Source = systemInfo});
+            tb_setting_pulse_delay.SetBinding(TextBox.TextProperty, new Binding("PulseDelay") {Source = systemInfo});
+            tb_setting_pulse_width.SetBinding(TextBox.TextProperty, new Binding("PulseWidth") {Source = systemInfo});
+            tb_setting_adc_offset.SetBinding(TextBox.TextProperty, new Binding("AdcOffset") {Source = systemInfo});
+            tb_setting_adc_num.SetBinding(TextBox.TextProperty, new Binding("AdcNum") {Source = systemInfo});
+            tb_origFram.SetBinding(TextBox.TextProperty, new Binding("OrigFramNums") {Source = SelectdInfo});
+            tb_deleyTime.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayTime") {Source = systemInfo});
+            tb_deleyChannel.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayNums") {Source = systemInfo});
+            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") {Source = SelectdInfo});
+            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") {Source = SelectdInfo});
+            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") {Source = SelectdInfo, Mode = BindingMode.TwoWay});
 
             #endregion
 
             OrigChannel = 0;
             DelayChannel = 0;
             OrigTiv = 0;
+            IsGraphPause = false;
 
             timer_bvalue = new DispatcherTimer();
             timer_blist = new DispatcherTimer();
             led_normaldata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
             isTabWorkGotFocus = true;
-
-
-            stopwatch = new Stopwatch();
         }
-
-        
 
         #region  基础功能
 
@@ -122,10 +116,45 @@ namespace ArrayDisplay.UI {
             }
         }
 
+        #region IDisposable
+
+        /// <inheritdoc />
+        public void Dispose() {
+            if (dataFile != null) {
+                dataFile.Dispose();
+            }
+            if (udpCommandSocket != null) {
+                udpCommandSocket.Dispose();
+            }
+            if (dataproc != null) {
+                dataproc.Dispose();
+            }
+            if (NormWaveData != null) {
+                NormWaveData.Dispose();
+            }
+            if (OrigWaveData != null) {
+                OrigWaveData.Dispose();
+            }
+            if (DelayWaveData != null) {
+                DelayWaveData.Dispose();
+            }
+        }
+
+        #endregion
+
         #region 读取波形数据
 
         /// <summary>///控件读入能量图波形/// </summary>
         void OnEnergyArrayGraph(object sender, float[] e) {
+            if (e == null)
+            {
+                return;
+            }
+            if (IsGraphPause)
+            {
+                Console.WriteLine("能量波形数据已暂停");
+                return;
+            }
             int len = ConstUdpArg.ARRAY_USED;
             var graphdata = new float[len];
 
@@ -144,7 +173,7 @@ namespace ArrayDisplay.UI {
             var dataPoints1 = new Point[len];
 
             for(int i = 0; i < xnums.Length; i++) {
-                xnums[i] = i+1;
+                xnums[i] = i + 1;
             }
             for(int i = 0; i < 64; i++) {
                 dataPoints1[i] = new Point(xnums[i], graphdata[i]);
@@ -157,7 +186,13 @@ namespace ArrayDisplay.UI {
 
         /// <summary>///控件读入延迟波形/// </summary>
         void OnDelayWaveGraph(object sender, float[][] e) {
-            if (e == null) {
+            if (e == null)
+            {
+                return;
+            }
+            if (IsGraphPause)
+            {
+                Console.WriteLine("原始波形数据已暂停");
                 return;
             }
             delay_graph.Dispatcher.Invoke(() => {
@@ -171,6 +206,10 @@ namespace ArrayDisplay.UI {
             if (e == null) {
                 return;
             }
+            if (IsGraphPause) {
+                Console.WriteLine("工作时域波形数据已暂停");
+                return;
+            }
             orige_graph.Dispatcher.Invoke(() => {
                                               orige_graph.Refresh();
                                               orige_graph.DataSource = e[OrigChannel * ConstUdpArg.ORIG_CHANNEL_NUMS + OrigTiv];
@@ -182,45 +221,75 @@ namespace ArrayDisplay.UI {
             if (e == null) {
                 return;
             }
+            if (IsGraphPause) {
+                Console.WriteLine("工作时域波形数据已暂停");
+                return;
+            }
             graph_normalTime.Dispatcher.Invoke(() => {
-                                                   graph_normalTime.Refresh(); ;
+                                                   graph_normalTime.Refresh();
+                                                   ;
                                                    graph_normalTime.DataSource = e;
                                                });
         }
+
         /// <summary>
-        /// 控件读入时域最大值
+        ///     控件读入时域最大值
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void OnMaxWorkValue(object sender, float[] e) {
-            var maxtmp = e.Max();
-            tb_ampValue.Dispatcher.Invoke(() =>
-                                          {
+            if (e == null) {
+                return;
+            }
+            if (IsGraphPause) {
+//                Console.WriteLine("工作时域波形数据已暂停");
+                return;
+            }
+            float maxtmp = e.Max();
+            tb_ampValue.Dispatcher.Invoke(() => {
                                               tb_ampValue.Text = maxtmp.ToString();
-                                          }); 
+                                          });
         }
+
         /// <summary>///控件读入工作频率波形/// </summary>
         void OnFrapPointGraph(object sender, Point[] e) {
+            if (e == null) {
+                return;
+            }
+            if (IsGraphPause) {
+                Console.WriteLine("工作频率波形数据已暂停");
+                return;
+            }
             graph_normalFrequency.Dispatcher.Invoke(() => {
                                                         graph_normalFrequency.Refresh();
                                                         graph_normalFrequency.DataSource = e;
                                                     });
         }
 
+        /// <summary>
+        ///     读入频率求出最大值，发送给控件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void OnMaxFrapPoint(object sender, Point[] e) {
+            if (e == null) {
+                return;
+            }
+            if (IsGraphPause) {
+                Console.WriteLine("工作频率波形数据已暂停");
+                return;
+            }
             Point maxPoint = new Point(0, 0);
-            foreach (Point dPoint in e)
-            {
-                if (maxPoint.Y < dPoint.Y)
-                {
+            foreach(Point dPoint in e) {
+                if (maxPoint.Y < dPoint.Y) {
                     maxPoint = dPoint;
                 }
             }
-            tb_frqValue.Dispatcher.Invoke(() =>
-                                     {
-                                          tb_frqValue.Text = maxPoint.X.ToString();
-                                     });
+            tb_frqValue.Dispatcher.Invoke(() => {
+                                              tb_frqValue.Text = maxPoint.X.ToString();
+                                          });
         }
+
         #endregion
 
         #region 点击响应函数
@@ -232,8 +301,7 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void GetState_OnClick(object sender, RoutedEventArgs e) {
-            btn_getState.Dispatcher.Invoke(() =>
-                                           {
+            btn_getState.Dispatcher.Invoke(() => {
                                                btn_getState.IsEnabled = false;
                                            });
             //切换到系统设置状态
@@ -242,19 +310,16 @@ namespace ArrayDisplay.UI {
                          try {
                              //发送查询指令
                              udpCommandSocket.GetDeviceState();
-
                          }
                          catch(Exception exception) {
                              Console.WriteLine(exception);
                          }
                          finally {
-                             btn_getState.Dispatcher.Invoke(() =>
-                                                            {
+                             btn_getState.Dispatcher.Invoke(() => {
                                                                 btn_getState.IsEnabled = true;
                                                             });
                          }
-                        
-                     });                                           
+                     });
             Console.WriteLine("获取系统设置状态成功");
         }
 
@@ -277,8 +342,6 @@ namespace ArrayDisplay.UI {
             }
         }
 
-       
-
         /// <summary>
         ///     连接正常工作数据
         /// </summary>
@@ -287,31 +350,26 @@ namespace ArrayDisplay.UI {
         void WorkDataStart_OnClick(object sender, RoutedEventArgs e) {
             try {
                 udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
-                if (NormWaveData==null) {
+                if (NormWaveData == null) {
                     NormWaveData = new UdpWaveData();
                     NormWaveData.StartReceiveData(ConstUdpArg.Src_NormWaveIp);
                     btn_normalstart.Content = "停止";
                     NormWaveData.StartRcvEvent.Set();
-          
                 }
-                else if (NormWaveData != null || NormWaveData.IsBuilded)
-                {
+                else if (NormWaveData != null || NormWaveData.IsBuilded) {
                     NormWaveData.Dispose();
                     NormWaveData = null;
-                    graph_normalTime.Dispatcher.Invoke(() =>
-                                                  {
+                    graph_normalTime.Dispatcher.Invoke(() => {
                                                            graph_normalTime.DataSource = 0;
-                                                  });
-                    graph_normalTime.Refresh();
-                    graph_normalFrequency.Dispatcher.Invoke(() =>
-                                                       {
-                                                           graph_normalFrequency.DataSource = 0;
                                                        });
-                    graph_normalFrequency.Refresh();
-                    graph_energyFirst.Dispatcher.Invoke(() =>
-                                                            {
-                                                            graph_energyFirst.DataSource = 0;
+                    graph_normalTime.Refresh();
+                    graph_normalFrequency.Dispatcher.Invoke(() => {
+                                                                graph_normalFrequency.DataSource = 0;
                                                             });
+                    graph_normalFrequency.Refresh();
+                    graph_energyFirst.Dispatcher.Invoke(() => {
+                                                            graph_energyFirst.DataSource = 0;
+                                                        });
                     graph_energyFirst.Refresh();
                     btn_normalstart.Content = "启动";
                 }
@@ -330,7 +388,7 @@ namespace ArrayDisplay.UI {
         void OrigDataStart_OnClick(object sender, RoutedEventArgs e) {
             try {
                 udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
-                if (OrigWaveData==null) {
+                if (OrigWaveData == null) {
                     OrigWaveData = new UdpWaveData();
                     OrigWaveData.StartReceiveData(ConstUdpArg.Src_OrigWaveIp);
                     udpCommandSocket.WriteOrigChannel(OrigChannel);
@@ -338,13 +396,11 @@ namespace ArrayDisplay.UI {
                     btn_origstart.Content = "停止";
                     OrigWaveData.StartRcvEvent.Set();
                 }
-                else if (OrigWaveData != null || OrigWaveData.IsBuilded)
-                {
+                else if (OrigWaveData != null || OrigWaveData.IsBuilded) {
                     OrigWaveData.Dispose();
                     OrigWaveData = null;
                     btn_origstart.Content = "启动";
-                    orige_graph.Dispatcher.Invoke(() =>
-                                                  {
+                    orige_graph.Dispatcher.Invoke(() => {
                                                       orige_graph.DataSource = 0;
                                                   });
                     orige_graph.Refresh();
@@ -363,19 +419,17 @@ namespace ArrayDisplay.UI {
         void DelayDataStart_OnClick(object sender, RoutedEventArgs e) {
             try {
                 udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToDeleyWindow);
-                if (DelayWaveData==null)
-                {
+                if (DelayWaveData == null) {
                     DelayWaveData = new UdpWaveData();
                     DelayWaveData.StartReceiveData(ConstUdpArg.Src_DelayWaveIp);
                     btn_delaystart.Content = "停止";
                     DelayWaveData.StartRcvEvent.Set();
                 }
-                else if(DelayWaveData!=null||DelayWaveData.IsBuilded) {
+                else if (DelayWaveData != null || DelayWaveData.IsBuilded) {
                     DelayWaveData.Dispose();
                     DelayWaveData = null;
                     btn_delaystart.Content = "启动";
-                    delay_graph.Dispatcher.Invoke(() =>
-                                                  {
+                    delay_graph.Dispatcher.Invoke(() => {
                                                       delay_graph.DataSource = 0;
                                                   });
                     delay_graph.Refresh();
@@ -393,30 +447,23 @@ namespace ArrayDisplay.UI {
 
         void Btn_Path_OnClick(object sender, RoutedEventArgs e) {
             FolderBrowserDialog folderdDialog = new FolderBrowserDialog();
-            var path = Environment.CurrentDirectory;
+            string path = Environment.CurrentDirectory;
             folderdDialog.ShowNewFolderButton = true;
-            if (folderdDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-                
-            }
-            
-
-            
+            if (folderdDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK) { }
         }
+
         /// <summary>
-        /// 从文档中读取B值
+        ///     从文档中读取B值
         /// </summary>
         /// <returns></returns>
-        float[] ReadDiscValue(string filepath,int valuedex) {
+        float[] ReadDiscValue(string filepath, int valuedex) {
             var rerList = new List<float>();
-            using (FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read))
-            {
-                using (StreamReader sr = new StreamReader(fs, Encoding.GetEncoding("gb2312")))
-                {
+            using(FileStream fs = new FileStream(filepath, FileMode.Open, FileAccess.Read)) {
+                using(StreamReader sr = new StreamReader(fs, Encoding.GetEncoding("gb2312"))) {
                     string line;
                     string pattern = @"[+-]?\d+[\.]?\d*"; //包括带小数点的数字和整数
                     float decvalue;
-                    while ((line = sr.ReadLine()) != null)
-                    {
+                    while((line = sr.ReadLine()) != null) {
                         Console.WriteLine(line);
                         MatchCollection matchCollection = Regex.Matches(line, pattern);
                         Match newMatch = matchCollection[valuedex];
@@ -428,14 +475,14 @@ namespace ArrayDisplay.UI {
             }
             return rerList.ToArray();
         }
+
         /// <summary>
         ///     发送B值
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void SendBvalue_OnClick(object sender, RoutedEventArgs e) {
-            if (!udpCommandSocket.IsSocketConnect)
-            {
+            if (!udpCommandSocket.IsSocketConnect) {
                 return;
             }
             string dirpath;
@@ -444,19 +491,15 @@ namespace ArrayDisplay.UI {
 
             string filename = "B值.txt";
             string filepath = dirpath + "\\" + filename;
-            var bfloats = ReadDiscValue(filepath,2);
-            var socket = new WaveSocket();
+            var bfloats = ReadDiscValue(filepath, 2);
+            WaveSocket socket = new WaveSocket();
             var result = socket.GetSendBvalues(bfloats);
 
             udpCommandSocket.WriteBvalue(result);
         }
 
-
-        
-
         void SendPhase_OnClick(object sender, RoutedEventArgs e) {
-            if (!udpCommandSocket.IsSocketConnect)
-            {
+            if (!udpCommandSocket.IsSocketConnect) {
                 return;
             }
             string dirpath;
@@ -465,16 +508,15 @@ namespace ArrayDisplay.UI {
 
             string filename = "初始相位.txt";
             string filepath = dirpath + "\\" + filename;
-            var bfloats = ReadDiscValue(filepath,1);
-            var socket = new WaveSocket();
+            var bfloats = ReadDiscValue(filepath, 1);
+            WaveSocket socket = new WaveSocket();
 //            var bfloats = new float[8];
             var result = socket.GetSendPhases(bfloats);
             udpCommandSocket.WritePhase(result);
         }
 
         void SaveBvalue_OnClick(object sender, RoutedEventArgs e) {
-            if (!udpCommandSocket.IsSocketConnect)
-            {
+            if (!udpCommandSocket.IsSocketConnect) {
                 return;
             }
             NormalBValueSave();
@@ -483,9 +525,8 @@ namespace ArrayDisplay.UI {
 
         void TestBvalueSave() {
             Bvalues = new float[ConstUdpArg.ORIG_TIME_NUMS * ConstUdpArg.ORIG_CHANNEL_NUMS];
-            List<List<float>> blist = new List<List<float>>();
-            for (int i = 0; i < 8; i++)
-            {
+            var blist = new List<List<float>>();
+            for(int i = 0; i < 8; i++) {
                 blist.Add(new List<float>());
             }
             for(int i = 0; i < Bvalues.Length; i++) {
@@ -498,9 +539,8 @@ namespace ArrayDisplay.UI {
             for(int i = 0; i < blist.Count; i++) {
                 blist[i].AddRange(package);
             }
-            List<float> zList = new List<float>();
-            for (int i = 0; i < blist.Count; i++)
-            {
+            var zList = new List<float>();
+            for(int i = 0; i < blist.Count; i++) {
                 zList.AddRange(blist[i].ToArray());
             }
             var senddata = zList.ToArray();
@@ -510,18 +550,14 @@ namespace ArrayDisplay.UI {
 
             string filename = "B值.txt";
             string filepath = dirpath + "\\" + filename;
-            using (FileStream fs = new FileStream(filepath, FileMode.Create, FileAccess.Write))
-            {
-                using (StreamWriter sw = new StreamWriter(fs, Encoding.GetEncoding("gb2312")))
-                {
-                    if (Bvalues == null)
-                    {
+            using(FileStream fs = new FileStream(filepath, FileMode.Create, FileAccess.Write)) {
+                using(StreamWriter sw = new StreamWriter(fs, Encoding.GetEncoding("gb2312"))) {
+                    if (Bvalues == null) {
                         return;
                     }
-                    for (int i = 0; i < senddata.Length; i++)
-                    {
-                        var tiv = i / 8;
-                        var chl = i % 8;
+                    for(int i = 0; i < senddata.Length; i++) {
+                        int tiv = i / 8;
+                        int chl = i % 8;
                         string tmp = string.Format("通道{0}时分{1}B={2}", chl + 1, tiv + 1, senddata[i]);
 
                         sw.WriteLine(tmp);
@@ -531,7 +567,7 @@ namespace ArrayDisplay.UI {
         }
 
         void PhaseSave() {
-            if (Phases==null) {
+            if (Phases == null) {
                 return;
             }
             string dirpath;
@@ -539,22 +575,18 @@ namespace ArrayDisplay.UI {
             dirpath = tb_filePath.Text == "" ? inipath : tb_filePath.Text;
             string filename = "初始相位.txt";
             string filepath = dirpath + "\\" + filename;
-            using (FileStream fs = new FileStream(filepath, FileMode.Create, FileAccess.Write))
-            {
-                using (StreamWriter sw = new StreamWriter(fs, Encoding.GetEncoding("gb2312")))
-                {
-                    
-                    for (int i = 0; i < Phases.Length; i++)
-                    {
+            using(FileStream fs = new FileStream(filepath, FileMode.Create, FileAccess.Write)) {
+                using(StreamWriter sw = new StreamWriter(fs, Encoding.GetEncoding("gb2312"))) {
+                    for(int i = 0; i < Phases.Length; i++) {
                         string tmp = string.Format("通道{0} Phase={1}", i + 1, Phases[i]);
                         sw.WriteLine(tmp);
                     }
                 }
-            } 
+            }
         }
+
         void NormalBValueSave() {
-            if (Bvalues == null)
-            {
+            if (Bvalues == null) {
                 return;
             }
             string dirpath;
@@ -562,14 +594,11 @@ namespace ArrayDisplay.UI {
             dirpath = tb_filePath.Text == "" ? inipath : tb_filePath.Text;
             string filename = "B值.txt";
             string filepath = dirpath + "\\" + filename;
-            using (FileStream fs = new FileStream(filepath, FileMode.Create, FileAccess.Write))
-            {
-                using (StreamWriter sw = new StreamWriter(fs, Encoding.GetEncoding("gb2312")))
-                {
-                    for (int i = 0; i < Bvalues.Length; i++)
-                    {
-                        var tiv = i / 8;
-                        var chl = i % 8;
+            using(FileStream fs = new FileStream(filepath, FileMode.Create, FileAccess.Write)) {
+                using(StreamWriter sw = new StreamWriter(fs, Encoding.GetEncoding("gb2312"))) {
+                    for(int i = 0; i < Bvalues.Length; i++) {
+                        int tiv = i / 8;
+                        int chl = i % 8;
                         string tmp = string.Format("时分:{0}B通道{1}:{2}", tiv + 1, chl + 1, Bvalues[i]);
                         sw.WriteLine(tmp);
                     }
@@ -578,29 +607,26 @@ namespace ArrayDisplay.UI {
         }
 
         /// <summary>
-        /// 计算初始相位
+        ///     计算初始相位
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void CalPhase_OnClick(object sender, RoutedEventArgs e) {
-            if (!udpCommandSocket.IsSocketConnect)
-            {
+            if (!udpCommandSocket.IsSocketConnect) {
                 return;
             }
             btn_calPhase.IsEnabled = false;
             Phases = new float[ConstUdpArg.ORIG_TIME_NUMS];
-            Task.Run(() =>
-            {
-                WaveSocket waveSocket = new WaveSocket();
-                waveSocket.StartCaclPhase(ConstUdpArg.Src_OrigWaveIp, udpCommandSocket);
-                waveSocket.SendOrigSwitchCommand(8, 1);//八个通道一个时分
-                waveSocket.RcvResetEvent.Set();
-                Phases = waveSocket.CalToPhase();    
-                MessageBox.Show("初始相位计算成功");
-                btn_calPhase.Dispatcher.Invoke(() =>
-                {
-                    btn_calPhase.IsEnabled = true;
-                });
+            Task.Run(() => {
+                         WaveSocket waveSocket = new WaveSocket();
+                         waveSocket.StartCaclPhase(ConstUdpArg.Src_OrigWaveIp, udpCommandSocket);
+                         waveSocket.SendOrigSwitchCommand(8, 1); //八个通道一个时分
+                         waveSocket.RcvResetEvent.Set();
+                         Phases = waveSocket.CalToPhase();
+                         MessageBox.Show("初始相位计算成功");
+                         btn_calPhase.Dispatcher.Invoke(() => {
+                                                            btn_calPhase.IsEnabled = true;
+                                                        });
 //                var minArray = new short[64];
 //                var maxArray = new short[64];
 //                var Bresults = new float[64];
@@ -627,31 +653,28 @@ namespace ArrayDisplay.UI {
 //                    MessageBox.Show("B值计算成功");
 //                    IsGetBvalue = true;
 //                });
-                waveSocket.Dispose();
-            });
+                         waveSocket.Dispose();
+                     });
         }
 
         /// <summary>
-        /// 计算B值
+        ///     计算B值
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void CalBvalue_OnClick(object sender, RoutedEventArgs e) {
-            if (!udpCommandSocket.IsSocketConnect)
-            {
+            if (!udpCommandSocket.IsSocketConnect) {
                 return;
             }
             btn_calBvalue.IsEnabled = false;
             Bvalues = new float[ConstUdpArg.ORIG_TIME_NUMS * ConstUdpArg.ORIG_CHANNEL_NUMS];
             Task.Run(() => {
                          WaveSocket waveSocket = new WaveSocket();
-                         waveSocket.StartCaclBvalue(ConstUdpArg.Src_OrigWaveIp,udpCommandSocket);
-                         waveSocket.SendOrigSwitchCommand(8,8);
+                         waveSocket.StartCaclBvalue(ConstUdpArg.Src_OrigWaveIp, udpCommandSocket);
+                         waveSocket.SendOrigSwitchCommand(8, 8);
                          waveSocket.RcvResetEvent.Set();
-                         for (int i = 0; i <waveSocket.BvalueData.Length ; i++)
-                         {
-                             if (waveSocket.BvalueData[i]!=null)
-                             {
+                         for(int i = 0; i < waveSocket.BvalueData.Length; i++) {
+                             if (waveSocket.BvalueData[i] != null) {
 //                                 Console.WriteLine(i);
                              }
                          }
@@ -665,27 +688,21 @@ namespace ArrayDisplay.UI {
                              Bresults[i] = (maxArray[i] - minArray[i]) / (8192.0f * 2.0f);
                          }
                          Array.Copy(Bresults, Bvalues, Bresults.Length);
-                         btn_calBvalue.Dispatcher.Invoke(() =>
-                                                         {
+                         btn_calBvalue.Dispatcher.Invoke(() => {
                                                              btn_calBvalue.IsEnabled = true;
                                                          });
                          blistview.Dispatcher.Invoke(() => {
-                                                            observableCollection.Clear();
-                                                            foreach (float bvalue in Bresults)
-                                                            {
-                                                                observableCollection.Add(new UIBValue(bvalue));
-                                                            }
-                                                            stopwatch.Stop();
-                                                            MessageBox.Show("B值计算成功");
-                                                            IsGetBvalue = true;
-                                                    });
-                         waveSocket.Dispose();           
+                                                         observableCollection.Clear();
+                                                         foreach(float bvalue in Bresults) {
+                                                             observableCollection.Add(new UIBValue(bvalue));
+                                                         }
+                                                         stopwatch.Stop();
+                                                         MessageBox.Show("B值计算成功");
+                                                         IsGetBvalue = true;
+                                                     });
+                         waveSocket.Dispose();
                      });
-
-
         }
-
-        
 
         /// <summary>
         ///     打开多波形界面
@@ -737,7 +754,10 @@ namespace ArrayDisplay.UI {
             }
         }
 
-       
+        void BtnPauseWorkGraph_OnClick(object sender, RoutedEventArgs e) {
+            IsGraphPause = !IsGraphPause;
+        }
+
         #endregion
 
         #region 控件响应函数
@@ -964,62 +984,60 @@ namespace ArrayDisplay.UI {
         //读取B值文件中的数据
         void ReadBFile() { }
 
-        void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var slcArg = e;
-            if (slcArg.RemovedItems.IsEmpty())
-            {
+        void TabControl_OnSelectionChanged(object sender, SelectionChangedEventArgs e) {
+            SelectionChangedEventArgs slcArg = e;
+            if (slcArg.RemovedItems.IsEmpty()) {
                 return;
             }
             HeaderedContentControl arg = slcArg.RemovedItems[0] as HeaderedContentControl;
-            switch (arg.Name)
-            {
+            if (arg == null) {
+                return;
+            }
+            IsGraphPause = false;
+            switch(arg.Name) {
                 case "delayItem": {
                     Task.Run(() => {
-                                 udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
-                                 if (DelayWaveData!=null) {
-                                     btn_delaystart.Dispatcher.Invoke(() =>
-                                                                      {
+                                 udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToDeleyWindow);
+                                 if (DelayWaveData != null) {
+                                     btn_delaystart.Dispatcher.Invoke(() => {
                                                                           DelayDataStart_OnClick(null, null);
                                                                       });
                                  }
                                  Console.WriteLine("关闭延时波形");
                              });
-                        break;
-                    }
-                case "origItem":
-                    {
-                    if (OrigWaveData!=null) {
-                        Task.Run(() => {
-                                     udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
-                                     btn_origstart.Dispatcher.Invoke(() => {
-                                                                         OrigDataStart_OnClick(null, null);
-                                                                     });
-                                 });
-
-                    }
-                        break;
-                    }
-                case "normalItem":
-                    {
-                    if (NormWaveData != null) {
-                        udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
-                        Task.Run(() => {
+                    break;
+                }
+                case "origItem": {
+                    Task.Run(() => {
+                                    udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
+                                     if (OrigWaveData != null) {
+                                         btn_origstart.Dispatcher.Invoke(() => {
+                                                                             OrigDataStart_OnClick(null, null);
+                                                                         });
+                                     }
+                                 Console.WriteLine("关闭原始波形");
+                             });
+                    break;
+                }
+                    
+                case "normalItem": {
+                    Task.Run(() => {
+                                 udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
+                                 if (NormWaveData != null) {
                                      btn_normalstart.Dispatcher.Invoke(() => {
                                                                            WorkDataStart_OnClick(null, null);
                                                                        });
-                                 });
-                    }
-                    
+                                 }
+                                 Console.WriteLine("关闭正常工作波形");
+                             });
                     break;
-                    }
-                case "configItem":
-                    {
-                        break;
-                    }
+                }
+                case "configItem": {
+                    break;
+                }
                 default:
                     return;
-            } 
+            }
         }
 
         #endregion
@@ -1050,12 +1068,12 @@ namespace ArrayDisplay.UI {
             get;
             set;
         }
-        public float[] Phases
-        {
+
+        public float[] Phases {
             get;
             set;
         }
-        
+
         public bool IsGetBvalue {
             get;
             set;
@@ -1066,13 +1084,17 @@ namespace ArrayDisplay.UI {
             set;
         }
 
-        public UdpWaveData OrigWaveData
-        {
+        public UdpWaveData OrigWaveData {
             get;
             set;
         }
 
         public UdpWaveData DelayWaveData {
+            get;
+            set;
+        }
+
+        public bool IsGraphPause {
             get;
             set;
         }
@@ -1086,7 +1108,7 @@ namespace ArrayDisplay.UI {
         //Udp_Data _capudp;
         //string _ip;
         //int _port;
-         DataFile.DataFile dataFile;
+        DataFile.DataFile dataFile;
         public static int sndCoefficent = 50;
         static DxPlaySound dxplaysnd; //播放声音对象
         UdpCommandSocket udpCommandSocket;
@@ -1101,6 +1123,7 @@ namespace ArrayDisplay.UI {
 
         ObservableCollection<UIBValue> observableCollection;
         Stopwatch stopwatch;
+
         #endregion
 
         //BindingSource dtBindingSource = new BindingSource();
@@ -1180,12 +1203,11 @@ namespace ArrayDisplay.UI {
             udpCommandSocket.ReadPulsePeriod();
             Task.Run(() => {
                          btn_readpluseperiod.Dispatcher.Invoke(() => {
-                                                                        btn_readpluseperiod.IsEnabled = false; 
-                                                                    });
-                         
+                                                                   btn_readpluseperiod.IsEnabled = false;
+                                                               });
+
                          Thread.Sleep(1000);
-                         btn_readpluseperiod.Dispatcher.Invoke(() =>
-                                                               {
+                         btn_readpluseperiod.Dispatcher.Invoke(() => {
                                                                    btn_readpluseperiod.IsEnabled = true;
                                                                });
                      });
@@ -1433,24 +1455,5 @@ namespace ArrayDisplay.UI {
         #endregion
 
         #endregion
-
-        #region IDisposable
-
-        /// <inheritdoc />
-        public void Dispose() {
-            if (dataFile != null) dataFile.Dispose();
-            if (udpCommandSocket != null) udpCommandSocket.Dispose();
-            if (dataproc != null) dataproc.Dispose();
-            if (NormWaveData != null) NormWaveData.Dispose();
-            if (OrigWaveData != null) OrigWaveData.Dispose();
-            if (DelayWaveData != null) DelayWaveData.Dispose();
-        }
-
-        #endregion
-
-        
     }
-
-   
-
 }
