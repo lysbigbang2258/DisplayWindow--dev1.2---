@@ -359,6 +359,7 @@ namespace ArrayDisplay.UI {
                 else if (NormWaveData != null || NormWaveData.IsBuilded) {
                     NormWaveData.Dispose();
                     NormWaveData = null;
+                    IsGraphPause = false;
                     graph_normalTime.Dispatcher.Invoke(() => {
                                                            graph_normalTime.DataSource = 0;
                                                        });
@@ -400,6 +401,7 @@ namespace ArrayDisplay.UI {
                     OrigWaveData.Dispose();
                     OrigWaveData = null;
                     btn_origstart.Content = "启动";
+                    IsGraphPause = false;
                     orige_graph.Dispatcher.Invoke(() => {
                                                       orige_graph.DataSource = 0;
                                                   });
@@ -427,6 +429,7 @@ namespace ArrayDisplay.UI {
                 }
                 else if (DelayWaveData != null || DelayWaveData.IsBuilded) {
                     DelayWaveData.Dispose();
+                    IsGraphPause = false;
                     DelayWaveData = null;
                     btn_delaystart.Content = "启动";
                     delay_graph.Dispatcher.Invoke(() => {
@@ -989,10 +992,13 @@ namespace ArrayDisplay.UI {
             if (slcArg.RemovedItems.IsEmpty()) {
                 return;
             }
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
             HeaderedContentControl arg = slcArg.RemovedItems[0] as HeaderedContentControl;
             if (arg == null) {
                 return;
             }
+            
             IsGraphPause = false;
             switch(arg.Name) {
                 case "delayItem": {
@@ -1005,8 +1011,9 @@ namespace ArrayDisplay.UI {
                                  }
                                  Console.WriteLine("关闭延时波形");
                              });
-                    break;
+                    
                 }
+                break;
                 case "origItem": {
                     Task.Run(() => {
                                     udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
@@ -1017,9 +1024,9 @@ namespace ArrayDisplay.UI {
                                      }
                                  Console.WriteLine("关闭原始波形");
                              });
-                    break;
-                }
                     
+                }
+                break;    
                 case "normalItem": {
                     Task.Run(() => {
                                  udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
@@ -1030,14 +1037,18 @@ namespace ArrayDisplay.UI {
                                  }
                                  Console.WriteLine("关闭正常工作波形");
                              });
-                    break;
+                    
                 }
-                case "configItem": {
-                    break;
+                break;
+                case "configItem": 
+                break;
+                default: {
+                    Console.WriteLine("切换窗口错误");
                 }
-                default:
-                    return;
+                    break;
             }
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.ElapsedMilliseconds);
         }
 
         #endregion

@@ -291,7 +291,7 @@ namespace ArrayDisplay.net {
             while(true) {
                 FreqWaveEvent.WaitOne();
                 FreqWaveOne = TransFormFft.FFT(WorkWavefdatas);
-                var dataPoints = NewFFT.Start(WorkWavefdatas, 1024 * 16);//用前1024 * 16个点
+                var dataPoints = NewFFT.Start(WorkWavefdatas, 1024*16);//用前1024 * 16个点
 //                if (FrapGraphEventHandler != null) {
 //                    FrapGraphEventHandler.Invoke(null, FreqWaveOne);
 //                }

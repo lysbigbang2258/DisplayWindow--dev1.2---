@@ -77,7 +77,7 @@ namespace ArrayDisplay.net {
         void WorktInit() {
             waveSocket.ReceiveBufferSize = ConstUdpArg.WORK_FRAME_LENGTH * ConstUdpArg.WORK_FRAME_NUMS * 2;
             frameNums = ConstUdpArg.WORK_FRAME_NUMS;
-            rcvBuf = new byte[ConstUdpArg.WORK_FRAME_LENGTH];
+            rcvBuf = new byte[ConstUdpArg.WORK_FRAME_LENGTH*2];
             RcvThread = new Thread(NormalThreadStart) { IsBackground = true, Priority = ThreadPriority.Highest, Name = "WorkWave" };
         }
 
@@ -178,12 +178,10 @@ namespace ArrayDisplay.net {
                             IsRcving = false;
                             break;
                         }
-
                         int offset = 0;
                         try
                         {
-                            //接收数据
-                            
+                            //接收数据                         
                             {
                                 int ret = waveSocket.ReceiveFrom(rcvBuf, offset, rcvBuf.Length - offset, SocketFlags.None, ref senderRemote); 
                             } 
@@ -259,12 +257,7 @@ namespace ArrayDisplay.net {
 
                     int offset = 0;
                     try {
-                            while (offset < rcvBuf.Length)
-                            {
-                                int ret=  waveSocket.ReceiveFrom(rcvBuf, offset, rcvBuf.Length - offset, SocketFlags.None, ref senderRemote);
-                                offset += ret;
-                            }
-                       
+                            int ret=  waveSocket.ReceiveFrom(rcvBuf, offset, rcvBuf.Length - offset, SocketFlags.None, ref senderRemote);
                             if (!Equals(senderRemote, ConstUdpArg.Dst_NormWaveIp))
                             {
                             Console.WriteLine("接收错误");
@@ -360,8 +353,11 @@ namespace ArrayDisplay.net {
             if (!Equals(Ip, ConstUdpArg.Src_NormWaveIp)) {
                 return;
             }
-            for(int i = 0; i < (buf.Length / 4); i++) {
-                Array.Copy(buf, i * 4, temp, 0, temp.Length);
+            var dataBytes = new byte[1024];
+            Array.Copy(buf, dataBytes, dataBytes.Length);
+            for (int i = 0; i < (dataBytes.Length / 4); i++)
+            {
+                Array.Copy(dataBytes, i * 4, temp, 0, temp.Length);
                 Array.Copy(temp, 0, waveDataproc.WorkWaveBytes[i], index * 4, temp.Length);
             }
         }
