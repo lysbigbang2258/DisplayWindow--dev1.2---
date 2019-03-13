@@ -21,7 +21,10 @@ namespace ArrayDisplay.net {
                 throw;
             }
         }
-
+        /// <summary>
+        /// 开启接收接收数据
+        /// </summary>
+        /// <param name="ip"></param>
         public void StartReceiveData(IPEndPoint ip) {
             Ip = ip;        
             try {
@@ -62,7 +65,7 @@ namespace ArrayDisplay.net {
 
         void OrigInit() {
             waveSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH * ConstUdpArg.ORIG_FRAME_NUMS * 2;
-            frameNums = DisPlayWindow.SelectdInfo.OrigFramNums;
+            frameNums = DisPlayWindow.selectdInfo.OrigFramNums;
             rcvBuf = new byte[ConstUdpArg.ORIG_FRAME_LENGTH];
             RcvThread = new Thread(OrigThreadStart) { IsBackground = true, Priority = ThreadPriority.Highest, Name = "Orig" };
         }

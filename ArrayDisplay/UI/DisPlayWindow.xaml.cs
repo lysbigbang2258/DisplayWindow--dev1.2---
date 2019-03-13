@@ -50,8 +50,8 @@ namespace ArrayDisplay.UI {
             hMainWindow = this;
 
             systemInfo = new SystemInfo();
-            SelectdInfo = new OnSelectdInfo();
-            dataFile = new DataFile.DataFile();
+            selectdInfo = new OnSelectdInfo();
+            dataFile = new DiscFile.DataFile();
             udpCommandSocket = new UdpCommandSocket();
             observableCollection = new ObservableCollection<UIBValue>();
             blistview.ItemsSource = observableCollection;
@@ -66,12 +66,12 @@ namespace ArrayDisplay.UI {
             tb_setting_pulse_width.SetBinding(TextBox.TextProperty, new Binding("PulseWidth") {Source = systemInfo});
             tb_setting_adc_offset.SetBinding(TextBox.TextProperty, new Binding("AdcOffset") {Source = systemInfo});
             tb_setting_adc_num.SetBinding(TextBox.TextProperty, new Binding("AdcNum") {Source = systemInfo});
-            tb_origFram.SetBinding(TextBox.TextProperty, new Binding("OrigFramNums") {Source = SelectdInfo});
+            tb_origFram.SetBinding(TextBox.TextProperty, new Binding("OrigFramNums") {Source = selectdInfo});
             tb_deleyTime.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayTime") {Source = systemInfo});
             tb_deleyChannel.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayNums") {Source = systemInfo});
-            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") {Source = SelectdInfo});
-            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") {Source = SelectdInfo});
-            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") {Source = SelectdInfo, Mode = BindingMode.TwoWay});
+            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") {Source = selectdInfo});
+            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") {Source = selectdInfo});
+            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") {Source = selectdInfo, Mode = BindingMode.TwoWay});
 
             #endregion
 
@@ -83,7 +83,6 @@ namespace ArrayDisplay.UI {
             timer_bvalue = new DispatcherTimer();
             timer_blist = new DispatcherTimer();
             led_normaldata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
-            isTabWorkGotFocus = true;
         }
 
         #region  基础功能
@@ -107,7 +106,7 @@ namespace ArrayDisplay.UI {
             if (isorigSaveFlag) {
                 btn_origsave.Content = "正在保存";
                 dataFile.EnableOrigSaveFile();
-                SelectdInfo.IsSaveData = true;
+                selectdInfo.IsSaveData = true;
             }
 
             else {
@@ -227,7 +226,6 @@ namespace ArrayDisplay.UI {
             }
             graph_normalTime.Dispatcher.Invoke(() => {
                                                    graph_normalTime.Refresh();
-                                                   ;
                                                    graph_normalTime.DataSource = e;
                                                });
         }
@@ -333,7 +331,7 @@ namespace ArrayDisplay.UI {
             if (isworkSaveFlag) {
                 btnSave.Content = "开始保存";
                 dataFile.EnableWorkSaveFile();
-                SelectdInfo.IsSaveData = true;
+                selectdInfo.IsSaveData = true;
             }
 
             else {
@@ -456,8 +454,10 @@ namespace ArrayDisplay.UI {
         }
 
         /// <summary>
-        ///     从文档中读取B值
+        /// 读取文本数据值
         /// </summary>
+        /// <param name="filepath">文本路径</param>
+        /// <param name="valuedex"></param>
         /// <returns></returns>
         float[] ReadDiscValue(string filepath, int valuedex) {
             var rerList = new List<float>();
@@ -676,8 +676,8 @@ namespace ArrayDisplay.UI {
                          waveSocket.StartCaclBvalue(ConstUdpArg.Src_OrigWaveIp, udpCommandSocket);
                          waveSocket.SendOrigSwitchCommand(8, 8);
                          waveSocket.RcvResetEvent.Set();
-                         for(int i = 0; i < waveSocket.BvalueData.Length; i++) {
-                             if (waveSocket.BvalueData[i] != null) {
+                         foreach(short[] t in waveSocket.BvalueData) {
+                             if (t != null) {
 //                                 Console.WriteLine(i);
                              }
                          }
@@ -760,7 +760,6 @@ namespace ArrayDisplay.UI {
         void BtnPauseWorkGraph_OnClick(object sender, RoutedEventArgs e) {
             IsGraphPause = !IsGraphPause;
         }
-
         #endregion
 
         #region 控件响应函数
@@ -901,9 +900,9 @@ namespace ArrayDisplay.UI {
                 try {
                     if (workchNum < 1 || workchNum > 256) {
                         tb_workChNum.Text = "1";
-                        SelectdInfo.WorkWaveChannel = 1;
+                        selectdInfo.WorkWaveChannel = 1;
                     }
-                    SelectdInfo.WorkWaveChannel = workchNum;
+                    selectdInfo.WorkWaveChannel = workchNum;
                 }
                 catch(Exception) {
                     // ignored
@@ -1065,7 +1064,7 @@ namespace ArrayDisplay.UI {
             set;
         }
 
-        public static OnSelectdInfo SelectdInfo {
+        public static OnSelectdInfo selectdInfo {
             get;
             set;
         }
@@ -1119,7 +1118,7 @@ namespace ArrayDisplay.UI {
         //Udp_Data _capudp;
         //string _ip;
         //int _port;
-        DataFile.DataFile dataFile;
+        DiscFile.DataFile dataFile;
         public static int sndCoefficent = 50;
         static DxPlaySound dxplaysnd; //播放声音对象
         UdpCommandSocket udpCommandSocket;
@@ -1137,73 +1136,6 @@ namespace ArrayDisplay.UI {
 
         #endregion
 
-        //BindingSource dtBindingSource = new BindingSource();
-
-        #region 界面切换控制
-
-        //标记,当前界面,延时校准
-        bool isTabDelayGotFocus;
-        //标记,当前界面,原始数据
-        bool isTabOranGotFocus;
-        //标记,当前界面,正常工作
-        bool isTabWorkGotFocus;
-        //标记,当前界面,自动标定
-        bool isTabAutoGotFocus;
-        //标记,当前界面,多通道显示
-        bool isTabMultGotFocus;
-
-        //Tab切换,延时校准
-        void TabDelayOnGotFocus(object sender, RoutedEventArgs e) {
-            if (!isTabDelayGotFocus) {
-                //切换到'延时校准'状态
-                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToDeleyWindow);
-                isTabDelayGotFocus = true;
-            }
-        }
-
-        //Tab切换,原始数据
-        void TabOranOnGotFocus(object sender, RoutedEventArgs e) {
-            if (!isTabOranGotFocus) {
-                //切换到'原始数据'状态
-                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
-                isTabOranGotFocus = true;
-            }
-        }
-
-        //Tab切换,正常工作
-        void TabWorkOnGotFocus(object sender, RoutedEventArgs e) {
-            if (!isTabWorkGotFocus) {
-                //切换到'正常工作'状态
-                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
-                isTabWorkGotFocus = true;
-            }
-        }
-
-        //Tab切换,自动标定
-        void TabAutoOnGotFocus(object sender, RoutedEventArgs e) {
-            if (!isTabAutoGotFocus) {
-                //切换到'自动标定'状态
-                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
-                isTabAutoGotFocus = true;
-            }
-        }
-
-        //Tab切换,多通道显示
-        void TabMultOnGotFocus(object sender, RoutedEventArgs e) {
-            if (!isTabMultGotFocus) {
-                //切换到'多通道显示'状态
-                udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToNormalWindow);
-                isTabMultGotFocus = true;
-            }
-        }
-
-        /// <summary>载入系统信息 </summary>
-        void LoadSystemInfo() {
-            Thread.Sleep(500);
-            udpCommandSocket.GetDeviceState();
-        }
-
-        #endregion
 
         #region 系统信息,(读/写/存)按钮响应
 
@@ -1448,7 +1380,7 @@ namespace ArrayDisplay.UI {
         }
 
         void DacLenSave_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_deleyTime.Text;
+            string strT = tb_dacLen.Text;
             if (string.IsNullOrEmpty(strT)) {
                 return;
             }
@@ -1460,7 +1392,7 @@ namespace ArrayDisplay.UI {
             data.SetValue((byte) a, 0);
             data.SetValue((byte) b, 1);
 
-            udpCommandSocket.SaveDelayTime(data);
+            udpCommandSocket.SaveDacLen(data);
         }
 
         #endregion

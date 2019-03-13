@@ -353,6 +353,14 @@ namespace ArrayDisplay.net {
             channel.SetValue((byte) (channel[5] + (idcNum - 1) * 2), 5);
             return channel;
         }
+        /// <summary>存指令:DacLen</summary>
+        public static byte[] GetDacLenSaveCommand(int idcNum)
+        {
+            var channel = new byte[DacChannel_Save.Length];
+            Array.Copy(DacChannel_Save, 0, channel, 0, DacChannel_Save.Length);
+            channel.SetValue((byte)(channel[5] + (idcNum - 1) * 2), 5);
+            return channel;
+        }
 
         #endregion
 
@@ -441,7 +449,7 @@ namespace ArrayDisplay.net {
         /// </summary>
         static byte[] dacChannel_Read = { 0, 0, 2, 0, 0, 91 };
         static byte[] dacChannel_Write = { 1, 0, 2, 0, 0 }; 
-        static byte[] dacChannel_Save = { 1, 0, 1, 0, 0, 155 }; 
+        static byte[] dacChannel_Save = { 1, 0, 1, 2, 0, 155 }; 
 
         #endregion
 

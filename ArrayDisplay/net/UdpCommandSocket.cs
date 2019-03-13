@@ -300,7 +300,7 @@ namespace ArrayDisplay.net {
 
         /// <summary>///读取ADC通道/// </summary>
         public void ReadCanChannelLen() {
-            var sedip = ConstUdpArg.GetDacChannelReadCommand(DisPlayWindow.SelectdInfo.DacChannel - 1);
+            var sedip = ConstUdpArg.GetDacChannelReadCommand(DisPlayWindow.selectdInfo.DacChannel - 1);
             Send(sedip, ConstUdpArg.Dst_ComMsgIp);
             ReceiveCanChannelLen(20);
         }
@@ -464,6 +464,14 @@ namespace ArrayDisplay.net {
         /// <param name="data">数据8bit,[(配置值+1.2)/1.2]*128</param>
         public void SaveDelayTime(byte[] data) {
             var cmd = ConstUdpArg.GetDelayTimeSaveCommand(int.Parse(DisPlayWindow.hMainWindow.tb_deleyChannel.Text));
+            SaveData(cmd, data);
+        }
+
+        /// <summary>存:DAC幅值</summary>
+        /// <param name="data">数据8bit,[(配置值+1.2)/1.2]*128</param>
+        public void SaveDacLen(byte[] data)
+        {
+            var cmd = ConstUdpArg.GetDacLenSaveCommand(int.Parse(DisPlayWindow.hMainWindow.tb_dacChannel.Text));
             SaveData(cmd, data);
         }
 
@@ -762,12 +770,12 @@ namespace ArrayDisplay.net {
                 int delaytime = BitConverter.ToUInt16(data, 0);
                 DisPlayWindow.systemInfo.ChannelDelayTime = delaytime;
             }
-            else if (Encoding.ASCII.GetString(ConstUdpArg.GetDacChannelReadCommand(DisPlayWindow.SelectdInfo.DacChannel - 1), 0, 6).Equals(cmd))
+            else if (Encoding.ASCII.GetString(ConstUdpArg.GetDacChannelReadCommand(DisPlayWindow.selectdInfo.DacChannel - 1), 0, 6).Equals(cmd))
                     //Dac数据
             {
                 int result = data[0] * 256;
                 result += data[1];
-                DisPlayWindow.SelectdInfo.DacLenth = result;
+                DisPlayWindow.selectdInfo.DacLenth = result;
             }
             else {
 //其他,未定义

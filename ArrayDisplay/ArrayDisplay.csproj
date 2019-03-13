@@ -85,7 +85,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="File\DataFile.cs" />
+    <Compile Include="DiscFile\DataFile.cs" />
     <Compile Include="MyUserControl\ArrayEnergy\ArrayEnergyControl.xaml.cs">
       <DependentUpon>ArrayEnergyControl.xaml</DependentUpon>
     </Compile>
@@ -104,7 +104,7 @@
     </Compile>
     <Compile Include="MyUserControl\FrequencyWave\CordAxis.cs" />
     <Compile Include="MyUserControl\FrequencyWave\DynamicAxis2.cs" />
-    <Compile Include="File\RelativeDirectory.cs" />
+    <Compile Include="DiscFile\RelativeDirectory.cs" />
     <Compile Include="net\ComData.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -125,7 +125,7 @@
     <Compile Include="net\UdpWaveData.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="net\UdpCommand.cs">
+    <Compile Include="net\UdpCommandSocket.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\Annotations.cs" />
@@ -133,7 +133,7 @@
     <Compile Include="UI\DisPlayWindow.xaml.cs">
       <DependentUpon>DisPlayWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="File\DefineConst.cs" />
+    <Compile Include="DiscFile\DefineConst.cs" />
     <Compile Include="net\IniFile.cs" />
     <Compile Include="UI\StateWindow.xaml.cs">
       <DependentUpon>StateWindow.xaml</DependentUpon>

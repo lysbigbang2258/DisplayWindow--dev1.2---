@@ -57,7 +57,7 @@ namespace ArrayDisplay.net {
             OrigChannnel = 0;
             OrigTimeDiv = 0;
 
-            int oFrime = DisPlayWindow.SelectdInfo.OrigFramNums; //原始数据帧数
+            int oFrime = DisPlayWindow.selectdInfo.OrigFramNums; //原始数据帧数
             Origdata = new byte[oFrime * ArrayNums];
             int olength = ConstUdpArg.ORIG_FRAME_LENGTH - 2; //每帧长度
             for (int i = 0; i < oNums; i++)
@@ -260,7 +260,7 @@ namespace ArrayDisplay.net {
                         Array.Copy(x, 0, PlayWaveBytes[i], j * 2, 2);
                     }
                 }
-                var offset = ConstUdpArg.offsetArray[DisPlayWindow.SelectdInfo.WorkWaveChannel-1];
+                var offset = ConstUdpArg.offsetArray[DisPlayWindow.selectdInfo.WorkWaveChannel-1];
                 WorkWavefdatas = WorkWaveFloats[offset-1];
                 WorkEnergyEvent.Set();
                 FreqWaveEvent.Set();
@@ -274,7 +274,7 @@ namespace ArrayDisplay.net {
 
                 if (SoundEventHandler != null)
                 {
-                    int channel = DisPlayWindow.SelectdInfo.WorkWaveChannel;
+                    int channel = DisPlayWindow.selectdInfo.WorkWaveChannel;
                     if (channel > 0)
                     {
                         SoundEventHandler.Invoke(null, PlayWaveBytes[channel]);

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ArrayDisplay.DataFile;
 using ArrayDisplay.net;
-using ArrayDisplay.UI;
 
-namespace ArrayDisplay.DataFile {
+namespace ArrayDisplay.DiscFile {
     public class DataFile : IDisposable {
         ConcurrentQueue<byte[]> origRcvQueue;
         ConcurrentQueue<byte[]> workRcvQueue;
