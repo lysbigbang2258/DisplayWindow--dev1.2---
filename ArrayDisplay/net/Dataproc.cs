@@ -161,6 +161,7 @@ namespace ArrayDisplay.net {
                         //                        OrigWave_Floats[i][j] = a / 104800.0f;
                     }
                 }
+
                 DelayGraphEventHandler(null, DelayWaveFloats);
             }
         }

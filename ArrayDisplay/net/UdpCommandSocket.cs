@@ -262,15 +262,9 @@ namespace ArrayDisplay.net {
 
         /// <summary>读取:脉冲周期</summary>
         public void ReadPulsePeriod() {
-            Stopwatch st = new Stopwatch();
-            st.Start();
+
             Send(ConstUdpArg.Pulse_Period_Read, ConstUdpArg.Dst_ComMsgIp);
-            st.Stop();
-            Console.WriteLine(st.ElapsedMilliseconds);
-            st.Start();
             ReceivePulsePeriod(20);
-            st.Stop();
-            Console.WriteLine(st.ElapsedMilliseconds);
         }
 
         /// <summary>读取:脉冲延时</summary>
@@ -312,11 +306,7 @@ namespace ArrayDisplay.net {
         /// <summary>写:脉冲周期</summary>
         /// <param name="data">数据,16bit,配置值/5</param>
         public void WritePulsePeriod(byte[] data) {
-            Stopwatch st = new Stopwatch();
-            st.Start();
             WriteData(ConstUdpArg.Pulse_Period_Write, data);
-            st.Stop();
-            Console.WriteLine(st.ElapsedMilliseconds);
         }
 
         /// <summary>写:脉冲延时</summary>
@@ -680,7 +670,7 @@ namespace ArrayDisplay.net {
             var rcvUdpBuffer = ReadRemote(bufferLength);
             if (rcvUdpBuffer == null)
             {
-                Console.WriteLine("接收ADC通道错误");
+                Console.WriteLine("接收ADC通道错误");                                          
                 return;
             }
             //返回数据以指令为开头

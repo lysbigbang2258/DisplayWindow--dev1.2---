@@ -31,7 +31,7 @@ namespace ArrayDisplay.net {
         /// <summary>
         /// B值数组，通道*多帧数据
         /// </summary>
-        public short[][] BvalueData {
+        public short[][] BvalueDatas {
             get;
             set;
         }
@@ -83,7 +83,7 @@ namespace ArrayDisplay.net {
                 MSocket.Bind(ip);
                 RcvThread = new Thread(RcvUdpdataToBvalue_ThreatStart) {IsBackground = true};
                 RcvResetEvent = new AutoResetEvent(false);
-                BvalueData = new short[64][];
+                BvalueDatas = new short[64][];
                 RcvThread.Start();
             }
             catch(Exception e) {
@@ -100,7 +100,6 @@ namespace ArrayDisplay.net {
         {
             try {
                 UCommandSocket = udpCommandSocket;
-                MSocket.Blocking = true;
                 MSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH;
                 MSocket.Bind(ip);
                 RcvThread = new Thread(RcvUdpdataToPhase_ThreatStart) { IsBackground = true };
@@ -213,10 +212,10 @@ namespace ArrayDisplay.net {
                         t[1] = purdata[2 * i];
                         sbdata[i] = BitConverter.ToInt16(t, 0);
                     }
-                    BvalueData[index] = new short[sbdata.Length];
+                    BvalueDatas[index] = new short[sbdata.Length];
                     double progressvalue = (index + 1) * 100.0 / 64; //进度条
                     Console.WriteLine("通道： " + index);
-                    Array.Copy(sbdata, BvalueData[index], sbdata.Length);
+                    Array.Copy(sbdata, BvalueDatas[index], sbdata.Length);
                     DisPlayWindow.hMainWindow.bvaulue_pgbar.Dispatcher.Invoke(() =>
                                                                               {
                                                                                   DisPlayWindow.hMainWindow.bvaulue_pgbar.Value = progressvalue;
@@ -448,7 +447,11 @@ namespace ArrayDisplay.net {
             ReleaseUnmanagedResources();
             if (disposing) {
                 if (RcvResetEvent != null) RcvResetEvent.Dispose();
-                if (MSocket != null) MSocket.Dispose();
+                if (MSocket != null) {
+                    MSocket.Shutdown(SocketShutdown.Both);
+                    MSocket.Close();
+                    MSocket.Dispose();
+                }
             }
         }
 

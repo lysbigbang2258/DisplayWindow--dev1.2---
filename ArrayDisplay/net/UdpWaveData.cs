@@ -447,7 +447,11 @@ namespace ArrayDisplay.net {
 
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                if (waveSocket != null) waveSocket.Dispose();
+                if (waveSocket != null) {
+                    waveSocket.Shutdown(SocketShutdown.Both);
+                    waveSocket.Close();
+                    waveSocket.Dispose();
+                }
                 if (waveDataproc != null) waveDataproc.Dispose();
                 if (StartRcvEvent != null) StartRcvEvent.Dispose();
                 if (StartRcvEvent != null) StartRcvEvent.Dispose();
