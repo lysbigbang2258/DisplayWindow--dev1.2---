@@ -112,8 +112,9 @@ namespace ArrayDisplay.UI {
             timer_blist = new DispatcherTimer();
             led_normaldata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
         }
+
         /// <summary>
-        /// 运行时加载系统信息，如果网络连接失败，报错
+        ///     运行时加载系统信息，如果网络连接失败，报错
         /// </summary>
         void Load_SystemMessage() {
             udpCommandSocket.TestConnect();
@@ -165,6 +166,38 @@ namespace ArrayDisplay.UI {
             }
         }
 
+        /// <summary>
+        ///     更改原始通道的时分/通道参数
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void ChangeOrigConfig_OnClick(object sender, RoutedEventArgs e) {
+            int ch = 1;
+            int tdiv = 1;
+            int.TryParse(tb_origChannel.Text, out ch);
+            int.TryParse(tb_orgiTdiv.Text, out tdiv);
+
+            try {
+                if (ch < 1 || ch > ConstUdpArg.ORIG_CHANNEL_NUMS)
+                {
+                    MessageBox.Show("请输入正确的通道值");
+                    ch = 1;
+                }
+                if (tdiv < 1 || tdiv > ConstUdpArg.ORIG_TIME_NUMS)
+                {
+                    MessageBox.Show("请输入正确的时分值");
+                    ch = 1;
+                }
+                OrigChannel = ch - 1;
+                OrigTiv = tdiv - 1;
+            }
+            catch(Exception) {
+                // ignored
+            }
+            udpCommandSocket.WriteOrigChannel(OrigChannel);
+            udpCommandSocket.WriteOrigTDiv(OrigTiv);
+        }
+
         #region 读取波形数据
 
         /// <summary>///控件读入能量图波形/// </summary>
@@ -183,7 +216,7 @@ namespace ArrayDisplay.UI {
 
             for(int i = 0; i < len; i++) {
                 if (Math.Abs(graphdata[i]) < 0.00001F) {
-                    graphdata[i] = 10;
+                    graphdata[i] = 0;
                 }
                 else {
 //                    graphdata[i] = 20 + 20 * (float)Math.Log10(Math.Abs(graphdata[i]));
@@ -231,7 +264,7 @@ namespace ArrayDisplay.UI {
             }
             orige_graph.Dispatcher.Invoke(() => {
                                               orige_graph.Refresh();
-                                              orige_graph.DataSource = e[OrigChannel * ConstUdpArg.ORIG_CHANNEL_NUMS + OrigTiv];
+                                              orige_graph.DataSource = e[OrigTiv * ConstUdpArg.ORIG_CHANNEL_NUMS + OrigChannel];
                                           });
         }
 
@@ -311,7 +344,6 @@ namespace ArrayDisplay.UI {
         #endregion
 
         #region 点击响应函数
-
 
         /// <summary>
         ///     保存数据按钮处理
@@ -490,8 +522,17 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void SendConfig_OnClick(object sender, RoutedEventArgs e) {
-            SendBvalue();
-            SendPhase();
+            try {
+                SendBvalue();
+                SendPhase();
+                MessageBox.Show("发送成功");
+            }
+            catch(Exception exception) {
+                Console.WriteLine(exception);
+                throw;
+            }
+            
+            
         }
 
         /// <summary>
@@ -966,6 +1007,7 @@ namespace ArrayDisplay.UI {
                 try {
                     if (channel < 1 || channel > 8) {
                         tb_deleyChannel.Text = "1";
+                        channel = 1;
                     }
                     DelayChannel = channel - 1;
                 }

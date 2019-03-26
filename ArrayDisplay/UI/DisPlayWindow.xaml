@@ -401,10 +401,7 @@
                             HorizontalAlignment="Left"
                             VerticalAlignment="Center"
                             SelectionChanged="TabControl_OnSelectionChanged">
-                    <TabItem Name="sysinfoItem"
-                             Width="160"
-                             Height="40"
-                             Header="系统状态与参数" />
+
                     <TabItem Name="delayItem"
                              Width="100"
                              Height="40"
@@ -578,13 +575,6 @@
                                              PreviewTextInput="InputIntegerOnly"
                                              Text="1"
                                              TextAlignment="Center" />
-                                    <Button x:Name="btn_origsave"
-                                            Width="100"
-                                            Height="32"
-                                            Margin="15,0,0,0"
-                                            Click="SaveOrigData_OnClick"
-                                            Content="保存数据"
-                                            FontFamily="18" />
                                     <Button x:Name="btn_origstart"
                                             Width="100"
                                             Height="32"
@@ -593,6 +583,14 @@
                                             Click="OrigDataStart_OnClick"
                                             Content="启动"
                                             FontFamily="18" />
+                                    <Button x:Name="btn_origsave"
+                                            Width="100"
+                                            Height="32"
+                                            Margin="15,0,0,0"
+                                            Click="SaveOrigData_OnClick"
+                                            Content="保存数据"
+                                            FontFamily="18" />
+
                                     <Button x:Name="btnPauseOrigGraph"
                                             Width="100"
                                             Height="32"
@@ -600,6 +598,13 @@
                                             Click="BtnPauseWorkGraph_OnClick"
                                             Content="暂停波形"
                                             FontSize="18" />
+                                    <Button x:Name="btn_changeOrigConfig"
+                                            Width="150"
+                                            Height="32"
+                                            Margin="15,0,0,0"
+                                            Click="ChangeOrigConfig_OnClick"
+                                            Content="更改通道/时分"
+                                            FontFamily="18" />
 
                                 </WrapPanel>
                                 <WrapPanel Grid.Row="1"
@@ -715,6 +720,81 @@
                                 </ni:WritableGraph.Plots>
                             </ni:WritableGraph>
                         </Grid>
+                    </TabItem>
+                    <TabItem Name="configItem" Header="自动标定">
+                        <Grid Background="#FFE5E5E5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="31*" />
+                                <ColumnDefinition Width="949*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <WrapPanel Grid.Row="0"
+                                       Grid.ColumnSpan="2"
+                                       Margin="0,0,0,128">
+                                <Button Name="btn_calBvalue"
+                                        Width="100"
+                                        Height="32"
+                                        Margin="5,0,5,0"
+                                        VerticalContentAlignment="Center"
+                                        Click="CalBvalue_OnClick"
+                                        Content="求B"
+                                        FontFamily="18" />
+                                <Button Name="btn_calPhase"
+                                        Width="120"
+                                        Height="32"
+                                        Margin="5,0,5,0"
+                                        VerticalContentAlignment="Center"
+                                        Click="CalPhase_OnClick"
+                                        Content="求初始相位"
+                                        FontFamily="18" />
+                                <ProgressBar Name="bvaulue_pgbar"
+                                             Width="100"
+                                             Height="20"
+                                             Margin="10"
+                                             HorizontalAlignment="Left"
+                                             VerticalAlignment="Top"
+                                             Maximum="100"
+                                             Minimum="0" />
+
+                                <Button Width="100"
+                                        Height="32"
+                                        Margin="0,0,5,0"
+                                        Click="SaveConfig_OnClick"
+                                        Content="保留参数"
+                                        FontFamily="18" />
+                                <Button Width="100"
+                                        Height="32"
+                                        VerticalContentAlignment="Center"
+                                        Click="SendConfig_OnClick"
+                                        Content="发送参数"
+                                        FontFamily="18" />
+                            </WrapPanel>
+                            <WrapPanel Grid.RowSpan="2"
+                                       Grid.ColumnSpan="2"
+                                       Margin="10,50,10,9.8">
+                                <ListView Name="blistview"
+                                          Width="464"
+                                          Height="500"
+                                          HorizontalAlignment="Left">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Width="200"
+                                                            DisplayMemberBinding="{Binding RelativeSource={RelativeSource FindAncestor,
+                                                                                                                          AncestorType={x:Type ListViewItem}},
+                                                                                           Converter={StaticResource MyIndexConverter}}"
+                                                            Header="序号" />
+                                            <GridViewColumn Width="200"
+                                                            DisplayMemberBinding="{Binding ChannelBvalue}"
+                                                            Header="B值" />
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                            </WrapPanel>
+                        </Grid>
+
                     </TabItem>
                     <TabItem Name="normalItem" Header="正常工作">
                         <Grid Background="#FFE5E5E5" ShowGridLines="True">
@@ -997,86 +1077,7 @@
                             </Grid>
                         </Grid>
                     </TabItem>
-                    <TabItem Name="configItem" Header="自动标定">
-                        <Grid Background="#FFE5E5E5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="31*" />
-                                <ColumnDefinition Width="949*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <WrapPanel Grid.Row="0"
-                                       Grid.ColumnSpan="2"
-                                       Margin="0,0,0,128">
-                                <Button Name="btn_calBvalue"
-                                        Width="100"
-                                        Height="32"
-                                        Margin="5,0,5,0"
-                                        VerticalContentAlignment="Center"
-                                        Click="CalBvalue_OnClick"
-                                        Content="求B"
-                                        FontFamily="18" />
-                                <Button Name="btn_calPhase"
-                                        Width="120"
-                                        Height="32"
-                                        Margin="5,0,5,0"
-                                        VerticalContentAlignment="Center"
-                                        Click="CalPhase_OnClick"
-                                        Content="求初始相位"
-                                        FontFamily="18" />
-                                <ProgressBar Name="bvaulue_pgbar"
-                                             Width="100"
-                                             Height="20"
-                                             Margin="10"
-                                             HorizontalAlignment="Left"
-                                             VerticalAlignment="Top"
-                                             Maximum="100"
-                                             Minimum="0" />
 
-                                <Button Width="100"
-                                        Height="32"
-                                        Margin="0,0,5,0"
-                                        Click="SaveConfig_OnClick"
-                                        Content="保留参数"
-                                        FontFamily="18" />
-                                <Button Width="100"
-                                        Height="32"
-                                        VerticalContentAlignment="Center"
-                                        Click="SendConfig_OnClick"
-                                        Content="发送参数"
-                                        FontFamily="18" />
-                            </WrapPanel>
-                            <WrapPanel Grid.RowSpan="2"
-                                       Grid.ColumnSpan="2"
-                                       Margin="10,50,10,9.8">
-                                <ListView Name="blistview"
-                                          Width="464"
-                                          Height="500"
-                                          HorizontalAlignment="Left">
-                                    <ListView.View>
-
-                                        <GridView>
-                                            <GridViewColumn Width="200"
-                                                            DisplayMemberBinding="{Binding RelativeSource={RelativeSource FindAncestor,
-                                                                                                                          AncestorType={x:Type ListViewItem}},
-                                                                                           Converter={StaticResource MyIndexConverter}}"
-                                                            Header="序号" />
-                                            <GridViewColumn Width="200"
-                                                            DisplayMemberBinding="{Binding ChannelBvalue}"
-                                                            Header="B值" />
-
-                                        </GridView>
-                                    </ListView.View>
-                                </ListView>
-
-                            </WrapPanel>
-
-
-                        </Grid>
-
-                    </TabItem>
                 </TabControl>
             </Grid>
         </Grid>
