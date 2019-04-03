@@ -461,7 +461,6 @@ namespace ArrayDisplay.UI {
         void SaveOrigData_OnClick(object sender, RoutedEventArgs e) {
             if (OrigWaveData == null || !OrigWaveData.IsRcving) {
                 MessageBox.Show("请采集原始波形数据");
-                btn_origsave.Content = "正在保存";
                 return;
             }
             IsorigSaveFlag = !IsorigSaveFlag;
@@ -469,8 +468,6 @@ namespace ArrayDisplay.UI {
                 btn_origsave.Content = "正在保存";
                 dataFile.IsStartFlag = true;
                 dataFile.EnableOrigSaveFile();
-
-                selectdInfo.IsSaveData = true;
             }
 
             else {
@@ -804,16 +801,23 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void SaveWorkData_OnClick(object sender, RoutedEventArgs e) {
+            if (NormWaveData == null || !NormWaveData.IsRcving)
+            {
+                MessageBox.Show("请采集原始波形数据");
+                btn_normalSave.Content = "保存数据";
+                return;
+            }
             IsworkSaveFlag = !IsworkSaveFlag;
             if (IsworkSaveFlag) {
-                btnSave.Content = "开始保存";
+                btn_normalSave.Content = "开始保存";
                 dataFile.EnableWorkSaveFile();
-                selectdInfo.IsSaveData = true;
+                dataFile.IsStartFlag = true;
             }
 
             else {
-                btnSave.Content = "保存数据";
+                btn_normalSave.Content = "保存数据";
                 dataFile.DisableSaveFile();
+                dataFile.IsStartFlag = true;
             }
         }
 

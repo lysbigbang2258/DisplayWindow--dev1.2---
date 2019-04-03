@@ -833,7 +833,7 @@
                                                 Content="启动"
                                                 FontSize="18" />
 
-                                        <Button x:Name="btnSave"
+                                        <Button x:Name="btn_normalSave"
                                                 Width="100"
                                                 Height="32"
                                                 Margin="10,0,0,0"

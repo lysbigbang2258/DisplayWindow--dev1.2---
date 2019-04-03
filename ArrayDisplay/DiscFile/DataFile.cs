@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -18,25 +16,32 @@ namespace ArrayDisplay.DiscFile {
         #region Field
 
         readonly string filepath;
+        readonly int origLength;
         readonly ConcurrentQueue<byte[]> origRcvQueue;
         readonly AutoResetEvent origResetEvent;
         readonly ConcurrentQueue<byte[]> workRcvQueue;
         readonly AutoResetEvent workResetEvent;
         BinaryWriter br_work;
+
+        string filename;
         FileStream fs_work;
-        readonly int origLength;
         Thread oriThread;
+        int packnum;
         int workLength;
         Thread workThread;
 
-        string filename;
-        int packnum;
         #endregion
+
+        #region Property
 
         public bool IsStartFlag {
             get;
             set;
         }
+
+        #endregion
+
+        #region Method
 
         public DataFile() {
             origRcvQueue = new ConcurrentQueue<byte[]>();
@@ -46,102 +51,9 @@ namespace ArrayDisplay.DiscFile {
             RelativeDirectory rd = new RelativeDirectory();
             origLength = ConstUdpArg.SAVE_ORIGPACK;
             workLength = ConstUdpArg.SAVE_WORKPACK;
-            filepath = rd.Path + "\\"+"wavedata"+"\\";
+            filepath = rd.Path + "\\" + "wavedata" + "\\";
             IsStartFlag = false;
             packnum = 0;
-        }
-
-        void Thread_WorkDataSave() {
-            while(true) {
-                workResetEvent.WaitOne();
-                string str = SetNowTimeStr(WaveData.WorkData);
-                if (workRcvQueue.Count >= (1024 * 100 * 4)) {
-                    try {
-                        fs_work = new FileStream(filepath + str, FileMode.CreateNew, FileAccess.Write);
-                        br_work = new BinaryWriter(fs_work);
-                    }
-                    catch(Exception e) {
-                        Console.WriteLine(e);
-                        throw;
-                    }
-                    byte[] temp;
-                    for(int i = 0; i <= (1024 * 100 * 4); i++) {
-                        workRcvQueue.TryDequeue(out temp);
-                        br_work.Write(temp);
-                    }
-                    workResetEvent.Set();
-                }
-            }
-        }
-
-        /// <summary>
-        /// 线程处理：写入原始数据
-        /// </summary>
-        void Thread_OrigDataSave() {
-            try {
-                while (true)
-                {
-                    origResetEvent.WaitOne();
-                    if (origRcvQueue.Count < origLength) {
-                        continue;
-                    }
-                    try
-                    {
-                        using (var fsOrig = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.Write))
-                        {
-                            using (var brWork = new BinaryWriter(fsOrig))
-                            {
-                                byte[] temp;
-                                int length = 0;
-                                for (int i = 0; i <= origLength; i++)
-                                {
-                                    origRcvQueue.TryDequeue(out temp);
-                                    if (temp != null)
-                                    {
-                                        brWork.Write(temp);
-                                    }
-                                }
-                            }
-                        }  
-
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                        throw;
-                    }
-                origResetEvent.Set();
-                }
-                
-            }
-            catch(ThreadAbortException abortException) {
-                Thread.ResetAbort();
-                if (!File.Exists(filename)) {return; }
-                try
-                {
-                    using (var fsOrig = new FileStream(filename, FileMode.Append, FileAccess.Write))
-                    {
-                        using (var brWork = new BinaryWriter(fsOrig))
-                        {
-                            byte[] temp;
-                            for (int i = 0; i <= origRcvQueue.Count; i++)
-                            {
-                                origRcvQueue.TryDequeue(out temp);
-                                if (temp != null)
-                                {
-                                    brWork.Write(temp);
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
-            }
-           
         }
 
         /// <summary>
@@ -169,58 +81,179 @@ namespace ArrayDisplay.DiscFile {
             string str = sb.ToString();
             return str;
         }
-        /// <summary>
-        /// 开启工作数据保存
-        /// </summary>
-        public void EnableWorkSaveFile() {
-            workThread = new Thread(Thread_WorkDataSave) { IsBackground = true };
-            workThread.Start();
-            UdpWaveData.WorkSaveDataEventHandler += WriteWorkData;
-        }
-        /// <summary>
-        /// 开启原始数据保存
-        /// </summary>
-        public void EnableOrigSaveFile() {
-            oriThread = new Thread(Thread_OrigDataSave) { IsBackground = true };
-            oriThread.Start();
-            UdpWaveData.OrigSaveDataEventHandler += WriteOrigData;
-            origResetEvent.Set();
-        }
 
+        /// <summary>
+        ///     关闭数据保存
+        /// </summary>
         public void DisableSaveFile() {
-            if (oriThread!=null && oriThread.IsAlive) {
+            if (oriThread != null && oriThread.IsAlive) {
                 origResetEvent.Reset();
                 oriThread.Abort();
             }
-            if (workThread!=null && workThread.IsAlive)
-            {
+            if (workThread != null && workThread.IsAlive) {
                 workThread.Abort();
             }
         }
 
-        void WriteWorkData(object sender, byte[] data) {
-            workRcvQueue.Enqueue(data);
-            int len = ConstUdpArg.SAVE_WORKPACK;
-            if (workRcvQueue.Count >= len) {
-                string filename = SetNowTimeStr(WaveData.WorkData);
+        #region orig相关
+
+        /// <summary>
+        ///     线程处理：写入原始数据
+        /// </summary>
+        void Thread_OrigDataSave() {
+            try {
+                while(true) {
+                    origResetEvent.WaitOne();
+                    if (origRcvQueue.Count < origLength) {
+                        continue;
+                    }
+                    try {
+                        using(FileStream fsOrig = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.Write)) {
+                            using(BinaryWriter brWork = new BinaryWriter(fsOrig)) {
+                                byte[] temp;
+                                int length = 0;
+                                for(int i = 0; i <= origLength; i++) {
+                                    origRcvQueue.TryDequeue(out temp);
+                                    if (temp != null) {
+                                        brWork.Write(temp);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch(Exception e) {
+                        Console.WriteLine(e);
+                        throw;
+                    }
+                    origResetEvent.Set();
+                }
+            }
+            catch(ThreadAbortException abortException) {
+                Thread.ResetAbort();
+                if (!File.Exists(filename)) { return; }
+                try {
+                    using(FileStream fsOrig = new FileStream(filename, FileMode.Append, FileAccess.Write)) {
+                        using(BinaryWriter brWork = new BinaryWriter(fsOrig)) {
+                            byte[] temp;
+                            for(int i = 0; i <= origRcvQueue.Count; i++) {
+                                origRcvQueue.TryDequeue(out temp);
+                                if (temp != null) {
+                                    brWork.Write(temp);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch(Exception e) {
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
         }
 
         /// <summary>
-        /// 实时获取原始数据
+        ///     开启原始数据保存
+        /// </summary>
+        public void EnableOrigSaveFile() {
+            oriThread = new Thread(Thread_OrigDataSave) {IsBackground = true};
+            oriThread.Start();
+            UdpWaveData.OrigSaveDataEventHandler += WriteOrigData;
+        }
+
+        /// <summary>
+        ///     实时获取原始数据
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="data"></param>
         void WriteOrigData(object sender, byte[] data) {
-            packnum++;
             origRcvQueue.Enqueue(data);
-            if (IsStartFlag) {
-                string str = SetNowTimeStr(WaveData.Origdata);
-                filename = filepath + str;
-                origResetEvent.Set();
-                
+            if (!IsStartFlag) {
+                return;
+            }
+            string str = SetNowTimeStr(WaveData.Origdata);
+            filename = filepath + str;
+            origResetEvent.Set();
+        }
+
+        #endregion
+
+        #region work相关
+
+        void Thread_WorkDataSave() {
+            try {
+                while(true) {
+                    workResetEvent.WaitOne();
+                    if (workRcvQueue.Count < workLength)
+                    {
+                        continue;
+                    }
+                    try {
+                        using(FileStream fsOrig = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.Write)) {
+                            using(BinaryWriter brWork = new BinaryWriter(fsOrig)) {
+                                byte[] temp;
+                                for(int i = 0; i <= workLength; i++) {
+                                    workRcvQueue.TryDequeue(out temp);
+                                    if (temp != null) {
+                                        brWork.Write(temp);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch(Exception e) {
+                        Console.WriteLine(e);
+                        throw;
+                    }
+                }
+            }
+            catch(ThreadAbortException abortException) {
+                Thread.ResetAbort();
+                if (!File.Exists(filename)) { return; }
+                try {
+                    using(FileStream fsOrig = new FileStream(filename, FileMode.Append, FileAccess.Write)) {
+                        using(BinaryWriter brWork = new BinaryWriter(fsOrig)) {
+                            byte[] temp;
+                            for(int i = 0; i <= workRcvQueue.Count; i++) {
+                                workRcvQueue.TryDequeue(out temp);
+                                if (temp != null) {
+                                    brWork.Write(temp);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch(Exception e) {
+                    Console.WriteLine(e);
+                    throw;
+                }
             }
         }
+
+        /// <summary>
+        ///     开启工作数据保存
+        /// </summary>
+        public void EnableWorkSaveFile() {
+            workThread = new Thread(Thread_WorkDataSave) {IsBackground = true};
+            workThread.Start();
+            UdpWaveData.WorkSaveDataEventHandler += WriteWorkData;
+        }
+        /// <summary>
+        /// 写入工作数据
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="data"></param>
+        void WriteWorkData(object sender, byte[] data) {
+            workRcvQueue.Enqueue(data);
+            if (!IsStartFlag)
+            {
+                return;
+            }
+            string str = SetNowTimeStr(WaveData.WorkData);
+            filename = filepath + str;
+            workResetEvent.Set();
+        }
+
+        #endregion
 
         #region IDisposable
 
@@ -240,6 +273,8 @@ namespace ArrayDisplay.DiscFile {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        #endregion
 
         #endregion
     }
