@@ -41,14 +41,7 @@ namespace ArrayDisplay.net {
                 {
                     Console.WriteLine(e);
                 }
-                if (reflag == 1)
-                {
-                    string commadid = Encoding.ASCII.GetString(rcvUdpBuffer, 0, 6);
-                    var str = ConstUdpArg.Device_Id.ToString();
-                    switch(commadid) {
-                        
-                    }
-                }
+                
             }
         }
 

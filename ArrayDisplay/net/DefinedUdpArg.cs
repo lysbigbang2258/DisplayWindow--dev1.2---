@@ -494,6 +494,9 @@ namespace ArrayDisplay.net {
         public const int DELAY_FRAME_NUMS = 10;
         public const int DELAY_FRAME_LENGTH = 402;
 
+        public const int SAVE_ORIGPACK = 4 * 1024;
+        public const int SAVE_WORKPACK = 1024 * 4 * 100;
+
 
         #endregion
     }

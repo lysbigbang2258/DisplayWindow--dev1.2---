@@ -166,7 +166,6 @@ namespace ArrayDisplay.net {
             IPEndPoint remote = new IPEndPoint(IPAddress.Any, 0);
             EndPoint senderRemote = remote;
             Console.WriteLine(@"启动UDP线程...");
-
             while (true)
             {
                 while (true)

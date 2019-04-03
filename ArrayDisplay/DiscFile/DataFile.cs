@@ -1,74 +1,71 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using ArrayDisplay.DataFile;
 using ArrayDisplay.net;
 
 namespace ArrayDisplay.DiscFile {
+    public enum WaveData {
+        WorkData,
+        Origdata
+    }
+
     public class DataFile : IDisposable {
-        ConcurrentQueue<byte[]> origRcvQueue;
-        ConcurrentQueue<byte[]> workRcvQueue;
+        #region Field
+
         readonly string filepath;
-        AutoResetEvent origResetEvent;
-        AutoResetEvent workResetEvent;
+        readonly ConcurrentQueue<byte[]> origRcvQueue;
+        readonly AutoResetEvent origResetEvent;
+        readonly ConcurrentQueue<byte[]> workRcvQueue;
+        readonly AutoResetEvent workResetEvent;
         BinaryWriter br_work;
-        BinaryWriter br_orig;
         FileStream fs_work;
-        FileStream fs_orig;
-        
+        readonly int origLength;
+        Thread oriThread;
+        int workLength;
+        Thread workThread;
+
+        string filename;
+        int packnum;
+        #endregion
+
+        public bool IsStartFlag {
+            get;
+            set;
+        }
 
         public DataFile() {
             origRcvQueue = new ConcurrentQueue<byte[]>();
             workRcvQueue = new ConcurrentQueue<byte[]>();
             origResetEvent = new AutoResetEvent(false);
             workResetEvent = new AutoResetEvent(false);
-            Thread hthread = new Thread(Thread_WorkDataSave) {IsBackground = true};
-            hthread.Start();
             RelativeDirectory rd = new RelativeDirectory();
-            filepath = rd.Path + "\\";
-            Task.Factory.StartNew(Thread_OrigDataSave);
-
+            origLength = ConstUdpArg.SAVE_ORIGPACK;
+            workLength = ConstUdpArg.SAVE_WORKPACK;
+            filepath = rd.Path + "\\"+"wavedata"+"\\";
+            IsStartFlag = false;
+            packnum = 0;
         }
 
-        void Thread_WorkDataSave()
-        {
-            while (true)
-            {
+        void Thread_WorkDataSave() {
+            while(true) {
                 workResetEvent.WaitOne();
-                DateTime dt = DateTime.Now;
-                StringBuilder sb = new StringBuilder();
-                sb.Append("WorkFile_");
-                sb.Append(dt.Year.ToString("d4"));
-                sb.Append("-");
-                sb.Append(dt.Month.ToString("d2"));
-                sb.Append("-");
-                sb.Append(dt.Day.ToString("d2"));
-                sb.Append("-");
-                sb.Append(dt.Hour.ToString("d2"));
-                sb.Append("-");
-                sb.Append(dt.Minute.ToString("d2"));
-                sb.Append("-");
-                sb.Append(dt.Second.ToString("d2"));
-                sb.Append(".bin");
-                var str = sb.ToString();
-                if (workRcvQueue.Count >= 1024 * 100 * 4)
-                {
-                    try
-                    {
+                string str = SetNowTimeStr(WaveData.WorkData);
+                if (workRcvQueue.Count >= (1024 * 100 * 4)) {
+                    try {
                         fs_work = new FileStream(filepath + str, FileMode.CreateNew, FileAccess.Write);
                         br_work = new BinaryWriter(fs_work);
                     }
-                    catch (Exception e)
-                    {
+                    catch(Exception e) {
                         Console.WriteLine(e);
                         throw;
                     }
                     byte[] temp;
-                    for (int i = 0; i <= 1024 * 100 * 4; i++)
-                    {
+                    for(int i = 0; i <= (1024 * 100 * 4); i++) {
                         workRcvQueue.TryDequeue(out temp);
                         br_work.Write(temp);
                     }
@@ -76,91 +73,165 @@ namespace ArrayDisplay.DiscFile {
                 }
             }
         }
-        
 
-        void Thread_OrigDataSave()
-        {
-            while (true)
-            {
-                origResetEvent.WaitOne();
-               
-
-                DateTime dt = DateTime.Now;
-                StringBuilder sb = new StringBuilder();
-                sb.Append("Origfile_");
-                sb.Append(dt.Year.ToString("d4"));
-                sb.Append("-");
-                sb.Append(dt.Month.ToString("d2"));
-                sb.Append("-");
-                sb.Append(dt.Day.ToString("d2"));
-                sb.Append("-");
-                sb.Append(dt.Hour.ToString("d2"));
-                sb.Append("-");
-                sb.Append(dt.Minute.ToString("d2"));
-                sb.Append("-");
-                sb.Append(dt.Second.ToString("d2"));
-                sb.Append(".bin");
-                var str = sb.ToString();
-
-                if (origRcvQueue.Count >= 1024*10)
+        /// <summary>
+        /// 线程处理：写入原始数据
+        /// </summary>
+        void Thread_OrigDataSave() {
+            try {
+                while (true)
                 {
-                    try {
-                        fs_orig = new FileStream(filepath + str, FileMode.CreateNew, FileAccess.Write);
-                        br_orig = new BinaryWriter(fs_orig);
+                    origResetEvent.WaitOne();
+                    if (origRcvQueue.Count < origLength) {
+                        continue;
                     }
-                    catch(Exception e) {
+                    try
+                    {
+                        using (var fsOrig = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.Write))
+                        {
+                            using (var brWork = new BinaryWriter(fsOrig))
+                            {
+                                byte[] temp;
+                                int length = 0;
+                                for (int i = 0; i <= origLength; i++)
+                                {
+                                    origRcvQueue.TryDequeue(out temp);
+                                    if (temp != null)
+                                    {
+                                        brWork.Write(temp);
+                                    }
+                                }
+                            }
+                        }  
+
+                    }
+                    catch (Exception e)
+                    {
                         Console.WriteLine(e);
                         throw;
                     }
-
-                    byte[] temp ;
-                    for (int i = 0; i <= 1024*10; i++)
+                origResetEvent.Set();
+                }
+                
+            }
+            catch(ThreadAbortException abortException) {
+                Thread.ResetAbort();
+                if (!File.Exists(filename)) {return; }
+                try
+                {
+                    using (var fsOrig = new FileStream(filename, FileMode.Append, FileAccess.Write))
                     {
-                        origRcvQueue.TryDequeue(out temp);
-                        br_orig.Write(temp);
+                        using (var brWork = new BinaryWriter(fsOrig))
+                        {
+                            byte[] temp;
+                            for (int i = 0; i <= origRcvQueue.Count; i++)
+                            {
+                                origRcvQueue.TryDequeue(out temp);
+                                if (temp != null)
+                                {
+                                    brWork.Write(temp);
+                                }
+                            }
+                        }
                     }
-                    origResetEvent.Set();
-//                    br_orig.Flush();
-//                    br_orig.Close();
-//                    fs_orig.Close();
-//                    fs_orig = null;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
                 }
             }
+           
         }
 
+        /// <summary>
+        ///     获取当前时间信息
+        /// </summary>
+        /// <returns></returns>
+        static string SetNowTimeStr(WaveData wave) {
+            DateTime dt = DateTime.Now;
+            StringBuilder sb = new StringBuilder();
+            sb.Append(wave == WaveData.WorkData ? "WorkFile_" : "OrigFile_");
+            sb.Append(dt.Year.ToString("d4"));
+            sb.Append("-");
+            sb.Append(dt.Month.ToString("d2"));
+            sb.Append("-");
+            sb.Append(dt.Day.ToString("d2"));
+            sb.Append("-");
+            sb.Append(dt.Hour.ToString("d2"));
+            sb.Append("-");
+            sb.Append(dt.Minute.ToString("d2"));
+            sb.Append("-");
+            sb.Append(dt.Second.ToString("d2"));
+            sb.Append("-");
+            sb.Append(dt.Millisecond.ToString("d2"));
+            sb.Append(".bin");
+            string str = sb.ToString();
+            return str;
+        }
+        /// <summary>
+        /// 开启工作数据保存
+        /// </summary>
         public void EnableWorkSaveFile() {
+            workThread = new Thread(Thread_WorkDataSave) { IsBackground = true };
+            workThread.Start();
             UdpWaveData.WorkSaveDataEventHandler += WriteWorkData;
         }
-        public void EnableOrigSaveFile()
-        {
+        /// <summary>
+        /// 开启原始数据保存
+        /// </summary>
+        public void EnableOrigSaveFile() {
+            oriThread = new Thread(Thread_OrigDataSave) { IsBackground = true };
+            oriThread.Start();
             UdpWaveData.OrigSaveDataEventHandler += WriteOrigData;
+            origResetEvent.Set();
         }
 
         public void DisableSaveFile() {
-            UdpWaveData.WorkSaveDataEventHandler = null;
+            if (oriThread!=null && oriThread.IsAlive) {
+                origResetEvent.Reset();
+                oriThread.Abort();
+            }
+            if (workThread!=null && workThread.IsAlive)
+            {
+                workThread.Abort();
+            }
         }
 
-        void WriteWorkData(object sender, byte[] data)
-        {
-            
+        void WriteWorkData(object sender, byte[] data) {
             workRcvQueue.Enqueue(data);
-            workResetEvent.Set();
+            int len = ConstUdpArg.SAVE_WORKPACK;
+            if (workRcvQueue.Count >= len) {
+                string filename = SetNowTimeStr(WaveData.WorkData);
+            }
         }
 
-        void WriteOrigData(object sender, byte[] data)
-        {
+        /// <summary>
+        /// 实时获取原始数据
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="data"></param>
+        void WriteOrigData(object sender, byte[] data) {
+            packnum++;
             origRcvQueue.Enqueue(data);
-            origResetEvent.Set();
+            if (IsStartFlag) {
+                string str = SetNowTimeStr(WaveData.Origdata);
+                filename = filepath + str;
+                origResetEvent.Set();
+                
+            }
         }
 
         #region IDisposable
 
         protected virtual void Dispose(bool disposing) {
             if (disposing) {
-                if (fs_work != null) fs_work.Dispose();
-                if (br_work != null) br_work.Dispose();
-                if (fs_orig != null) fs_orig.Dispose();
-                if (br_orig != null) br_orig.Dispose();
+                if (fs_work != null) {
+                    fs_work.Dispose();
+                }
+                if (br_work != null) {
+                    br_work.Dispose();
+                }
             }
         }
 
