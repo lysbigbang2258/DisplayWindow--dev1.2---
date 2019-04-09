@@ -584,7 +584,7 @@
                                     <Button x:Name="btnPauseOrigGraph"
                                             Width="100"
                                             Height="32"
-                                            Margin="10,0,0,0"
+                                            Margin="15,0,0,0"
                                             Click="BtnPauseWorkGraph_OnClick"
                                             Content="暂停波形"
                                             FontSize="18" />
@@ -596,7 +596,9 @@
                                             Click="SaveOrigData_OnClick"
                                             Content="保存数据"
                                             FontFamily="18" />
-                                    <Button Width="100"
+
+                                    <Button x:Name="btn_origreplay"
+                                            Width="100"
                                             Height="32"
                                             Margin="15,0,0,0"
                                             Click="ReplayOrigData_OnClick"
@@ -700,17 +702,11 @@
                     </TabItem>
                     <TabItem Name="configItem" Header="自动标定">
                         <Grid Background="#FFE5E5E5">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="31*" />
-                                <ColumnDefinition Width="949*" />
-                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <WrapPanel Grid.Row="0"
-                                       Grid.ColumnSpan="2"
-                                       Margin="0,0,0,128">
+                            <WrapPanel Grid.Row="0">
                                 <Button Name="btn_calBvalue"
                                         Width="100"
                                         Height="32"
@@ -749,7 +745,7 @@
                                         Content="发送参数"
                                         FontFamily="18" />
                             </WrapPanel>
-                            <WrapPanel Grid.RowSpan="2" Grid.ColumnSpan="2">
+                            <WrapPanel Grid.Row="1" Grid.ColumnSpan="2">
                                 <ListView Name="blistview"
                                           Width="464"
                                           Height="500"

@@ -274,20 +274,20 @@ namespace ArrayDisplay.net {
 
         /// <summary>读取:ADC偏移</summary>
         public void ReadAdcOffset() {
-            Send(ConstUdpArg.GetAdcOffsetRead(DisPlayWindow.systemInfo.AdcNum), ConstUdpArg.Dst_ComMsgIp);
+            Send(ConstUdpArg.GetAdcOffsetRead(DisPlayWindow.Info.AdcNum), ConstUdpArg.Dst_ComMsgIp);
             ReceiveAdcOffset(19);
         }
 
         /// <summary>///读取延时信息/// </summary>
         public void ReadDelyTime() {
-            var sedip = ConstUdpArg.GetDelayTimeReadCommand(DisPlayWindow.systemInfo.ChannelDelayNums);
+            var sedip = ConstUdpArg.GetDelayTimeReadCommand(DisPlayWindow.Info.DelayChannel);
             Send(sedip, ConstUdpArg.Dst_ComMsgIp);
             ReceiveChannelDeleyTime(20);
         }
 
         /// <summary>///读取ADC通道/// </summary>
         public void ReadCanChannelLen() {
-            var sedip = ConstUdpArg.GetDacChannelReadCommand(DisPlayWindow.selectdInfo.DacChannel - 1);
+            var sedip = ConstUdpArg.GetDacChannelReadCommand(DisPlayWindow.Info.DacChannel - 1);
             Send(sedip, ConstUdpArg.Dst_ComMsgIp);
             ReceiveCanChannelLen(20);
         }
@@ -317,7 +317,7 @@ namespace ArrayDisplay.net {
         /// <summary>写:ADC偏移</summary>
         /// <param name="data">数据8bit,[(配置值+1.2)/1.2]*128</param>
         public void WriteAdcOffset(byte data) {
-            var addr = ConstUdpArg.GetAdcOffsetWrite(DisPlayWindow.systemInfo.AdcNum);
+            var addr = ConstUdpArg.GetAdcOffsetWrite(DisPlayWindow.Info.AdcNum);
             var sendData = new byte[addr.Length + 1];
             Array.Copy(addr, sendData, addr.Length);
 
@@ -330,7 +330,7 @@ namespace ArrayDisplay.net {
         /// <summary>写:脉冲宽度</summary>
         /// <param name="data">数据,16bit,配置值/5</param>
         public void WriteDelayTime(byte[] data) {
-            var tmp = ConstUdpArg.GetDelayTimeWriteCommand(int.Parse(DisPlayWindow.hMainWindow.tb_deleyChannel.Text) - 1);
+            var tmp = ConstUdpArg.GetDelayTimeWriteCommand(int.Parse(DisPlayWindow.HMainWindow.tb_deleyChannel.Text) - 1);
             WriteData(tmp, data);
         }
 
@@ -367,7 +367,7 @@ namespace ArrayDisplay.net {
             int offset = partAddr.Length;
 
             int len;
-            int.TryParse(DisPlayWindow.hMainWindow.tb_dacChannel.Text, out len);
+            int.TryParse(DisPlayWindow.HMainWindow.tb_dacChannel.Text, out len);
             int chennelsite = 91 + len;
             var ctmp = new byte[1];
             ctmp[0] = (byte) chennelsite;
@@ -433,7 +433,7 @@ namespace ArrayDisplay.net {
         /// <summary>存:ADC偏移</summary>
         /// <param name="data">数据8bit,[(配置值+1.2)/1.2]*128</param>
         public void SaveAdcOffset(byte data) {
-            var addr = ConstUdpArg.GetAdcOffsetSave(DisPlayWindow.systemInfo.AdcNum);
+            var addr = ConstUdpArg.GetAdcOffsetSave(DisPlayWindow.Info.AdcNum);
             var sendData = new byte[addr.Length + 1];
             Array.Copy(addr, sendData, addr.Length);
 
@@ -446,7 +446,7 @@ namespace ArrayDisplay.net {
         /// <summary>存:延时通道</summary>
         /// <param name="data">数据8bit,[(配置值+1.2)/1.2]*128</param>
         public void SaveDelayTime(byte[] data) {
-            var cmd = ConstUdpArg.GetDelayTimeSaveCommand(int.Parse(DisPlayWindow.hMainWindow.tb_deleyChannel.Text));
+            var cmd = ConstUdpArg.GetDelayTimeSaveCommand(int.Parse(DisPlayWindow.HMainWindow.tb_deleyChannel.Text));
             SaveData(cmd, data);
         }
 
@@ -454,7 +454,7 @@ namespace ArrayDisplay.net {
         /// <param name="data">数据8bit,[(配置值+1.2)/1.2]*128</param>
         public void SaveDacLen(byte[] data)
         {
-            var cmd = ConstUdpArg.GetDacLenSaveCommand(int.Parse(DisPlayWindow.hMainWindow.tb_dacChannel.Text));
+            var cmd = ConstUdpArg.GetDacLenSaveCommand(int.Parse(DisPlayWindow.HMainWindow.tb_dacChannel.Text));
             SaveData(cmd, data);
         }
 
@@ -517,7 +517,7 @@ namespace ArrayDisplay.net {
             }
                 string mcType = Encoding.ASCII.GetString(rcvUdpBuffer, 6, 8);
                 Console.WriteLine("mc_type={0}", mcType);
-                DisPlayWindow.systemInfo.McType = mcType;
+                DisPlayWindow.Info.McType = mcType;
             
         }
 
@@ -536,7 +536,7 @@ namespace ArrayDisplay.net {
                     mcId += BitConverter.ToString(rcvUdpBuffer, 6 + i, 1);
                 }
                 Console.WriteLine("mc_id={0}", mcId);
-                DisPlayWindow.systemInfo.McId = mcId;
+                DisPlayWindow.Info.McId = mcId;
             
         }
 
@@ -560,7 +560,7 @@ namespace ArrayDisplay.net {
                     }
                 }
                 Console.WriteLine("mc_mac={0}", mcMac);
-                DisPlayWindow.systemInfo.McMac = mcMac;
+                DisPlayWindow.Info.McMac = mcMac;
             
             
            
@@ -723,42 +723,42 @@ namespace ArrayDisplay.net {
             {
                 int pulsePeriod = ToInt(data) * 5;
                 Console.WriteLine("pulse_period={0}", pulsePeriod);
-                DisPlayWindow.systemInfo.PulsePeriod = pulsePeriod;
+                DisPlayWindow.Info.PulsePeriod = pulsePeriod;
             }
             else if (Encoding.ASCII.GetString(ConstUdpArg.Pulse_Delay_Read, 0, 6).Equals(cmd)) //脉冲延时
             {
                 int pulseDelay = ToInt(data) * 5;
                 Console.WriteLine("pulse_delay={0}", pulseDelay);
-                DisPlayWindow.systemInfo.PulseDelay = pulseDelay;
+                DisPlayWindow.Info.PulseDelay = pulseDelay;
             }
             else if (Encoding.ASCII.GetString(ConstUdpArg.Pulse_Width_Read, 0, 6).Equals(cmd)) //脉冲宽度
             {
                 int pulseWidth = ToInt(data) * 5;
                 Console.WriteLine("pulse_width={0}", pulseWidth);
-                DisPlayWindow.systemInfo.PulseWidth = pulseWidth;
+                DisPlayWindow.Info.PulseWidth = pulseWidth;
             }
-            else if (Encoding.ASCII.GetString(ConstUdpArg.GetAdcOffsetRead(DisPlayWindow.systemInfo.AdcNum), 0, 6).Equals(cmd)) //ADC偏移
+            else if (Encoding.ASCII.GetString(ConstUdpArg.GetAdcOffsetRead(DisPlayWindow.Info.AdcNum), 0, 6).Equals(cmd)) //ADC偏移
             {
                 double adcOffset = data[0];
                 adcOffset = adcOffset * 1.2 / 128 - 1.2;
                 //AdcOffset.ToString("G3");
                 Console.WriteLine("adc_offset={0}", adcOffset.ToString("G2"));
-                DisPlayWindow.systemInfo.AdcOffset = adcOffset.ToString("G2");
+                DisPlayWindow.Info.AdcOffset = adcOffset.ToString("G2");
             }
-            else if (Encoding.ASCII.GetString(ConstUdpArg.GetDelayTimeReadCommand(DisPlayWindow.systemInfo.ChannelDelayNums), 0, 6).Equals(cmd)) //延迟通道
+            else if (Encoding.ASCII.GetString(ConstUdpArg.GetDelayTimeReadCommand(DisPlayWindow.Info.DelayChannel), 0, 6).Equals(cmd)) //延迟通道
             {
                 byte t = data[0];
                 data[0] = data[1];
                 data[1] = t;
                 int delaytime = BitConverter.ToUInt16(data, 0);
-                DisPlayWindow.systemInfo.ChannelDelayTime = delaytime;
+                DisPlayWindow.Info.DelayTime = delaytime;
             }
-            else if (Encoding.ASCII.GetString(ConstUdpArg.GetDacChannelReadCommand(DisPlayWindow.selectdInfo.DacChannel - 1), 0, 6).Equals(cmd))
+            else if (Encoding.ASCII.GetString(ConstUdpArg.GetDacChannelReadCommand(DisPlayWindow.Info.DacChannel - 1), 0, 6).Equals(cmd))
                     //Dac数据
             {
                 int result = data[0] * 256;
                 result += data[1];
-                DisPlayWindow.selectdInfo.DacLenth = result;
+                DisPlayWindow.Info.DacLenth = result;
             }
             else {
 //其他,未定义

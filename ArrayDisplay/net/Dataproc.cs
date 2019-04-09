@@ -57,7 +57,7 @@ namespace ArrayDisplay.net {
             OrigChannnel = 0;
             OrigTimeDiv = 0;
 
-            int oFrime = DisPlayWindow.selectdInfo.OrigFramNums; //原始数据帧数
+            int oFrime = DisPlayWindow.Info.OrigFramNums; //原始数据帧数
             Origdata = new byte[oFrime * ArrayNums];
             int olength = ConstUdpArg.ORIG_FRAME_LENGTH - 2; //每帧长度
             for (int i = 0; i < oNums; i++)
@@ -161,8 +161,8 @@ namespace ArrayDisplay.net {
                         //                        OrigWave_Floats[i][j] = a / 104800.0f;
                     }
                 }
-
-                DelayGraphEventHandler(null, DelayWaveFloats);
+                int channel = DisPlayWindow.Info.DelayChannel-1;
+                DelayGraphEventHandler(null, DelayWaveFloats[channel]);
             }
         }
         /// <summary>
@@ -183,9 +183,12 @@ namespace ArrayDisplay.net {
                         OrigWaveFloats[i][j] = a / 8192.0f;
                     }
                 }
-                if (OrigGraphEventHandler != null)
-                {
-                    OrigGraphEventHandler.Invoke(null, OrigWaveFloats);
+                int origchannel = DisPlayWindow.Info.OrigChannel - 1;
+                int origTdiv = DisPlayWindow.Info.OrigTdiv - 1;
+                int origpack = origchannel * 8 + origTdiv;
+                if (OrigGraphEventHandler != null) {
+                    string sender = "OrigNet";
+                    OrigGraphEventHandler.Invoke(sender, OrigWaveFloats[origpack]);
                 }
             }
         }
@@ -194,7 +197,7 @@ namespace ArrayDisplay.net {
 
         /// <summary>
         ///线程处理函数：能量数据处理
-        /// </summary>
+        /// </summary>                                        
         void ThreadEnergyStart() {
             while(true) {
                 WorkEnergyEvent.WaitOne();
@@ -261,7 +264,7 @@ namespace ArrayDisplay.net {
                         Array.Copy(x, 0, PlayWaveBytes[i], j * 2, 2);
                     }
                 }
-                var offset = ConstUdpArg.offsetArray[DisPlayWindow.selectdInfo.WorkWaveChannel-1];
+                var offset = ConstUdpArg.offsetArray[DisPlayWindow.Info.WorkChannel-1];
                 WorkWavefdatas = WorkWaveFloats[offset-1];
                 WorkEnergyEvent.Set();
                 FreqWaveEvent.Set();
@@ -275,7 +278,7 @@ namespace ArrayDisplay.net {
 
                 if (SoundEventHandler != null)
                 {
-                    int channel = DisPlayWindow.selectdInfo.WorkWaveChannel;
+                    int channel = DisPlayWindow.Info.WorkChannel;
                     if (channel > 0)
                     {
                         SoundEventHandler.Invoke(null, PlayWaveBytes[channel]);
@@ -293,9 +296,7 @@ namespace ArrayDisplay.net {
                 FreqWaveEvent.WaitOne();
                 FreqWaveOne = TransFormFft.FFT(WorkWavefdatas);
                 var dataPoints = NewFFT.Start(WorkWavefdatas, 1024*16);//用前1024 * 16个点
-//                if (FrapGraphEventHandler != null) {
-//                    FrapGraphEventHandler.Invoke(null, FreqWaveOne);
-//                }
+
                 if (FrapPointGraphEventHandler != null) {
                     FrapPointGraphEventHandler(null, dataPoints);   
                 }
@@ -356,7 +357,7 @@ namespace ArrayDisplay.net {
             set;
         }
 
-        public static EventHandler<float[][]> OrigGraphEventHandler {
+        public static EventHandler<float[]> OrigGraphEventHandler {
             get;
             set;
         }
@@ -371,7 +372,7 @@ namespace ArrayDisplay.net {
             set;
         }
 
-        public static EventHandler<float[][]> DelayGraphEventHandler {
+        public static EventHandler<float[]> DelayGraphEventHandler {
             get;
             set;
         }

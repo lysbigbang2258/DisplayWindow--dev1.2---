@@ -30,7 +30,7 @@ namespace ArrayDisplay.sound {
         {
             device = new DirectSound(); //音频设备对象
 
-            IntPtr hwnd = new WindowInteropHelper(DisPlayWindow.hMainWindow).Handle; //设置窗口句柄
+            IntPtr hwnd = new WindowInteropHelper(DisPlayWindow.HMainWindow).Handle; //设置窗口句柄
             device.SetCooperativeLevel(hwnd, CooperativeLevel.Priority);
 
             //设置Wav音频文件对象属性

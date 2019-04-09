@@ -3,6 +3,7 @@ using System.Timers;
 using System.Windows;
 using System.Windows.Input;
 using ArrayDisplay.DataFile;
+using ArrayDisplay.DiscFile;
 using ArrayDisplay.MyUserControl.ArrayEnergy;
 using ArrayDisplay.net;
 

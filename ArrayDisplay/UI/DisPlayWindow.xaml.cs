@@ -11,11 +11,17 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
+using ArrayDisplay.DiscFile;
 using ArrayDisplay.net;
 using ArrayDisplay.sound;
 using NationalInstruments.Restricted;
+using Binding = System.Windows.Data.Binding;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using MessageBox = System.Windows.MessageBox;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace ArrayDisplay.UI {
     /// <summary>
@@ -24,8 +30,8 @@ namespace ArrayDisplay.UI {
     public sealed partial class DisPlayWindow : IDisposable {
         #region Field
 
-        public static DisPlayWindow hMainWindow; //当前窗口句柄
-        public static SystemInfo systemInfo; //UI绑定参数文件
+        public static DisPlayWindow HMainWindow; //当前窗口句柄
+
         public static int sndCoefficent = 50;
         static DxPlaySound dxplaysnd; //播放声音对象
         //Udp_Data _capudp;
@@ -43,11 +49,15 @@ namespace ArrayDisplay.UI {
 
         #region Property
 
+        public static SystemInfo Info {
+            get;
+            set;
+        }
+
         public bool IsorigSaveFlag {
             get;
             private set;
         }
-
 
         public bool IsworkSaveFlag {
             get;
@@ -60,11 +70,6 @@ namespace ArrayDisplay.UI {
         }
 
         int OrigChannel {
-            get;
-            set;
-        }
-
-        public static OnSelectdInfo selectdInfo {
             get;
             set;
         }
@@ -124,11 +129,21 @@ namespace ArrayDisplay.UI {
             set;
         }
 
+        public bool IsReplay {
+            get;
+            set;
+        }
+
+        public CancellationTokenSource Cancellation {
+            get;
+            set;
+        }
+
         #endregion
 
         //界面初始化
 
-        #region 点击响应函数
+        #region 听音功能
 
         /// <summary>
         ///     听音相关
@@ -212,10 +227,9 @@ namespace ArrayDisplay.UI {
             Dataproc.EnergyArrayEventHandler += OnEnergyArrayGraph; //能量图事件处理方法
             Dataproc.FrapPointGraphEventHandler += OnFrapPointGraph; //使用新FFT频域事件处理
             Dataproc.FrapPointGraphEventHandler += OnMaxFrapPoint; //频率最大值
-            hMainWindow = this;
+            HMainWindow = this;
 
-            systemInfo = new SystemInfo();
-            selectdInfo = new OnSelectdInfo();
+            Info = new SystemInfo();
             dataFile = new DiscFile.DataFile();
             udpCommandSocket = new UdpCommandSocket();
             Load_SystemMessage();
@@ -223,24 +237,7 @@ namespace ArrayDisplay.UI {
             observableCollection = new ObservableCollection<UIBValue>();
             blistview.ItemsSource = observableCollection;
 
-            #region UI绑定
-
-            tb_state_mc_type.SetBinding(TextBox.TextProperty, new Binding("McType") {Source = systemInfo});
-            tb_state_mc_id.SetBinding(TextBox.TextProperty, new Binding("McId") {Source = systemInfo});
-            tb_state_mc_mac.SetBinding(TextBox.TextProperty, new Binding("McMac") {Source = systemInfo});
-            tb_setting_pulse_period.SetBinding(TextBox.TextProperty, new Binding("PulsePeriod") {Source = systemInfo});
-            tb_setting_pulse_delay.SetBinding(TextBox.TextProperty, new Binding("PulseDelay") {Source = systemInfo});
-            tb_setting_pulse_width.SetBinding(TextBox.TextProperty, new Binding("PulseWidth") {Source = systemInfo});
-            tb_setting_adc_offset.SetBinding(TextBox.TextProperty, new Binding("AdcOffset") {Source = systemInfo});
-            tb_setting_adc_num.SetBinding(TextBox.TextProperty, new Binding("AdcNum") {Source = systemInfo});
-            tb_origFram.SetBinding(TextBox.TextProperty, new Binding("OrigFramNums") {Source = selectdInfo});
-            tb_deleyTime.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayTime") {Source = systemInfo});
-            tb_deleyChannel.SetBinding(TextBox.TextProperty, new Binding("ChannelDelayNums") {Source = systemInfo});
-            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") {Source = selectdInfo});
-            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") {Source = selectdInfo});
-            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkWaveChannel") {Source = selectdInfo, Mode = BindingMode.TwoWay});
-
-            #endregion
+            ControlsSetBinding();
 
             OrigChannel = 0;
             DelayChannel = 0;
@@ -250,6 +247,36 @@ namespace ArrayDisplay.UI {
             IsWorkWaveStart = false;
             MainStopwatch = new Stopwatch();
             led_normaldata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
+            IsReplay = false;
+            Cancellation = new CancellationTokenSource();
+        }
+
+        /// <summary>
+        ///     给控件添加绑定
+        /// </summary>
+        void ControlsSetBinding() {
+            //系统信息
+            tb_state_mc_type.SetBinding(TextBox.TextProperty, new Binding("McType") {Source = Info});
+            tb_state_mc_id.SetBinding(TextBox.TextProperty, new Binding("McId") {Source = Info});
+            tb_state_mc_mac.SetBinding(TextBox.TextProperty, new Binding("McMac") {Source = Info});
+            //系统参数
+            tb_setting_pulse_period.SetBinding(TextBox.TextProperty, new Binding("PulsePeriod") {Source = Info});
+            tb_setting_pulse_delay.SetBinding(TextBox.TextProperty, new Binding("PulseDelay") {Source = Info});
+            tb_setting_pulse_width.SetBinding(TextBox.TextProperty, new Binding("PulseWidth") {Source = Info});
+            tb_setting_adc_offset.SetBinding(TextBox.TextProperty, new Binding("AdcOffset") {Source = Info});
+            tb_setting_adc_num.SetBinding(TextBox.TextProperty, new Binding("AdcNum") {Source = Info});
+
+            //延时波形
+            tb_deleyTime.SetBinding(TextBox.TextProperty, new Binding("DelayTime") {Source = Info});
+            tb_deleyChannel.SetBinding(TextBox.TextProperty, new Binding("DelayChannel") {Source = Info});
+            //原始数据
+            tb_origFram.SetBinding(TextBox.TextProperty, new Binding("OrigFramNums") {Source = Info});
+            tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") {Source = Info});
+            tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") {Source = Info});
+            tb_origChannel.SetBinding(TextBox.TextProperty, new Binding("OrigChannel") {Source = Info});
+            tb_orgiTdiv.SetBinding(TextBox.TextProperty, new Binding("OrigTdiv") {Source = Info});
+            //正常工作
+            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkChannel") {Source = Info, Mode = BindingMode.TwoWay});
         }
 
         /// <summary>
@@ -412,7 +439,7 @@ namespace ArrayDisplay.UI {
                         tb_deleyChannel.Text = "1";
                         channel = 1;
                     }
-                    DelayChannel = channel - 1;
+                    Info.DelayChannel = channel;
                 }
                 catch(Exception) {
                     // ignored
@@ -789,7 +816,93 @@ namespace ArrayDisplay.UI {
         }
 
         //回放原始数据
-        void ReplayOrigData_OnClick(object sender, RoutedEventArgs e) { }
+        void ReplayOrigData_OnClick(object sender, RoutedEventArgs e) {
+            if (!IsReplay) {
+                btn_origreplay.Content = "正在回放";
+                OpenFileDialog open = new OpenFileDialog {Title = "打开文件", Filter = "波形文件（.bin）|*.bin|所有文件|*.*"};
+
+                RelativeDirectory rd = new RelativeDirectory();
+                open.InitialDirectory = rd.Path + "//wavedata";
+
+                var fileList = new List<string>(); //文件列表
+                var bytesesList = new List<byte>(); //数据缓存
+                byte[] buffBytes;
+                if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK) //打开
+                {
+                    fileList.AddRange(open.FileNames);
+                }
+
+                var tc = Cancellation.Token;
+                IsReplay = true;
+                Task.Run(() => {
+                             
+                             //获取数据流保存于列表
+                             foreach(string filename in fileList) {
+                                 using(FileStream fsOrig = new FileStream(filename, FileMode.Open, FileAccess.Read)) {
+                                     int readlen = (int) fsOrig.Length;
+                                     buffBytes = new byte[readlen];
+                                     fsOrig.ReadAsync(buffBytes, 0, readlen, tc);
+                                     bytesesList.AddRange(buffBytes);
+                                 }
+                             }
+
+                             var sourceBytes = bytesesList.ToArray();
+                             var floatlist = new List<float>();
+                             var tmp = new byte[2];
+                             for(int i = 0; i < (sourceBytes.Length / 2 - 1); i++) {
+                                 tmp[0] = sourceBytes[i * 2 + 1];
+                                 tmp[1] = sourceBytes[i * 2];
+                                 short a = BitConverter.ToInt16(tmp, 0);
+                                 floatlist.Add(a / 8192.0f);
+                             }
+                             var splitList = SplitList(floatlist, 400);
+                             
+                            for (int index = 0; index < splitList.Count && !tc.IsCancellationRequested; index++)
+                            {
+                                var list = splitList[index];
+                                var sendfloats = list.ToArray();
+                                Dataproc.OrigGraphEventHandler.Invoke(sender, sendfloats);
+                                Thread.Sleep(200);
+                            }
+                }, tc);
+            }
+            else {
+                btn_origreplay.Content = "回放";
+                Cancellation.Cancel();
+                Cancellation = new CancellationTokenSource();
+                IsReplay = false;
+                orige_graph.DataSource = 0;
+                orige_graph.Refresh();
+            }
+            
+
+           
+        }
+
+        /// <summary>
+        ///     切分列表
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="list">列表</param>
+        /// <param name="size">基本大小</param>
+        /// <returns>切分后的二维列表</returns>
+        public List<List<T>> SplitList<T>(List<T> list, int size) {
+            var result = new List<List<T>>();
+            for(int i = 0; i < (list.Count() / size); i++) {
+                var clist = new T[size];
+                list.CopyTo(i * size, clist, 0, size);
+                result.Add(clist.ToList());
+            }
+
+            int r = list.Count() % size;
+            if (r != 0) {
+                var cclist = new T[r];
+                list.CopyTo(list.Count() - r, cclist, 0, r);
+                result.Add(cclist.ToList());
+            }
+
+            return result;
+        }
 
         #endregion
 
@@ -801,8 +914,7 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void SaveWorkData_OnClick(object sender, RoutedEventArgs e) {
-            if (NormWaveData == null || !NormWaveData.IsRcving)
-            {
+            if (NormWaveData == null || !NormWaveData.IsRcving) {
                 MessageBox.Show("请采集原始波形数据");
                 btn_normalSave.Content = "保存数据";
                 return;
@@ -885,9 +997,9 @@ namespace ArrayDisplay.UI {
                 try {
                     if (workchNum < 1 || workchNum > 256) {
                         tb_workChNum.Text = "1";
-                        selectdInfo.WorkWaveChannel = 1;
+                        Info.WorkChannel = 1;
                     }
-                    selectdInfo.WorkWaveChannel = workchNum;
+                    Info.WorkChannel = workchNum;
                 }
                 catch(Exception) {
                     // ignored
@@ -938,7 +1050,7 @@ namespace ArrayDisplay.UI {
         }
 
         /// <summary>///控件读入延迟波形/// </summary>
-        void OnDelayWaveGraph(object sender, float[][] e) {
+        void OnDelayWaveGraph(object sender, float[] e) {
             if (e == null) {
                 return;
             }
@@ -948,12 +1060,12 @@ namespace ArrayDisplay.UI {
             }
             delay_graph.Dispatcher.Invoke(() => {
                                               delay_graph.Refresh();
-                                              delay_graph.DataSource = e[DelayChannel];
+                                              delay_graph.DataSource = e;
                                           });
         }
 
         /// <summary>///控件读入原始波形/// </summary>
-        void OnOrigGraph(object sender, float[][] e) {
+        void OnOrigGraph(object sender, float[] e) {
             if (e == null) {
                 return;
             }
@@ -963,7 +1075,7 @@ namespace ArrayDisplay.UI {
             }
             orige_graph.Dispatcher.Invoke(() => {
                                               orige_graph.Refresh();
-                                              orige_graph.DataSource = e[OrigTiv * ConstUdpArg.ORIG_CHANNEL_NUMS + OrigChannel];
+                                              orige_graph.DataSource = e;
                                           });
         }
 
@@ -977,7 +1089,7 @@ namespace ArrayDisplay.UI {
                 return;
             }
             graph_normalTime.Dispatcher.Invoke(() => {
-                                                   graph_normalTime.Refresh();
+//                                                   graph_normalTime.Refresh();
                                                    graph_normalTime.DataSource = e;
                                                });
         }

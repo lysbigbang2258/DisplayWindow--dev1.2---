@@ -216,9 +216,9 @@ namespace ArrayDisplay.net {
                     double progressvalue = (index + 1) * 100.0 / 64; //进度条
                     Console.WriteLine("通道： " + index);
                     Array.Copy(sbdata, BvalueDatas[index], sbdata.Length);
-                    DisPlayWindow.hMainWindow.bvaulue_pgbar.Dispatcher.Invoke(() =>
+                    DisPlayWindow.HMainWindow.bvaulue_pgbar.Dispatcher.Invoke(() =>
                                                                               {
-                                                                                  DisPlayWindow.hMainWindow.bvaulue_pgbar.Value = progressvalue;
+                                                                                  DisPlayWindow.HMainWindow.bvaulue_pgbar.Value = progressvalue;
                                                                               });//进度条
                 }
                 catch (Exception e)

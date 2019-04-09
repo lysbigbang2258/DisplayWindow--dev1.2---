@@ -118,7 +118,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="net\NewFFT.cs" />
-    <Compile Include="net\OnSelectdInfo.cs" />
     <Compile Include="net\SystemInfo.cs">
       <SubType>Code</SubType>
     </Compile>
