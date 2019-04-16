@@ -158,7 +158,6 @@
                             VerticalAlignment="Center"
                             input:InputMethod.IsInputMethodEnabled="False"
                             MouseWheel="TextboxOnMouseWheel"
-                           
                             Text=""
                             TextWrapping="Wrap" />
                         <Label
@@ -219,7 +218,6 @@
                             VerticalAlignment="Center"
                             input:InputMethod.IsInputMethodEnabled="False"
                             MouseWheel="TextboxOnMouseWheel"
-                           
                             Text=""
                             TextWrapping="Wrap" />
                         <Label
@@ -280,7 +278,6 @@
                             VerticalAlignment="Center"
                             input:InputMethod.IsInputMethodEnabled="False"
                             MouseWheel="TextboxOnMouseWheel"
-                            
                             TextWrapping="Wrap" />
                         <Label
                             Grid.Column="2"
@@ -456,7 +453,11 @@
                         Height="40"
                         Header="延时校准">
                         <Grid Name="delaygrid" Background="#FFE5E5E5">
-                            <StackPanel>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="337*"/>
+                                <ColumnDefinition Width="1623*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.ColumnSpan="2" Margin="0,0,0,-0.2">
                                 <WrapPanel>
                                     <Label
                                         Width="100"
@@ -472,9 +473,9 @@
                                         VerticalAlignment="Center"
                                         FontFamily="18"
                                         KeyDown="Tb_deleyChannel_OnKeyDown"
-                                        TextChanged="Tb_deleyChannel_OnTextChanged"
                                         Text="1"
                                         TextAlignment="Center"
+                                        TextChanged="Tb_deleyChannel_OnTextChanged"
                                         TextWrapping="Wrap" />
                                     <Label
                                         Width="100"
@@ -488,7 +489,6 @@
                                         Height="40"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center"
-                                       
                                         Text="200"
                                         TextWrapping="Wrap" />
                                     <Label
@@ -621,7 +621,6 @@
                                         Margin="0,0,5,0"
                                         FontFamily="18"
                                         KeyDown="Tb_origChannel_OnKeyDown"
-                                        TextChanged="Tb_origChannel_OnTextChanged"
                                         Text="1"
                                         TextAlignment="Center" />
                                     <Label
@@ -636,8 +635,8 @@
                                         Height="32"
                                         Margin="0,0,5,0"
                                         FontFamily="18"
+                                        KeyUp="Tb_origTdiv_OnPreviewKeyDown"
                                         KeyDown="Tb_orgiTdiv_OnKeyDown"
-                                       
                                         Text="1"
                                         TextAlignment="Center" />
                                     <Button
@@ -648,7 +647,6 @@
                                         Click="ChangeOrigConfig_OnClick"
                                         Content="更改通道/时分"
                                         FontFamily="18" />
-
                                     <Button
                                         x:Name="btn_origstart"
                                         Width="100"
@@ -684,7 +682,6 @@
                                         Click="ReplayOrigData_OnClick"
                                         Content="回放数据"
                                         FontFamily="18" />
-
                                 </WrapPanel>
                                 <GridSplitter
                                     Grid.Column="1"
@@ -909,7 +906,6 @@
                                                 VerticalContentAlignment="Center"
                                                 FontSize="16"
                                                 KeyDown="TextBox_KeyDown_workChNum"
-                                                
                                                 Text="1"
                                                 TextAlignment="Center" />
                                             <ni:LED

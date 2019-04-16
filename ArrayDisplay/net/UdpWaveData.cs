@@ -164,9 +164,7 @@ namespace ArrayDisplay.net {
                         int offset = 0;
                         try {
                             //接收数据                         
-                            {
                                 int ret = waveSocket.ReceiveFrom(rcvBuf, offset, rcvBuf.Length - offset, SocketFlags.None, ref senderRemote);
-                            }
                         }
                         catch(Exception e) {
                             Console.WriteLine(e);
@@ -298,12 +296,12 @@ namespace ArrayDisplay.net {
             }
             offset += head.Length;
 
-            int len = origChannelOffsets[channel * 8 + timdiv];
+       int len = origChannelOffsets[channel  + timdiv * 8];
             if (len >= waveDataproc.OrigWaveBytes[0].Length) {
-                origChannelOffsets[channel * 8 + timdiv] = 0;
+                origChannelOffsets[channel + timdiv * 8] = 0;
                 len = 0;
-            }
-            Array.Copy(buf, offset, waveDataproc.OrigWaveBytes[channel * 8 + timdiv], len, buf.Length - 2);
+            }     
+            Array.Copy(buf, offset, waveDataproc.OrigWaveBytes[channel + timdiv * 8 ], len, buf.Length - 2);
 
             var data = new byte[buf.Length - 2];
             Array.Copy(buf, offset, data, 0, buf.Length - 2);

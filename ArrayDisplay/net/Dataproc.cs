@@ -178,7 +178,7 @@ namespace ArrayDisplay.net {
                 }
                 int origchannel = DisPlayWindow.Info.OrigChannel - 1;
                 int origTdiv = DisPlayWindow.Info.OrigTdiv - 1;
-                int origpack = origchannel * 8 + origTdiv;
+                int origpack = origchannel  + origTdiv * 8;
                 if (OrigGraphEventHandler != null) {
                     string sender = "OrigNet";
                     OrigGraphEventHandler.Invoke(sender, OrigWaveFloats[origpack]);

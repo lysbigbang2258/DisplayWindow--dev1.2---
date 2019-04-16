@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -20,7 +19,6 @@ using ArrayDisplay.net;
 using ArrayDisplay.sound;
 using NationalInstruments.Restricted;
 using Binding = System.Windows.Data.Binding;
-using Button = System.Windows.Controls.Button;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBox = System.Windows.MessageBox;
 using TextBox = System.Windows.Controls.TextBox;
@@ -68,7 +66,6 @@ namespace ArrayDisplay.UI {
 
         int DelayChannel {
             get;
-            set;
         }
 
         int OrigChannel {
@@ -311,9 +308,6 @@ namespace ArrayDisplay.UI {
             }
         }
 
-       
-
-
         void InitGrapheState() {
             IsGraphPause = false;
 
@@ -448,17 +442,15 @@ namespace ArrayDisplay.UI {
         }
 
         /// <summary>
-        /// 延时通道更改，更新接收数据
+        ///     延时通道更改，更新接收数据
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void Tb_deleyChannel_OnTextChanged(object sender, TextChangedEventArgs e) {
             TextBox tb = sender as TextBox;
             int channel = 1;
-            if (tb != null)
-            {
+            if (tb != null) {
                 int.TryParse(tb.Text, out channel);
-
             }
         }
 
@@ -565,20 +557,69 @@ namespace ArrayDisplay.UI {
         }
 
         /// <summary>
+        /// 按键更改响应
+        /// 回车：数值发送 
+        /// 上下方向键：更改数值
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Tb_origTdiv_OnPreviewKeyDown(object sender, KeyEventArgs e) {
+            TextBox tb = sender as TextBox;
+            int num = 1;
+            switch(e.Key) {
+                case Key.Enter: {//回车更改
+                    if (int.TryParse(tb.Text, out num)) {
+                        try {
+                            if (num < 1 || num > 8) {
+                                num = 1;
+                                tb_origTdiv.Text = "1";
+                            }
+                            OrigTiv = num - 1;
+                            udpCommandSocket.WriteOrigTDiv(OrigTiv);
+                        }
+                        catch(Exception exception) {
+                            Console.WriteLine(exception);
+                        }
+                    }
+                    break;
+                }
+                case Key.Up: {//上方向键增加数值
+                    if (int.TryParse(tb.Text, out num)) {
+                        if ((num + 1) > 8) {
+                            return;
+                        }
+                        tb.Text = (num + 1).ToString();
+                    }
+                    break;
+                }
+                case Key.Down: {//下方向键减少数值
+                    if (int.TryParse(tb.Text, out num)) {
+                        if ((num - 1) < 1) {
+                            return;
+                        }
+                        tb.Text = (num - 1).ToString();
+                    }
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
         ///     原始通道数改变响应
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void Tb_origChannel_OnKeyDown(object sender, KeyEventArgs e) {
             TextBox tb = sender as TextBox;
-           
+
             if (e.Key == Key.Enter) {
                 int num = 1;
                 if (tb != null) {
                     int.TryParse(tb.Text, out num);
                 }
                 try {
-                    if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS) {//1-8
+                    if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS) {
+//1-8
                         tb_origChannel.Text = "1";
                         MessageBox.Show("请输入有效值");
                         return;
@@ -592,35 +633,101 @@ namespace ArrayDisplay.UI {
             }
         }
 
-
         /// <summary>
         ///     原始时分改变响应
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void Tb_orgiTdiv_OnKeyDown(object sender, KeyEventArgs e) {
-            
-            if (e.Key == Key.Enter) {
-                TextBox tb = sender as TextBox;
-                int num = 1;
-                if (tb != null) {
-                    int.TryParse(tb.Text, out num);
-                }
-                try {
-                    if (num < 1 || num >= ConstUdpArg.ORIG_TIME_NUMS) {
-                        num = 1;
-                        tb_origTdiv.Text = "1";
-                    }
-                    OrigTiv = num - 1;
-                }
-                catch(Exception) {
-                    // ignored
-                }
-
-                udpCommandSocket.WriteOrigTDiv(OrigTiv);
-            }
+//            TextBox tb = sender as TextBox;
+//            switch(e.Key) {
+//                case Key.Enter: {
+//                    int num = 1;
+//                    if (int.TryParse(tb.Text, out num)) {
+//                        try {
+//                            if (num < 1 || num > 8) {
+//                                num = 1;
+//                                tb_origTdiv.Text = "1";
+//                            }
+//                            OrigTiv = num - 1;
+//                            udpCommandSocket.WriteOrigTDiv(OrigTiv);
+//                        }
+//                        catch(Exception exception) {
+//                            Console.WriteLine(exception);
+//                        }
+//                    }
+//                    break;
+//                }
+//                case Key.Up: {
+//                    int num = 1;
+//                    if (int.TryParse(tb.Text, out num)) {
+//                        if ((num + 1) > 8) {
+//                            return;
+//                        }
+//                        tb.Text = (num + 1).ToString();
+//                    }
+//                    break;
+//                }
+//                case Key.Down: {
+//                    int num = 1;
+//                    if (int.TryParse(tb.Text, out num)) {
+//                        if ((num - 1) < 1) {
+//                            return;
+//                        }
+//                        tb.Text = (num - 1).ToString();
+//                    }
+//                    break;
+//                }
+//            }
         }
 
+        /// <summary>
+        ///     原始时分改变响应
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void ChannelOrTdivChanged_OnKeyDown(object sender, KeyEventArgs e) {
+            TextBox tb = sender as TextBox;
+            switch(e.Key) {
+                case Key.Enter: {
+                    int num = 1;
+                    if (int.TryParse(tb.Text, out num)) {
+                        try {
+                            if (num < 1 || num > 8) {
+                                num = 1;
+                                tb_origTdiv.Text = "1";
+                            }
+                            OrigTiv = num - 1;
+                            udpCommandSocket.WriteOrigTDiv(OrigTiv);
+                        }
+                        catch(Exception exception) {
+                            Console.WriteLine(exception);
+                        }
+                    }
+                    break;
+                }
+                case Key.Up: {
+                    int num = 1;
+                    if (int.TryParse(tb.Text, out num)) {
+                        if ((num + 1) > 8) {
+                            return;
+                        }
+                        tb.Text = (num + 1).ToString();
+                    }
+                    break;
+                }
+                case Key.Down: {
+                    int num = 1;
+                    if (int.TryParse(tb.Text, out num)) {
+                        if ((num - 1) < 1) {
+                            return;
+                        }
+                        tb.Text = (num - 1).ToString();
+                    }
+                    break;
+                }
+            }
+        }
 
         /// <summary>
         ///     读取文本数据值
@@ -838,15 +945,14 @@ namespace ArrayDisplay.UI {
             if (!IsOrigReplay) {
                 btn_origreplay.Content = "正在回放";
                 byte[] buffBytes;
-               
+
                 var fileList = GetFileDialogList(); //选择
-                if (fileList==null)
-                {
+                if (fileList == null) {
                     btn_origreplay.Content = "回放";
                     return;
                 }
                 IsOrigReplay = true;
-                if (!dataFile. ReplayData(fileList,Cancellation)) {
+                if (!dataFile.ReplayData(fileList, Cancellation)) {
                     MessageBox.Show("回放数据失败");
                 }
             }
@@ -859,8 +965,6 @@ namespace ArrayDisplay.UI {
                 orige_graph.Refresh();
             }
         }
-        
-
 
         /// <summary>
         ///     从文件选择框选择文件并获取文件名列表
@@ -882,8 +986,6 @@ namespace ArrayDisplay.UI {
             }
             return null;
         }
-
-        
 
         #endregion
 
@@ -967,9 +1069,7 @@ namespace ArrayDisplay.UI {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ReplayWorkData_OnClick(object sender, RoutedEventArgs e) {
-            
-        }
+        void ReplayWorkData_OnClick(object sender, RoutedEventArgs e) { }
 
         //传输数据用于显示
         /// <summary>
@@ -1203,6 +1303,18 @@ namespace ArrayDisplay.UI {
 
         #region 脉冲延时.(读/写/存).按钮响应
 
+        /// <summary>
+        ///     可调整值的TextBox上滚轮动作响应(小数)
+        ///     ADC偏移
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void TextboxOnMouseWheel2(object sender, MouseWheelEventArgs e) {
+            // e.Delta > 0,向上滚动滚轮,文本框数字+0.01,最大1
+            // e.Delta < 0,向下滚动滚轮,文本框数字-0.01,最小0
+            ChangeMouseWheel(sender, false, e.Delta > 0);
+        }
+
         /// <summary>脉冲延时.读.按钮响应</summary>
         void OnPulseDelayRead_OnClick(object sender, RoutedEventArgs e) {
             udpCommandSocket.ReadPulseDelay();
@@ -1417,18 +1529,6 @@ namespace ArrayDisplay.UI {
         }
 
         /// <summary>
-        ///     可调整值的TextBox上滚轮动作响应(小数)
-        ///     ADC偏移
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void TextboxOnMouseWheel2(object sender, MouseWheelEventArgs e) {
-            // e.Delta > 0,向上滚动滚轮,文本框数字+0.01,最大1
-            // e.Delta < 0,向下滚动滚轮,文本框数字-0.01,最小0
-            ChangeMouseWheel(sender, false, e.Delta > 0);
-        }
-
-        /// <summary>
         ///     TextBox值发生变化
         /// </summary>
         /// <param name="sender">TextBox</param>
@@ -1461,7 +1561,7 @@ namespace ArrayDisplay.UI {
                     if ((d + 0.01) > 1) {
                         return;
                     }
-                    tb.Text = (d + 0.01).ToString("G2");
+                    string s = tb.Text = (d + 0.01).ToString("G2");
                 }
                 else {
                     if ((d - 0.01) < 0) {
@@ -1493,7 +1593,5 @@ namespace ArrayDisplay.UI {
         }
 
         #endregion
-
-        
     }
 }
