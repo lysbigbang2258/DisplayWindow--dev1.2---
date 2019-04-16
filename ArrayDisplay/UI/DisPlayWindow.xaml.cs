@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -19,6 +20,7 @@ using ArrayDisplay.net;
 using ArrayDisplay.sound;
 using NationalInstruments.Restricted;
 using Binding = System.Windows.Data.Binding;
+using Button = System.Windows.Controls.Button;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBox = System.Windows.MessageBox;
 using TextBox = System.Windows.Controls.TextBox;
@@ -129,7 +131,14 @@ namespace ArrayDisplay.UI {
             set;
         }
 
-        public bool IsReplay {
+        //标识原始数据回放
+        public bool IsOrigReplay {
+            get;
+            set;
+        }
+
+        //标识正常数据回放
+        public bool IsWorkReplay {
             get;
             set;
         }
@@ -185,6 +194,17 @@ namespace ArrayDisplay.UI {
 
         public DisPlayWindow() {
             InitializeComponent();
+            OrigChannel = 0;
+            DelayChannel = 0;
+            OrigTiv = 0;
+            IsGraphPause = false;
+            IsOrigWaveStart = false;
+            IsWorkWaveStart = false;
+            MainStopwatch = new Stopwatch();
+            led_workdata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
+            IsOrigReplay = false;
+            IsWorkReplay = false;
+            Cancellation = new CancellationTokenSource();
         }
 
         #region IDisposable
@@ -238,17 +258,6 @@ namespace ArrayDisplay.UI {
             blistview.ItemsSource = observableCollection;
 
             ControlsSetBinding();
-
-            OrigChannel = 0;
-            DelayChannel = 0;
-            OrigTiv = 0;
-            IsGraphPause = false;
-            IsOrigWaveStart = false;
-            IsWorkWaveStart = false;
-            MainStopwatch = new Stopwatch();
-            led_normaldata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
-            IsReplay = false;
-            Cancellation = new CancellationTokenSource();
         }
 
         /// <summary>
@@ -274,7 +283,7 @@ namespace ArrayDisplay.UI {
             tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") {Source = Info});
             tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") {Source = Info});
             tb_origChannel.SetBinding(TextBox.TextProperty, new Binding("OrigChannel") {Source = Info});
-            tb_orgiTdiv.SetBinding(TextBox.TextProperty, new Binding("OrigTdiv") {Source = Info});
+            tb_origTdiv.SetBinding(TextBox.TextProperty, new Binding("OrigTdiv") {Source = Info});
             //正常工作
             tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkChannel") {Source = Info, Mode = BindingMode.TwoWay});
         }
@@ -302,17 +311,8 @@ namespace ArrayDisplay.UI {
             }
         }
 
-        /// <summary>
-        ///     ///文本框只允许输入数字
-        ///     /// 脉冲周期/脉冲延时/脉冲宽度///
-        /// </summary>
-        void InputIntegerOnly(object sender, TextCompositionEventArgs e) {
-            //throw new NotImplementedException();
-            Regex re = new Regex("[^0-9.-]+");
-            if (e != null) {
-                e.Handled = re.IsMatch(e.Text);
-            }
-        }
+       
+
 
         void InitGrapheState() {
             IsGraphPause = false;
@@ -447,6 +447,21 @@ namespace ArrayDisplay.UI {
             }
         }
 
+        /// <summary>
+        /// 延时通道更改，更新接收数据
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Tb_deleyChannel_OnTextChanged(object sender, TextChangedEventArgs e) {
+            TextBox tb = sender as TextBox;
+            int channel = 1;
+            if (tb != null)
+            {
+                int.TryParse(tb.Text, out channel);
+
+            }
+        }
+
         #endregion
 
         #region 原始数据与自动定标功能
@@ -513,7 +528,7 @@ namespace ArrayDisplay.UI {
             int ch = 1;
             int tdiv = 1;
             int.TryParse(tb_origChannel.Text, out ch);
-            int.TryParse(tb_orgiTdiv.Text, out tdiv);
+            int.TryParse(tb_origTdiv.Text, out tdiv);
 
             try {
                 if (ch < 1 || ch > ConstUdpArg.ORIG_CHANNEL_NUMS) {
@@ -555,24 +570,28 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void Tb_origChannel_OnKeyDown(object sender, KeyEventArgs e) {
+            TextBox tb = sender as TextBox;
+           
             if (e.Key == Key.Enter) {
-                TextBox tb = sender as TextBox;
                 int num = 1;
                 if (tb != null) {
                     int.TryParse(tb.Text, out num);
                 }
                 try {
-                    if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS) {
+                    if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS) {//1-8
                         tb_origChannel.Text = "1";
+                        MessageBox.Show("请输入有效值");
+                        return;
                     }
                     OrigChannel = num - 1;
                 }
                 catch(Exception) {
                     // ignored
                 }
-                udpCommandSocket.WriteOrigChannel(num - 1);
+                udpCommandSocket.WriteOrigChannel(OrigChannel);
             }
         }
+
 
         /// <summary>
         ///     原始时分改变响应
@@ -580,16 +599,17 @@ namespace ArrayDisplay.UI {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void Tb_orgiTdiv_OnKeyDown(object sender, KeyEventArgs e) {
+            
             if (e.Key == Key.Enter) {
                 TextBox tb = sender as TextBox;
-                int num = 0;
+                int num = 1;
                 if (tb != null) {
                     int.TryParse(tb.Text, out num);
                 }
                 try {
-                    if (num < 1 || num > ConstUdpArg.ORIG_TIME_NUMS) {
+                    if (num < 1 || num >= ConstUdpArg.ORIG_TIME_NUMS) {
                         num = 1;
-                        tb_orgiTdiv.Text = "1";
+                        tb_origTdiv.Text = "1";
                     }
                     OrigTiv = num - 1;
                 }
@@ -597,12 +617,10 @@ namespace ArrayDisplay.UI {
                     // ignored
                 }
 
-                udpCommandSocket.WriteOrigTDiv(num - 1);
+                udpCommandSocket.WriteOrigTDiv(OrigTiv);
             }
         }
 
-        //读取B值文件中的数据
-        void ReadBFile() { }
 
         /// <summary>
         ///     读取文本数据值
@@ -817,92 +835,55 @@ namespace ArrayDisplay.UI {
 
         //回放原始数据
         void ReplayOrigData_OnClick(object sender, RoutedEventArgs e) {
-            if (!IsReplay) {
+            if (!IsOrigReplay) {
                 btn_origreplay.Content = "正在回放";
-                OpenFileDialog open = new OpenFileDialog {Title = "打开文件", Filter = "波形文件（.bin）|*.bin|所有文件|*.*"};
-
-                RelativeDirectory rd = new RelativeDirectory();
-                open.InitialDirectory = rd.Path + "//wavedata";
-
-                var fileList = new List<string>(); //文件列表
-                var bytesesList = new List<byte>(); //数据缓存
                 byte[] buffBytes;
-                if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK) //打开
+               
+                var fileList = GetFileDialogList(); //选择
+                if (fileList==null)
                 {
-                    fileList.AddRange(open.FileNames);
+                    btn_origreplay.Content = "回放";
+                    return;
                 }
-
-                var tc = Cancellation.Token;
-                IsReplay = true;
-                Task.Run(() => {
-                             
-                             //获取数据流保存于列表
-                             foreach(string filename in fileList) {
-                                 using(FileStream fsOrig = new FileStream(filename, FileMode.Open, FileAccess.Read)) {
-                                     int readlen = (int) fsOrig.Length;
-                                     buffBytes = new byte[readlen];
-                                     fsOrig.ReadAsync(buffBytes, 0, readlen, tc);
-                                     bytesesList.AddRange(buffBytes);
-                                 }
-                             }
-
-                             var sourceBytes = bytesesList.ToArray();
-                             var floatlist = new List<float>();
-                             var tmp = new byte[2];
-                             for(int i = 0; i < (sourceBytes.Length / 2 - 1); i++) {
-                                 tmp[0] = sourceBytes[i * 2 + 1];
-                                 tmp[1] = sourceBytes[i * 2];
-                                 short a = BitConverter.ToInt16(tmp, 0);
-                                 floatlist.Add(a / 8192.0f);
-                             }
-                             var splitList = SplitList(floatlist, 400);
-                             
-                            for (int index = 0; index < splitList.Count && !tc.IsCancellationRequested; index++)
-                            {
-                                var list = splitList[index];
-                                var sendfloats = list.ToArray();
-                                Dataproc.OrigGraphEventHandler.Invoke(sender, sendfloats);
-                                Thread.Sleep(200);
-                            }
-                }, tc);
+                IsOrigReplay = true;
+                if (!dataFile. ReplayData(fileList,Cancellation)) {
+                    MessageBox.Show("回放数据失败");
+                }
             }
             else {
                 btn_origreplay.Content = "回放";
                 Cancellation.Cancel();
                 Cancellation = new CancellationTokenSource();
-                IsReplay = false;
+                IsOrigReplay = false;
                 orige_graph.DataSource = 0;
                 orige_graph.Refresh();
             }
-            
-
-           
         }
+        
+
 
         /// <summary>
-        ///     切分列表
+        ///     从文件选择框选择文件并获取文件名列表
         /// </summary>
-        /// <typeparam name="T">数据类型</typeparam>
-        /// <param name="list">列表</param>
-        /// <param name="size">基本大小</param>
-        /// <returns>切分后的二维列表</returns>
-        public List<List<T>> SplitList<T>(List<T> list, int size) {
-            var result = new List<List<T>>();
-            for(int i = 0; i < (list.Count() / size); i++) {
-                var clist = new T[size];
-                list.CopyTo(i * size, clist, 0, size);
-                result.Add(clist.ToList());
-            }
+        /// <returns></returns>
+        static List<string> GetFileDialogList() {
+            OpenFileDialog open = new OpenFileDialog {Title = "打开文件", Filter = "波形文件（.bin）|*.bin|所有文件|*.*"};
 
-            int r = list.Count() % size;
-            if (r != 0) {
-                var cclist = new T[r];
-                list.CopyTo(list.Count() - r, cclist, 0, r);
-                result.Add(cclist.ToList());
-            }
+            RelativeDirectory rd = new RelativeDirectory();
+            open.InitialDirectory = rd.Path + "//wavedata";
 
-            return result;
+            var fileList = new List<string>(); //文件列表
+
+            byte[] buffBytes;
+            if (open.ShowDialog() == System.Windows.Forms.DialogResult.OK) //打开
+            {
+                fileList.AddRange(open.FileNames);
+                return fileList;
+            }
+            return null;
         }
+
+        
 
         #endregion
 
@@ -916,18 +897,18 @@ namespace ArrayDisplay.UI {
         void SaveWorkData_OnClick(object sender, RoutedEventArgs e) {
             if (NormWaveData == null || !NormWaveData.IsRcving) {
                 MessageBox.Show("请采集原始波形数据");
-                btn_normalSave.Content = "保存数据";
+                btn_workSave.Content = "保存数据";
                 return;
             }
             IsworkSaveFlag = !IsworkSaveFlag;
             if (IsworkSaveFlag) {
-                btn_normalSave.Content = "开始保存";
+                btn_workSave.Content = "开始保存";
                 dataFile.EnableWorkSaveFile();
                 dataFile.IsStartFlag = true;
             }
 
             else {
-                btn_normalSave.Content = "保存数据";
+                btn_workSave.Content = "保存数据";
                 dataFile.DisableSaveFile();
                 dataFile.IsStartFlag = true;
             }
@@ -944,7 +925,7 @@ namespace ArrayDisplay.UI {
                 if (NormWaveData == null) {
                     NormWaveData = new UdpWaveData();
                     NormWaveData.StartReceiveData(ConstUdpArg.Src_NormWaveIp);
-                    btn_normalstart.Content = "停止";
+                    btn_workstart.Content = "停止";
                     NormWaveData.StartRcvEvent.Set();
                 }
                 else if (NormWaveData != null || NormWaveData.IsBuilded) {
@@ -963,7 +944,7 @@ namespace ArrayDisplay.UI {
                                                             graph_energyFirst.DataSource = 0;
                                                         });
                     graph_energyFirst.Refresh();
-                    btn_normalstart.Content = "启动";
+                    btn_workstart.Content = "启动";
                 }
             }
             catch {
@@ -981,6 +962,15 @@ namespace ArrayDisplay.UI {
             IsGraphPause = !IsGraphPause;
         }
 
+        /// <summary>
+        ///     回放正常工作数据
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void ReplayWorkData_OnClick(object sender, RoutedEventArgs e) {
+            
+        }
+
         //传输数据用于显示
         /// <summary>
         ///     工作通道改变响应
@@ -995,7 +985,7 @@ namespace ArrayDisplay.UI {
             }
             if (e.Key == Key.Enter) {
                 try {
-                    if (workchNum < 1 || workchNum > 256) {
+                    if (workchNum < 1 || workchNum > 64) {
                         tb_workChNum.Text = "1";
                         Info.WorkChannel = 1;
                     }
@@ -1089,7 +1079,7 @@ namespace ArrayDisplay.UI {
                 return;
             }
             graph_normalTime.Dispatcher.Invoke(() => {
-//                                                   graph_normalTime.Refresh();
+                                                   graph_normalTime.Refresh();
                                                    graph_normalTime.DataSource = e;
                                                });
         }
@@ -1114,8 +1104,8 @@ namespace ArrayDisplay.UI {
         }
 
         /// <summary>///控件读入工作频率波形/// </summary>
-        void OnFrapPointGraph(object sender, Point[] e) {
-            if (e == null) {
+        void OnFrapPointGraph(object sender, Point[] points) {
+            if (points == null) {
                 return;
             }
             if (IsGraphPause) {
@@ -1124,7 +1114,7 @@ namespace ArrayDisplay.UI {
             }
             graph_normalFrequency.Dispatcher.Invoke(() => {
                                                         graph_normalFrequency.Refresh();
-                                                        graph_normalFrequency.DataSource = e;
+                                                        graph_normalFrequency.DataSource = points;
                                                     });
         }
 
@@ -1503,5 +1493,7 @@ namespace ArrayDisplay.UI {
         }
 
         #endregion
+
+        
     }
 }

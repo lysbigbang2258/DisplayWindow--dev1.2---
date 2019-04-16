@@ -44,7 +44,7 @@ namespace ArrayDisplay.net {
                 case ConstUdpArg.WaveType.Orig:
                     OrigInit();
                     break;
-                 default:
+                default:
                     Console.WriteLine("初始化Dataproc出错");
                     break;
             }
@@ -60,13 +60,11 @@ namespace ArrayDisplay.net {
             int oFrime = DisPlayWindow.Info.OrigFramNums; //原始数据帧数
             Origdata = new byte[oFrime * ArrayNums];
             int olength = ConstUdpArg.ORIG_FRAME_LENGTH - 2; //每帧长度
-            for (int i = 0; i < oNums; i++)
-            {
+            for(int i = 0; i < oNums; i++) {
                 OrigWaveBytes[i] = new byte[olength * oFrime];
                 OrigWaveFloats[i] = new float[olength / 2 * oFrime];
-
             }
-            OrigThread = new Thread(ThreadOrigWaveStart) { IsBackground = true };
+            OrigThread = new Thread(ThreadOrigWaveStart) {IsBackground = true};
             OrigThread.Start();
         }
 
@@ -79,21 +77,20 @@ namespace ArrayDisplay.net {
 
             int frameNum = ConstUdpArg.WORK_FRAME_NUMS * 4; //工作数据帧数
 //            int frameNum = 2000 * ConstUdpArg.WORK_FRAME_LENGTH; //工作数据帧数
-            for (int i = 0; i < ArrayNums; i++)
-            {
+            for(int i = 0; i < ArrayNums; i++) {
                 WorkWaveBytes[i] = new byte[frameNum * 4]; //避免数据为null
                 WorkWaveFloats[i] = new float[frameNum]; //避免数据为null 
                 PlayWaveBytes[i] = new byte[frameNum * 2]; //避免数据为null 
             }
             WorkWavefdatas = new float[frameNum]; //工作波形
             EnergyFloats = new float[ArrayNums];
-            ListenCoefficent = (float)Math.Pow(10, 50 / 20.0F) * 100; //31622.78; //听音强度
+            ListenCoefficent = (float) Math.Pow(10, 50 / 20.0F) * 100; //31622.78; //听音强度
 
-            WorkThread = new Thread(ThreadWorkWaveStart) { IsBackground = true };
+            WorkThread = new Thread(ThreadWorkWaveStart) {IsBackground = true};
             WorkThread.Start();
-            EnergyThread = new Thread(ThreadEnergyStart) { IsBackground = true };
+            EnergyThread = new Thread(ThreadEnergyStart) {IsBackground = true};
             EnergyThread.Start();
-            FreqThread = new Thread(ThreadFreqWaveStart) { IsBackground = true };
+            FreqThread = new Thread(ThreadFreqWaveStart) {IsBackground = true};
             FreqThread.Start();
         }
 
@@ -103,14 +100,12 @@ namespace ArrayDisplay.net {
             int dframeNum = ConstUdpArg.DELAY_FRAME_NUMS;
             DelayWaveBytes = new byte[dchannels][];
             DelayWaveFloats = new float[dchannels][];
-            for (int i = 0; i < dchannels; i++)
-            {
+            for(int i = 0; i < dchannels; i++) {
                 DelayWaveBytes[i] = new byte[dframeLen * dframeNum];
                 DelayWaveFloats[i] = new float[dframeLen * dframeNum / 2];
             }
-            DelayThread = new Thread(ThreadDelayWaveStart) { IsBackground = true };
+            DelayThread = new Thread(ThreadDelayWaveStart) {IsBackground = true};
             DelayThread.Start();
-            
         }
 
         /// <summary>
@@ -120,6 +115,7 @@ namespace ArrayDisplay.net {
             get;
             set;
         }
+
         public Thread EnergyThread {
             get;
             set;
@@ -128,14 +124,12 @@ namespace ArrayDisplay.net {
         public Thread WorkThread {
             get;
             set;
-        
         }
 
         public Thread DelayThread {
             get;
 
             set;
-
         }
 
         public Thread OrigThread {
@@ -161,21 +155,20 @@ namespace ArrayDisplay.net {
                         //                        OrigWave_Floats[i][j] = a / 104800.0f;
                     }
                 }
-                int channel = DisPlayWindow.Info.DelayChannel-1;
+                int channel = DisPlayWindow.Info.DelayChannel - 1;
                 DelayGraphEventHandler(null, DelayWaveFloats[channel]);
             }
         }
+
         /// <summary>
-        /// 线程处理函数：原始数据处理
+        ///     线程处理函数：原始数据处理
         /// </summary>
         void ThreadOrigWaveStart() {
             while(true) {
                 OrigBytesEvent.WaitOne();
                 var r = new byte[2];
-                for (int i = 0; i < ConstUdpArg.ORIG_DETECT_LENGTH; i++)
-                {
-                    for (int j = 0; j < OrigWaveBytes[0].Length / 2 - 1; j++)
-                    {
+                for(int i = 0; i < ConstUdpArg.ORIG_DETECT_LENGTH; i++) {
+                    for(int j = 0; j < (OrigWaveBytes[0].Length / 2 - 1); j++) {
                         r[0] = OrigWaveBytes[i][j * 2 + 1];
                         r[1] = OrigWaveBytes[i][j * 2];
                         short a = BitConverter.ToInt16(r, 0);
@@ -193,17 +186,15 @@ namespace ArrayDisplay.net {
             }
         }
 
-        
-
         /// <summary>
-        ///线程处理函数：能量数据处理
-        /// </summary>                                        
+        ///     线程处理函数：能量数据处理
+        /// </summary>
         void ThreadEnergyStart() {
             while(true) {
                 WorkEnergyEvent.WaitOne();
                 double ftemp = 0;
                 for(int i = 0; i < WorkWaveFloats.Length; i++) {
-                        float f = WorkWaveFloats[i].Max();
+                    float f = WorkWaveFloats[i].Max();
                     ftemp = Math.Abs(f);
                     EnergyFloats[i] = (float) ftemp;
                 }
@@ -215,15 +206,14 @@ namespace ArrayDisplay.net {
                     else {
                         EnergyFloats[i] = 0;
                     }
-                    
                 }
-                List<float> rlist = new List<float>();
+                var rlist = new List<float>();
                 for(int i = 0; i < EnergyFloats.Length; i++) {
-                    if ((i%32)<8) {
+                    if ((i % 32) < 8) {
                         rlist.Add(EnergyFloats[i]);
                     }
                 }
-                
+
                 if (EnergyArrayEventHandler != null) {
                     EnergyArrayEventHandler.Invoke(null, rlist.ToArray());
                 }
@@ -231,7 +221,7 @@ namespace ArrayDisplay.net {
         }
 
         /// <summary>
-        /// 线程函数处理：正常工作数据处理
+        ///     线程函数处理：正常工作数据处理
         /// </summary>
         void ThreadWorkWaveStart() {
             while(true) {
@@ -264,45 +254,37 @@ namespace ArrayDisplay.net {
                         Array.Copy(x, 0, PlayWaveBytes[i], j * 2, 2);
                     }
                 }
-                var offset = ConstUdpArg.offsetArray[DisPlayWindow.Info.WorkChannel-1];
-                WorkWavefdatas = WorkWaveFloats[offset-1];
+                int offset = ConstUdpArg.offsetArray[DisPlayWindow.Info.WorkChannel - 1];
+                WorkWavefdatas = WorkWaveFloats[offset - 1];
                 WorkEnergyEvent.Set();
                 FreqWaveEvent.Set();
 
-
-                if (PreGraphEventHandler != null)
-                {
-                    PreGraphEventHandler.Invoke(null, WorkWavefdatas);
-                }
+                PreGraphEventHandler?.Invoke(null, WorkWavefdatas);
                 //            if (BckGraphEventHandler != null) BckGraphEventHandler.Invoke(null, WorkWaveTwo);
 
-                if (SoundEventHandler != null)
-                {
+                if (SoundEventHandler != null) {
                     int channel = DisPlayWindow.Info.WorkChannel;
-                    if (channel > 0)
-                    {
+                    if (channel > 0) {
                         SoundEventHandler.Invoke(null, PlayWaveBytes[channel]);
                     }
                 }
-               
             }
         }
 
         /// <summary>
-        /// 线程处理函数：正常工作数据处理
+        ///     线程处理函数：正常工作数据处理
         /// </summary>
         void ThreadFreqWaveStart() {
             while(true) {
                 FreqWaveEvent.WaitOne();
                 FreqWaveOne = TransFormFft.FFT(WorkWavefdatas);
-                var dataPoints = NewFFT.Start(WorkWavefdatas, 1024*16);//用前1024 * 16个点
+                var dataPoints = NewFFT.Start(WorkWavefdatas, 1024 * 16); //用前1024 * 16个点
 
                 if (FrapPointGraphEventHandler != null) {
-                    FrapPointGraphEventHandler(null, dataPoints);   
+                    FrapPointGraphEventHandler(null, dataPoints);
                 }
             }
         }
-
 
         #region 变量
 
@@ -384,11 +366,12 @@ namespace ArrayDisplay.net {
             get;
             set;
         }
-         public int OrigTimeDiv
-        {
+
+        public int OrigTimeDiv {
             get;
             set;
         }
+
         public byte[][] DelayWaveBytes {
             get;
             set;
@@ -426,8 +409,6 @@ namespace ArrayDisplay.net {
             get;
             set;
         }
-
-        
 
         FFT_TransForm TransFormFft {
             get;
@@ -480,57 +461,58 @@ namespace ArrayDisplay.net {
 
         #endregion
 
-
         #region IDisposable
 
         void ReleaseUnmanagedResources() {
             // TODO release unmanaged resources here
         }
-        protected virtual void Dispose(bool disposing)
-        {
+
+        protected virtual void Dispose(bool disposing) {
             ReleaseUnmanagedResources();
-            if (disposing)
-            {
-                if (WorkBytesEvent != null) WorkBytesEvent.Dispose();
-                if (OrigBytesEvent != null) OrigBytesEvent.Dispose();
-                if (DelayBytesEvent != null) DelayBytesEvent.Dispose();
-                if (WorkEnergyEvent != null) WorkEnergyEvent.Dispose();
-                if (FreqWaveEvent != null) FreqWaveEvent.Dispose();
-                if (OrigThread != null)
-                {
+            if (disposing) {
+                if (WorkBytesEvent != null) {
+                    WorkBytesEvent.Dispose();
+                }
+                if (OrigBytesEvent != null) {
+                    OrigBytesEvent.Dispose();
+                }
+                if (DelayBytesEvent != null) {
+                    DelayBytesEvent.Dispose();
+                }
+                if (WorkEnergyEvent != null) {
+                    WorkEnergyEvent.Dispose();
+                }
+                if (FreqWaveEvent != null) {
+                    FreqWaveEvent.Dispose();
+                }
+                if (OrigThread != null) {
                     OrigThread.Abort();
-                    if (OrigThread.ThreadState!=ThreadState.Aborted) {
+                    if (OrigThread.ThreadState != ThreadState.Aborted) {
                         Thread.Sleep(100);
                     }
                 }
-                if (DelayThread != null)
-                {
+                if (DelayThread != null) {
                     DelayThread.Abort();
                 }
-                if (WorkThread != null)
-                {
+                if (WorkThread != null) {
                     WorkThread.Abort();
-                    if (WorkThread.ThreadState != ThreadState.Aborted)
-                    {
+                    if (WorkThread.ThreadState != ThreadState.Aborted) {
                         Thread.Sleep(100);
                     }
-                    
                 }
-                if (EnergyThread != null)
-                {
+                if (EnergyThread != null) {
                     EnergyThread.Abort();
                 }
-                if (FreqThread != null)
-                {
+                if (FreqThread != null) {
                     FreqThread.Abort();
                 }
             }
         }
+
         /// <inheritdoc />
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
-            
         }
 
         /// <inheritdoc />

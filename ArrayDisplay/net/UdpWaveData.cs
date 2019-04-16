@@ -64,21 +64,21 @@ namespace ArrayDisplay.net {
 
         void OrigInit() {
             waveSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH * ConstUdpArg.ORIG_FRAME_NUMS * 2;
-            frameNums = DisPlayWindow.Info.OrigFramNums;
+            FrameNums = DisPlayWindow.Info.OrigFramNums;
             rcvBuf = new byte[ConstUdpArg.ORIG_FRAME_LENGTH];
             RcvThread = new Thread(OrigThreadStart) {IsBackground = true, Priority = ThreadPriority.Highest, Name = "Orig"};
         }
 
         void DelayInit() {
             waveSocket.ReceiveBufferSize = ConstUdpArg.DELAY_FRAME_NUMS * ConstUdpArg.DELAY_FRAME_LENGTH * 2;
-            frameNums = ConstUdpArg.DELAY_FRAME_NUMS;
+            FrameNums = ConstUdpArg.DELAY_FRAME_NUMS;
             rcvBuf = new byte[ConstUdpArg.DELAY_FRAME_LENGTH];
             RcvThread = new Thread(DelayThreadStart) {IsBackground = true, Priority = ThreadPriority.Highest, Name = "Delay"};
         }
 
         void WorktInit() {
             waveSocket.ReceiveBufferSize = ConstUdpArg.WORK_FRAME_LENGTH * ConstUdpArg.WORK_FRAME_NUMS * 2;
-            frameNums = ConstUdpArg.WORK_FRAME_NUMS;
+            FrameNums = ConstUdpArg.WORK_FRAME_NUMS;
             rcvBuf = new byte[ConstUdpArg.WORK_FRAME_LENGTH * 2];
             RcvThread = new Thread(NormalThreadStart) {IsBackground = true, Priority = ThreadPriority.Highest, Name = "WorkWave"};
         }
@@ -93,7 +93,7 @@ namespace ArrayDisplay.net {
                     StartRcvEvent.WaitOne();
                     int index = 0;
                     IsRcving = true;
-                    while(index < frameNums) {
+                    while(index < FrameNums) {
                         if (waveSocket == null) {
                             IsRcving = false;
                             break;
@@ -117,7 +117,7 @@ namespace ArrayDisplay.net {
                                     WorkSaveDataEventHandler(null, rcvBuf);
                                 }
                                 PutWorkData(rcvBuf, index++);
-                                if (index >= frameNums) {
+                                if (index >= FrameNums) {
                                     index = 0;
                                 }
                                 waveDataproc.WorkBytesEvent.Set();
@@ -127,14 +127,14 @@ namespace ArrayDisplay.net {
                                 waveDataproc.OrigBytesEvent.Set();
                                 index++;
                                 index++;
-                                if (index >= frameNums) {
+                                if (index >= FrameNums) {
                                     index = 0;
                                 }
                                 break;
                             case ConstUdpArg.WaveType.Delay:
                                 PutDelayData(rcvBuf);
                                 index++;
-                                if (index >= frameNums) {
+                                if (index >= FrameNums) {
                                     index = 0;
                                 }
                                 waveDataproc.DelayBytesEvent.Set();
@@ -156,7 +156,7 @@ namespace ArrayDisplay.net {
                     StartRcvEvent.WaitOne();
                     int index = 0;
                     IsRcving = true;
-                    while(index < frameNums) {
+                    while(index < FrameNums) {
                         if (waveSocket == null) {
                             IsRcving = false;
                             break;
@@ -180,7 +180,7 @@ namespace ArrayDisplay.net {
                                     WorkSaveDataEventHandler(null, rcvBuf);
                                 }
                                 PutWorkData(rcvBuf, index++);
-                                if (index >= frameNums) {
+                                if (index >= FrameNums) {
                                     index = 0;
                                 }
                                 waveDataproc.WorkBytesEvent.Set();
@@ -190,14 +190,14 @@ namespace ArrayDisplay.net {
                                 waveDataproc.OrigBytesEvent.Set();
                                 index++;
                                 index++;
-                                if (index >= frameNums) {
+                                if (index >= FrameNums) {
                                     index = 0;
                                 }
                                 break;
                             case ConstUdpArg.WaveType.Delay:
                                 PutDelayData(rcvBuf);
                                 index++;
-                                if (index >= frameNums) {
+                                if (index >= FrameNums) {
                                     index = 0;
                                 }
                                 waveDataproc.DelayBytesEvent.Set();
@@ -221,7 +221,7 @@ namespace ArrayDisplay.net {
                 }
                 int index = 0;
                 IsRcving = true;
-                while(index < frameNums) {
+                while(index < FrameNums) {
                     if (waveSocket == null) {
                         IsRcving = false;
                         break;
@@ -245,7 +245,7 @@ namespace ArrayDisplay.net {
                         WorkSaveDataEventHandler(null, rcvBuf);
                     }
                     PutWorkData(rcvBuf, index++);
-                    if (index >= frameNums) {
+                    if (index >= FrameNums) {
                         index = 0;
                     }
                     waveDataproc.WorkBytesEvent.Set();
@@ -263,14 +263,17 @@ namespace ArrayDisplay.net {
             }
             Array.Copy(buf, 0, head, 0, head.Length);
             int channel = head[1];
+            if (channel > 7 || channel < 0) {
+                return;
+            }
             offset += head.Length;
             Array.Copy(buf, offset, temp, 0, temp.Length);
-            if (delaychannelOffsets[channel] >= waveDataproc.DelayWaveBytes[0].Length) {
-                delaychannelOffsets[channel] = 0;
+            if (delayChannelOffsets[channel] >= waveDataproc.DelayWaveBytes[0].Length) {
+                delayChannelOffsets[channel] = 0;
             }
 
-            Array.Copy(temp, 0, waveDataproc.DelayWaveBytes[channel], delaychannelOffsets[channel], temp.Length);
-            delaychannelOffsets[channel] += temp.Length;
+            Array.Copy(temp, 0, waveDataproc.DelayWaveBytes[channel], delayChannelOffsets[channel], temp.Length);
+            delayChannelOffsets[channel] += temp.Length;
         }
 
         /// <summary>
@@ -295,16 +298,16 @@ namespace ArrayDisplay.net {
             }
             offset += head.Length;
 
-            int len = origchannelOffsets[channel * 8 + timdiv];
+            int len = origChannelOffsets[channel * 8 + timdiv];
             if (len >= waveDataproc.OrigWaveBytes[0].Length) {
-                origchannelOffsets[channel * 8 + timdiv] = 0;
+                origChannelOffsets[channel * 8 + timdiv] = 0;
                 len = 0;
             }
             Array.Copy(buf, offset, waveDataproc.OrigWaveBytes[channel * 8 + timdiv], len, buf.Length - 2);
 
             var data = new byte[buf.Length - 2];
             Array.Copy(buf, offset, data, 0, buf.Length - 2);
-            origchannelOffsets[channel * 8 + timdiv] += data.Length;
+            origChannelOffsets[channel * 8 + timdiv] += data.Length;
             if (OrigSaveDataEventHandler != null) {
                 //发送给保存线程
                 OrigSaveDataEventHandler(null, data);
@@ -332,10 +335,10 @@ namespace ArrayDisplay.net {
         #region Field
 
         static readonly LinkedList<Array> linkbuffer = new LinkedList<Array>(); //缓存数据buff
-        public static int frameNums; //一帧数据长度
+        public static int FrameNums; //一帧数据长度
         public static ConstUdpArg.WaveType waveType; //波形数据类型
-        readonly int[] delaychannelOffsets = new int[8];
-        readonly int[] origchannelOffsets = new int[64];
+        readonly int[] delayChannelOffsets = new int[8];
+        readonly int[] origChannelOffsets = new int[64];
         byte[] rcvBuf; //接收数据缓存
         readonly Socket waveSocket;
         Dataproc waveDataproc;
