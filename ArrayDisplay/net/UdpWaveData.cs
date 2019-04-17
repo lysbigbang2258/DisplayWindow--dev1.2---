@@ -296,12 +296,12 @@ namespace ArrayDisplay.net {
             }
             offset += head.Length;
 
-       int len = origChannelOffsets[channel  + timdiv * 8];
-            if (len >= waveDataproc.OrigWaveBytes[0].Length) {
+            int len = origChannelOffsets[channel  + timdiv * 8];//写入数据偏移长度
+            if (len >= waveDataproc.OrigWaveBytes[0].Length) { //大于容量数据覆盖，从头再写入
                 origChannelOffsets[channel + timdiv * 8] = 0;
                 len = 0;
-            }     
-            Array.Copy(buf, offset, waveDataproc.OrigWaveBytes[channel + timdiv * 8 ], len, buf.Length - 2);
+            }
+            Array.Copy(buf, offset, waveDataproc.OrigWaveBytes[channel + timdiv* 8 ], len, buf.Length - 2);
 
             var data = new byte[buf.Length - 2];
             Array.Copy(buf, offset, data, 0, buf.Length - 2);

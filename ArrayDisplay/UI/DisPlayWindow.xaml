@@ -454,10 +454,10 @@
                         Header="延时校准">
                         <Grid Name="delaygrid" Background="#FFE5E5E5">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="337*"/>
-                                <ColumnDefinition Width="1623*"/>
+                                <ColumnDefinition Width="337*" />
+                                <ColumnDefinition Width="1623*" />
                             </Grid.ColumnDefinitions>
-                            <StackPanel Grid.ColumnSpan="2" Margin="0,0,0,-0.2">
+                            <StackPanel Grid.ColumnSpan="2">
                                 <WrapPanel>
                                     <Label
                                         Width="100"
@@ -472,10 +472,9 @@
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                         FontFamily="18"
-                                        KeyDown="Tb_deleyChannel_OnKeyDown"
+                                        KeyUp="Tb_deleyChannel_OnKeyUp"
                                         Text="1"
                                         TextAlignment="Center"
-                                        TextChanged="Tb_deleyChannel_OnTextChanged"
                                         TextWrapping="Wrap" />
                                     <Label
                                         Width="100"
@@ -489,6 +488,7 @@
                                         Height="40"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center"
+                                        KeyUp="Tb_deleyTime_OnKeyUp"
                                         Text="200"
                                         TextWrapping="Wrap" />
                                     <Label
@@ -549,7 +549,6 @@
                                     x:Name="delay_graph"
                                     Width="1000"
                                     Height="635"
-                                    Margin="480,5"
                                     VerticalAlignment="Top"
                                     HorizontalContentAlignment="Center"
                                     VerticalContentAlignment="Center"
@@ -584,10 +583,6 @@
                             </Grid.RowDefinitions>
 
                             <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="163*" />
-                                    <ColumnDefinition Width="817*" />
-                                </Grid.ColumnDefinitions>
 
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -596,10 +591,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                                <WrapPanel
-                                    Grid.Row="0"
-                                    Grid.ColumnSpan="2"
-                                    Margin="0,0,0,135">
+                                <WrapPanel Grid.Row="0">
                                     <Label
                                         Width="100"
                                         Height="40"
@@ -611,6 +603,7 @@
                                         Width="100"
                                         Height="32"
                                         FontFamily="18"
+                                        KeyUp="Tb_origFram_OnKeyUp"
                                         Text="20"
                                         TextAlignment="Center" />
                                     <Label Width="100" Height="40">测试通道：</Label>
@@ -620,7 +613,7 @@
                                         Height="32"
                                         Margin="0,0,5,0"
                                         FontFamily="18"
-                                        KeyDown="Tb_origChannel_OnKeyDown"
+                                        KeyUp="Tb_origChannel_OnKeyUp"
                                         Text="1"
                                         TextAlignment="Center" />
                                     <Label
@@ -635,8 +628,7 @@
                                         Height="32"
                                         Margin="0,0,5,0"
                                         FontFamily="18"
-                                        KeyUp="Tb_origTdiv_OnPreviewKeyDown"
-                                        KeyDown="Tb_orgiTdiv_OnKeyDown"
+                                        KeyUp="Tb_origTdiv_KeyUp"
                                         Text="1"
                                         TextAlignment="Center" />
                                     <Button
@@ -683,11 +675,8 @@
                                         Content="回放数据"
                                         FontFamily="18" />
                                 </WrapPanel>
-                                <GridSplitter
-                                    Grid.Column="1"
-                                    Height="10"
-                                    Margin="0,41,0,125" />
-                                <WrapPanel Grid.ColumnSpan="2" Margin="0,50,0,84">
+                                <GridSplitter Grid.Row="1" Height="10" />
+                                <WrapPanel Grid.Row="2">
                                     <Label Width="100" Height="40">DAC幅值：</Label>
                                     <TextBox
                                         Name="tb_dacLen"
@@ -749,9 +738,7 @@
 
 
                                 </WrapPanel>
-                                <GridSplitter Grid.Column="1" Height="10" />
-                                <WrapPanel Grid.ColumnSpan="2" />
-
+                                <GridSplitter Grid.Row="3" Height="10" />
                             </Grid>
                             <ni:WritableGraph
                                 x:Name="orige_graph"
@@ -897,7 +884,7 @@
                                                 Content="通道"
                                                 FontSize="18" />
                                             <TextBox
-                                                x:Name="tb_workChNum"
+                                                x:Name="tb_workChannel"
                                                 Width="98"
                                                 Height="32"
                                                 Margin="0,0,0,0"
@@ -905,7 +892,7 @@
                                                 VerticalAlignment="Center"
                                                 VerticalContentAlignment="Center"
                                                 FontSize="16"
-                                                KeyDown="TextBox_KeyDown_workChNum"
+                                                KeyUp="Tb_workChNum_OnKeyUp"
                                                 Text="1"
                                                 TextAlignment="Center" />
                                             <ni:LED

@@ -178,7 +178,7 @@ namespace ArrayDisplay.net {
                 }
                 int origchannel = DisPlayWindow.Info.OrigChannel - 1;
                 int origTdiv = DisPlayWindow.Info.OrigTdiv - 1;
-                int origpack = origchannel  + origTdiv * 8;
+                int origpack = origchannel  + origTdiv * 8; 
                 if (OrigGraphEventHandler != null) {
                     string sender = "OrigNet";
                     OrigGraphEventHandler.Invoke(sender, OrigWaveFloats[origpack]);
@@ -432,7 +432,9 @@ namespace ArrayDisplay.net {
             get;
             set;
         }
-
+        /// <summary>
+        /// 原始数据解调数据，横坐标表示探头序列，纵坐标表示数据组成
+        /// </summary>
         float[][] OrigWaveFloats {
             get;
             set;

@@ -66,6 +66,7 @@ namespace ArrayDisplay.UI {
 
         int DelayChannel {
             get;
+            set;
         }
 
         int OrigChannel {
@@ -282,7 +283,7 @@ namespace ArrayDisplay.UI {
             tb_origChannel.SetBinding(TextBox.TextProperty, new Binding("OrigChannel") {Source = Info});
             tb_origTdiv.SetBinding(TextBox.TextProperty, new Binding("OrigTdiv") {Source = Info});
             //正常工作
-            tb_workChNum.SetBinding(TextBox.TextProperty, new Binding("WorkChannel") {Source = Info, Mode = BindingMode.TwoWay});
+            tb_workChannel.SetBinding(TextBox.TextProperty, new Binding("WorkChannel") {Source = Info, Mode = BindingMode.TwoWay});
         }
 
         /// <summary>
@@ -416,41 +417,116 @@ namespace ArrayDisplay.UI {
                      });
         }
 
+     
+    
+
         /// <summary>
-        ///     延时通道改变响应
+        ///     Tb_deleyChannel的按键更改响应
+        ///     回车：数值发送
+        ///     上下方向键：更改数值
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Tb_deleyChannel_OnKeyDown(object sender, KeyEventArgs e) {
+        void Tb_deleyChannel_OnKeyUp(object sender, KeyEventArgs e) {
             TextBox tb = sender as TextBox;
-            int channel = 1;
-            if (tb != null) {
-                int.TryParse(tb.Text, out channel);
+            int num = 1;
+            if (!int.TryParse(tb.Text, out num)) {
+                return;
             }
-            if (e.Key == Key.Enter) {
-                try {
-                    if (channel < 1 || channel > 8) {
-                        tb_deleyChannel.Text = "1";
-                        channel = 1;
+            switch(e.Key) {
+                case Key.Enter: {
+                    //回车更改
+                    try {
+                        if (num < 1 || num > ConstUdpArg.DELAY_FRAME_CHANNELS) {
+                            num = 1;
+                            tb.Text = "1";
+                        }
+                         Info.DelayChannel = num;
                     }
-                    Info.DelayChannel = channel;
+                    catch(Exception exception) {
+                        Console.WriteLine(exception);
+                    }
+                    break;
                 }
-                catch(Exception) {
-                    // ignored
+                case Key.Up: {
+                    //上方向键增加数值
+                    if ((num + 1) > ConstUdpArg.DELAY_FRAME_CHANNELS) {
+                        return;
+                    }
+                    tb.Text = (num + 1).ToString();
+
+                    break;
+                }
+                case Key.Down: {
+                    //下方向键减少数值
+
+                    if ((num - 1) < 1) {
+                        return;
+                    }
+                    tb.Text = (num - 1).ToString();
+
+                    break;
                 }
             }
         }
 
         /// <summary>
-        ///     延时通道更改，更新接收数据
+        ///     Tb_deleyTime的按键更改响应
+        ///     回车：数值发送
+        ///     上下方向键：更改数值
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Tb_deleyChannel_OnTextChanged(object sender, TextChangedEventArgs e) {
+        void Tb_deleyTime_OnKeyUp(object sender, KeyEventArgs e) {
             TextBox tb = sender as TextBox;
-            int channel = 1;
-            if (tb != null) {
-                int.TryParse(tb.Text, out channel);
+            int num = 1;
+            if (!int.TryParse(tb.Text, out num))
+            {
+                return;
+            }
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    {
+                        //回车更改
+                        try
+                        {
+                            if (num < 1 || num > 1000)
+                            {
+                                num = 1;
+                                tb.Text = "1";
+                            }
+                            OnDelayTimeWrite_OnClick(null, null);//发送通道延时值 
+                        }
+                        catch (Exception exception)
+                        {
+                            Console.WriteLine(exception);
+                        }
+                        break;
+                    }
+                case Key.Up:
+                    {
+                        //上方向键增加数值
+                        if ((num + 1) > 1000)
+                        {
+                            return;
+                        }
+                        tb.Text = (num + 1).ToString();
+
+                        break;
+                    }
+                case Key.Down:
+                    {
+                        //下方向键减少数值
+
+                        if ((num - 1) < 1)
+                        {
+                            return;
+                        }
+                        tb.Text = (num - 1).ToString();
+
+                        break;
+                    }
             }
         }
 
@@ -557,173 +633,157 @@ namespace ArrayDisplay.UI {
         }
 
         /// <summary>
-        /// 按键更改响应
-        /// 回车：数值发送 
-        /// 上下方向键：更改数值
+        ///     Tb_origTdiv的按键更改响应
+        ///     回车：数值发送
+        ///     上下方向键：更改数值
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void Tb_origTdiv_OnPreviewKeyDown(object sender, KeyEventArgs e) {
+        void Tb_origTdiv_KeyUp(object sender, KeyEventArgs e) {
             TextBox tb = sender as TextBox;
             int num = 1;
-            switch(e.Key) {
-                case Key.Enter: {//回车更改
-                    if (int.TryParse(tb.Text, out num)) {
-                        try {
-                            if (num < 1 || num > 8) {
-                                num = 1;
-                                tb_origTdiv.Text = "1";
-                            }
-                            OrigTiv = num - 1;
-                            udpCommandSocket.WriteOrigTDiv(OrigTiv);
-                        }
-                        catch(Exception exception) {
-                            Console.WriteLine(exception);
-                        }
-                    }
-                    break;
-                }
-                case Key.Up: {//上方向键增加数值
-                    if (int.TryParse(tb.Text, out num)) {
-                        if ((num + 1) > 8) {
-                            return;
-                        }
-                        tb.Text = (num + 1).ToString();
-                    }
-                    break;
-                }
-                case Key.Down: {//下方向键减少数值
-                    if (int.TryParse(tb.Text, out num)) {
-                        if ((num - 1) < 1) {
-                            return;
-                        }
-                        tb.Text = (num - 1).ToString();
-                    }
-                    break;
-                }
+            if (!int.TryParse(tb.Text, out num)) {
+                return;
             }
-        }
-
-        /// <summary>
-        ///     原始通道数改变响应
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void Tb_origChannel_OnKeyDown(object sender, KeyEventArgs e) {
-            TextBox tb = sender as TextBox;
-
-            if (e.Key == Key.Enter) {
-                int num = 1;
-                if (tb != null) {
-                    int.TryParse(tb.Text, out num);
-                }
-                try {
-                    if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS) {
-//1-8
-                        tb_origChannel.Text = "1";
-                        MessageBox.Show("请输入有效值");
-                        return;
-                    }
-                    OrigChannel = num - 1;
-                }
-                catch(Exception) {
-                    // ignored
-                }
-                udpCommandSocket.WriteOrigChannel(OrigChannel);
-            }
-        }
-
-        /// <summary>
-        ///     原始时分改变响应
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void Tb_orgiTdiv_OnKeyDown(object sender, KeyEventArgs e) {
-//            TextBox tb = sender as TextBox;
-//            switch(e.Key) {
-//                case Key.Enter: {
-//                    int num = 1;
-//                    if (int.TryParse(tb.Text, out num)) {
-//                        try {
-//                            if (num < 1 || num > 8) {
-//                                num = 1;
-//                                tb_origTdiv.Text = "1";
-//                            }
-//                            OrigTiv = num - 1;
-//                            udpCommandSocket.WriteOrigTDiv(OrigTiv);
-//                        }
-//                        catch(Exception exception) {
-//                            Console.WriteLine(exception);
-//                        }
-//                    }
-//                    break;
-//                }
-//                case Key.Up: {
-//                    int num = 1;
-//                    if (int.TryParse(tb.Text, out num)) {
-//                        if ((num + 1) > 8) {
-//                            return;
-//                        }
-//                        tb.Text = (num + 1).ToString();
-//                    }
-//                    break;
-//                }
-//                case Key.Down: {
-//                    int num = 1;
-//                    if (int.TryParse(tb.Text, out num)) {
-//                        if ((num - 1) < 1) {
-//                            return;
-//                        }
-//                        tb.Text = (num - 1).ToString();
-//                    }
-//                    break;
-//                }
-//            }
-        }
-
-        /// <summary>
-        ///     原始时分改变响应
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void ChannelOrTdivChanged_OnKeyDown(object sender, KeyEventArgs e) {
-            TextBox tb = sender as TextBox;
             switch(e.Key) {
                 case Key.Enter: {
-                    int num = 1;
-                    if (int.TryParse(tb.Text, out num)) {
-                        try {
-                            if (num < 1 || num > 8) {
-                                num = 1;
-                                tb_origTdiv.Text = "1";
-                            }
-                            OrigTiv = num - 1;
-                            udpCommandSocket.WriteOrigTDiv(OrigTiv);
+                    //回车更改
+                    try {
+                        if (num < 1 || num > ConstUdpArg.ORIG_TIME_NUMS) {
+                            num = 1;
                         }
-                        catch(Exception exception) {
-                            Console.WriteLine(exception);
-                        }
+                        OrigTiv = num - 1;
+                        udpCommandSocket.WriteOrigTDiv(OrigTiv);//0起始方式
+                        OrigDataStart_OnClick(null, null); //关闭波形
+                        OrigDataStart_OnClick(null, null); //开启波形
+                    }
+                    catch(Exception exception) {
+                        Console.WriteLine(exception);
                     }
                     break;
                 }
                 case Key.Up: {
-                    int num = 1;
-                    if (int.TryParse(tb.Text, out num)) {
-                        if ((num + 1) > 8) {
-                            return;
-                        }
-                        tb.Text = (num + 1).ToString();
+                    //上方向键增加数值
+                    if ((num + 1) > ConstUdpArg.ORIG_TIME_NUMS) {
+                        return;
                     }
+                    tb.Text = (num + 1).ToString();
+
                     break;
                 }
                 case Key.Down: {
-                    int num = 1;
-                    if (int.TryParse(tb.Text, out num)) {
-                        if ((num - 1) < 1) {
-                            return;
-                        }
-                        tb.Text = (num - 1).ToString();
+                    //下方向键减少数值
+
+                    if ((num - 1) < 1) {
+                        return;
                     }
+                    tb.Text = (num - 1).ToString();
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Tb_origChannel的按键更改响应
+        ///     回车：数值发送
+        ///     上下方向键：更改数值
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Tb_origChannel_OnKeyUp(object sender, KeyEventArgs e) {
+            TextBox tb = sender as TextBox;
+            int num = 1;
+            if (!int.TryParse(tb.Text, out num)) {
+                return;
+            }
+            switch(e.Key) {
+                case Key.Enter: {
+                    //回车更改
+                    try {
+                        if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS) {
+                            num = 1;
+                            tb.Text = "1";
+                        }
+                        OrigChannel = num - 1;
+                        udpCommandSocket.WriteOrigChannel(num-1);//0起始方式
+                        OrigDataStart_OnClick(null, null); //关闭波形
+                        OrigDataStart_OnClick(null, null); //开启波形
+                    }
+                    catch(Exception exception) {
+                        Console.WriteLine(exception);
+                    }
+                    break;
+                }
+                case Key.Up: {
+                    //上方向键增加数值
+                    if ((num + 1) > ConstUdpArg.ORIG_CHANNEL_NUMS) {
+                        return;
+                    }
+                    tb.Text = (num + 1).ToString();
+
+                    break;
+                }
+                case Key.Down: {
+                    //下方向键减少数值
+
+                    if ((num - 1) < 1) {
+                        return;
+                    }
+                    tb.Text = (num - 1).ToString();
+
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Tb_origFram的按键更改响应
+        ///     回车：数值发送
+        ///     上下方向键：更改数值
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Tb_origFram_OnKeyUp(object sender, KeyEventArgs e) {
+            TextBox tb = sender as TextBox;
+            int num = 1;
+            if (!int.TryParse(tb.Text, out num)) {
+                return;
+            }
+            switch(e.Key) {
+                case Key.Enter: {
+                    //回车更改
+                    try {
+                        if (num < 0 || num > ConstUdpArg.ORIG_FRAME_NUMS * 10) {
+                            num = 200;
+                            tb.Text = "200";
+                        }
+                        
+                        OrigDataStart_OnClick(null, null); //关闭波形
+                        Info.OrigFramNums = num;
+                        OrigDataStart_OnClick(null, null); //开启波形
+                    }
+                    catch(Exception exception) {
+                        Console.WriteLine(exception);
+                    }
+                    break;
+                }
+                case Key.Up: {
+                    //上方向键增加数值
+                    if ((num * 10) > ConstUdpArg.ORIG_FRAME_NUMS * 10) {
+                        return;
+                    }
+                    tb.Text = (num * 10).ToString();
+
+                    break;
+                }
+                case Key.Down: {
+                    //下方向键减少数值
+
+                    if ((num /10) < 1) {
+                        return;
+                    }
+                    tb.Text = (num/10).ToString();
+
                     break;
                 }
             }
@@ -1071,28 +1131,54 @@ namespace ArrayDisplay.UI {
         /// <param name="e"></param>
         void ReplayWorkData_OnClick(object sender, RoutedEventArgs e) { }
 
-        //传输数据用于显示
+
+
         /// <summary>
-        ///     工作通道改变响应
+        ///     Tb_origTdiv的按键更改响应
+        ///     回车：数值发送
+        ///     上下方向键：更改数值
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void TextBox_KeyDown_workChNum(object sender, KeyEventArgs e) {
+        void Tb_workChNum_OnKeyUp(object sender, KeyEventArgs e) {
             TextBox tb = sender as TextBox;
-            int workchNum = 1;
-            if (tb != null) {
-                int.TryParse(tb.Text, out workchNum);
+            int num = 1;
+            if (!int.TryParse(tb.Text, out num)) {
+                return;
             }
-            if (e.Key == Key.Enter) {
-                try {
-                    if (workchNum < 1 || workchNum > 64) {
-                        tb_workChNum.Text = "1";
-                        Info.WorkChannel = 1;
+            switch(e.Key) {
+                case Key.Enter: {
+                    //回车更改
+                    try {
+                        if (num < 1 || num > ConstUdpArg.ORIG_TIME_NUMS * ConstUdpArg.ORIG_CHANNEL_NUMS) {
+                            num = 1;
+
+                        }
+                        Info.WorkChannel = num;
                     }
-                    Info.WorkChannel = workchNum;
+                    catch(Exception exception) {
+                        Console.WriteLine(exception);
+                    }
+                    break;
                 }
-                catch(Exception) {
-                    // ignored
+                case Key.Up: {
+                    //上方向键增加数值
+                    if ((num + 1) > ConstUdpArg.ORIG_TIME_NUMS * ConstUdpArg.ORIG_CHANNEL_NUMS) {
+                        return;
+                    }
+                    tb.Text = (num + 1).ToString();
+
+                    break;
+                }
+                case Key.Down: {
+                    //下方向键减少数值
+
+                    if ((num - 1) < 1) {
+                        return;
+                    }
+                    tb.Text = (num - 1).ToString();
+
+                    break;
                 }
             }
         }

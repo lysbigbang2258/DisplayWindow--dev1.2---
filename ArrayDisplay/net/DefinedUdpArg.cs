@@ -490,6 +490,7 @@ namespace ArrayDisplay.net {
         public const int ORIG_TIME_OLDNUMS= 32;
         public const int ORIG_CHANNEL_NUMS = 8;
 
+
         public const int DELAY_FRAME_CHANNELS = 8;
         public const int DELAY_FRAME_NUMS = 10;
         public const int DELAY_FRAME_LENGTH = 402;
