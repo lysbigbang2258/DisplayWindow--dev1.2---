@@ -368,7 +368,27 @@ namespace ArrayDisplay.UI {
                     break;
             }
         }
+        /// <summary>
+        ///     按钮事件响应：调试窗口最小化
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnBtnWindowMinClick(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
 
+        /// <summary>
+        ///     按钮事件响应：调试窗口关闭
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void OnBtnWindowShutDownClick(object sender, RoutedEventArgs e)
+        {
+            udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+            //            Dispose();
+            Close();
+        }
         #endregion
 
         #region 延时数据功能
@@ -529,7 +549,92 @@ namespace ArrayDisplay.UI {
                     }
             }
         }
+        #region 延时信息.(读/写/存).按钮响应
 
+        /// <summary>///延时信息.读.按钮响应 /// </summary>
+        void OnDelayTimeRead_OnClick(object sender, RoutedEventArgs e)
+        {
+            udpCommandSocket.ReadDelyTime();
+        }
+
+        /// <summary>///延时信息.写.按钮响应 /// </summary>
+        void OnDelayTimeWrite_OnClick(object sender, RoutedEventArgs e)
+        {
+            string strT = tb_deleyTime.Text;
+            if (string.IsNullOrEmpty(strT))
+            {
+                return;
+            }
+            uint t = uint.Parse(strT);
+            var temp = BitConverter.GetBytes(t);
+            var data = new byte[2];
+            for (int i = 0; i < 2; i++)
+            {
+                data[0] = temp[1];
+                data[1] = temp[0];
+            }
+            udpCommandSocket.WriteDelayTime(data);
+        }
+
+        /// <summary>///延时信息.存.按钮响应 /// </summary>
+        void OnDelayTimeSave_OnClick(object sender, RoutedEventArgs e)
+        {
+            string strT = tb_deleyTime.Text;
+            if (string.IsNullOrEmpty(strT))
+            {
+                return;
+            }
+            int intT = int.Parse(strT);
+            int a = intT / 256;
+            int b = intT - a * 256;
+
+            var data = new byte[2];
+            data.SetValue((byte)a, 0);
+            data.SetValue((byte)b, 1);
+
+            udpCommandSocket.SaveDelayTime(data);
+        }
+
+        #endregion
+
+        #region Dac信息.(读/写/存).按钮响应
+
+        void DacLenRead_OnClick(object sender, RoutedEventArgs e)
+        {
+            udpCommandSocket.ReadCanChannelLen();
+        }
+
+        void DacLenWrite_OnClick(object sender, RoutedEventArgs e)
+        {
+            string strT = tb_dacLen.Text;
+            if (string.IsNullOrEmpty(strT))
+            {
+                return;
+            }
+            int t = int.Parse(strT);
+
+            udpCommandSocket.WriteDacChannel(t);
+        }
+
+        void DacLenSave_OnClick(object sender, RoutedEventArgs e)
+        {
+            string strT = tb_dacLen.Text;
+            if (string.IsNullOrEmpty(strT))
+            {
+                return;
+            }
+            int intT = int.Parse(strT);
+            int a = intT / 256;
+            int b = intT - a * 256;
+
+            var data = new byte[2];
+            data.SetValue((byte)a, 0);
+            data.SetValue((byte)b, 1);
+
+            udpCommandSocket.SaveDacLen(data);
+        }
+
+        #endregion
         #endregion
 
         #region 原始数据与自动定标功能
@@ -1525,82 +1630,7 @@ namespace ArrayDisplay.UI {
         }
 
         #endregion
-
-        #region 延时信息.(读/写/存).按钮响应
-
-        /// <summary>///延时信息.读.按钮响应 /// </summary>
-        void OnDelayTimeRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommandSocket.ReadDelyTime();
-        }
-
-        /// <summary>///延时信息.写.按钮响应 /// </summary>
-        void OnDelayTimeWrite_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_deleyTime.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-            uint t = uint.Parse(strT);
-            var temp = BitConverter.GetBytes(t);
-            var data = new byte[2];
-            for(int i = 0; i < 2; i++) {
-                data[0] = temp[1];
-                data[1] = temp[0];
-            }
-            udpCommandSocket.WriteDelayTime(data);
-        }
-
-        /// <summary>///延时信息.存.按钮响应 /// </summary>
-        void OnDelayTimeSave_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_deleyTime.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-            int intT = int.Parse(strT);
-            int a = intT / 256;
-            int b = intT - a * 256;
-
-            var data = new byte[2];
-            data.SetValue((byte) a, 0);
-            data.SetValue((byte) b, 1);
-
-            udpCommandSocket.SaveDelayTime(data);
-        }
-
-        #endregion
-
-        #region Dac信息.(读/写/存).按钮响应
-
-        void DacLenRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommandSocket.ReadCanChannelLen();
-        }
-
-        void DacLenWrite_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_dacLen.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-            int t = int.Parse(strT);
-
-            udpCommandSocket.WriteDacChannel(t);
-        }
-
-        void DacLenSave_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_dacLen.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-            int intT = int.Parse(strT);
-            int a = intT / 256;
-            int b = intT - a * 256;
-
-            var data = new byte[2];
-            data.SetValue((byte) a, 0);
-            data.SetValue((byte) b, 1);
-
-            udpCommandSocket.SaveDacLen(data);
-        }
-
-        #endregion
+   
 
         /// <summary>
         ///     可调整值的TextBox上滚轮动作响应(整数)
@@ -1656,26 +1686,6 @@ namespace ArrayDisplay.UI {
                     tb.Text = (d - 0.01).ToString("G2");
                 }
             }
-        }
-
-        /// <summary>
-        ///     按钮事件响应：调试窗口最小化
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void OnBtnWindowMinClick(object sender, RoutedEventArgs e) {
-            WindowState = WindowState.Minimized;
-        }
-
-        /// <summary>
-        ///     按钮事件响应：调试窗口关闭
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void OnBtnWindowShutDownClick(object sender, RoutedEventArgs e) {
-            udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
-            //            Dispose();
-            Close();
         }
 
         #endregion
