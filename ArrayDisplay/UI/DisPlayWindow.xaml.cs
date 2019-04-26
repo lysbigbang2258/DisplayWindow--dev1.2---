@@ -193,7 +193,6 @@ namespace ArrayDisplay.UI {
             IsGraphPause = false;
             IsWorkWaveStart = false;
             MainStopwatch = new Stopwatch();
-            led_workdata.FalseBrush = new SolidColorBrush(Colors.Red); //正常工作指示灯
             IsOrigReplay = false;
             IsWorkReplay = false;
             Cancellation = new CancellationTokenSource();
@@ -256,16 +255,6 @@ namespace ArrayDisplay.UI {
         ///     给控件添加绑定
         /// </summary>
         void ControlsSetBinding() {
-            //系统信息
-            tb_state_mc_type.SetBinding(TextBox.TextProperty, new Binding("McType") {Source = Info});
-            tb_state_mc_id.SetBinding(TextBox.TextProperty, new Binding("McId") {Source = Info});
-            tb_state_mc_mac.SetBinding(TextBox.TextProperty, new Binding("McMac") {Source = Info});
-            //系统参数
-            tb_setting_pulse_period.SetBinding(TextBox.TextProperty, new Binding("PulsePeriod") {Source = Info});
-            tb_setting_pulse_delay.SetBinding(TextBox.TextProperty, new Binding("PulseDelay") {Source = Info});
-            tb_setting_pulse_width.SetBinding(TextBox.TextProperty, new Binding("PulseWidth") {Source = Info});
-            tb_setting_adc_offset.SetBinding(TextBox.TextProperty, new Binding("AdcOffset") {Source = Info});
-            tb_setting_adc_num.SetBinding(TextBox.TextProperty, new Binding("AdcNum") {Source = Info});
 
             //延时波形
             tb_deleyTime.SetBinding(TextBox.TextProperty, new Binding("DelayTime") {Source = Info});
@@ -275,7 +264,7 @@ namespace ArrayDisplay.UI {
             tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") {Source = Info});
             tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") {Source = Info});
             tb_origChannel.SetBinding(TextBox.TextProperty, new Binding("OrigChannel") {Source = Info});
-            tb_origTdiv.SetBinding(TextBox.TextProperty, new Binding("OrigTdiv") {Source = Info});
+
             //正常工作
             tb_workChannel.SetBinding(TextBox.TextProperty, new Binding("WorkChannel") {Source = Info, Mode = BindingMode.TwoWay});
         }
@@ -689,35 +678,7 @@ namespace ArrayDisplay.UI {
             }
         }
 
-        /// <summary>
-        ///     更改原始通道的时分/通道参数
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void ChangeOrigConfig_OnClick(object sender, RoutedEventArgs e) {
-            int ch = 1;
-            int tdiv = 1;
-            int.TryParse(tb_origChannel.Text, out ch);
-            int.TryParse(tb_origTdiv.Text, out tdiv);
-
-            try {
-                if (ch < 1 || ch > ConstUdpArg.ORIG_CHANNEL_NUMS) {
-                    MessageBox.Show("请输入正确的通道值");
-                    ch = 1;
-                }
-                if (tdiv < 1 || tdiv > ConstUdpArg.ORIG_TIME_NUMS) {
-                    MessageBox.Show("请输入正确的时分值");
-                    ch = 1;
-                }
-                OrigChannel = ch - 1;
-                OrigTiv = tdiv - 1;
-            }
-            catch(Exception) {
-                // ignored
-            }
-            udpCommandSocket.WriteOrigChannel(OrigChannel);
-            udpCommandSocket.WriteOrigTDiv(OrigTiv);
-        }
+ 
 
         /// <summary>
         ///     计算C值
@@ -1102,31 +1063,6 @@ namespace ArrayDisplay.UI {
                      });
         }
 
-        //回放原始数据
-        void ReplayOrigData_OnClick(object sender, RoutedEventArgs e) {
-            if (!IsOrigReplay) {
-                btn_origreplay.Content = "正在回放";
-                byte[] buffBytes;
-
-                var fileList = GetFileDialogList(); //选择
-                if (fileList == null) {
-                    btn_origreplay.Content = "回放";
-                    return;
-                }
-                IsOrigReplay = true;
-                if (!dataFile.ReplayData(fileList, Cancellation)) {
-                    MessageBox.Show("回放数据失败");
-                }
-            }
-            else {
-                btn_origreplay.Content = "回放";
-                Cancellation.Cancel();
-                Cancellation = new CancellationTokenSource();
-                IsOrigReplay = false;
-                orige_graph.DataSource = 0;
-                orige_graph.Refresh();
-            }
-        }
 
         /// <summary>
         ///     从文件选择框选择文件并获取文件名列表
@@ -1432,201 +1368,6 @@ namespace ArrayDisplay.UI {
         #endregion
 
         #region 系统设置与参数
-
-        #region 脉冲周期.(读/写/存).按钮响应
-
-        /// <summary>脉冲周期.读.按钮响应</summary>
-        void OnPulsePeriodRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommandSocket.ReadPulsePeriod();
-            Task.Run(() => {
-                         btn_readpluseperiod.Dispatcher.Invoke(() => {
-                                                                   btn_readpluseperiod.IsEnabled = false;
-                                                               });
-
-                         Thread.Sleep(1000);
-                         btn_readpluseperiod.Dispatcher.Invoke(() => {
-                                                                   btn_readpluseperiod.IsEnabled = true;
-                                                               });
-                     });
-        }
-
-        /// <summary>脉冲周期.写.按钮响应</summary>
-        void OnPulsePeriodWrite_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_setting_pulse_period.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-
-            int intT = int.Parse(strT);
-            intT = intT / 5;
-            int a = intT / 256;
-            int b = intT - a * 256;
-
-            var data = new byte[2];
-            data.SetValue((byte) a, 0);
-            data.SetValue((byte) b, 1);
-            udpCommandSocket.WritePulsePeriod(data);
-        }
-
-        /// <summary>脉冲周期.存.按钮响应</summary>
-        void OnPulsePeriodSave_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_setting_pulse_period.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-
-            int intT = int.Parse(strT);
-            intT = intT / 5;
-            int a = intT / 256;
-            int b = intT - a * 256;
-
-            var data = new byte[2];
-            data.SetValue((byte) a, 0);
-            data.SetValue((byte) b, 1);
-            udpCommandSocket.SavePulsePeriod(data);
-        }
-
-        #endregion
-
-        #region 脉冲延时.(读/写/存).按钮响应
-
-        /// <summary>
-        ///     可调整值的TextBox上滚轮动作响应(小数)
-        ///     ADC偏移
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void TextboxOnMouseWheel2(object sender, MouseWheelEventArgs e) {
-            // e.Delta > 0,向上滚动滚轮,文本框数字+0.01,最大1
-            // e.Delta < 0,向下滚动滚轮,文本框数字-0.01,最小0
-            ChangeMouseWheel(sender, false, e.Delta > 0);
-        }
-
-        /// <summary>脉冲延时.读.按钮响应</summary>
-        void OnPulseDelayRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommandSocket.ReadPulseDelay();
-        }
-
-        /// <summary>脉冲延时.写.按钮响应</summary>
-        void OnPulseDelayWrite_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_setting_pulse_delay.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-
-            int intT = int.Parse(strT);
-            intT = intT / 5;
-            int a = intT / 256;
-            int b = intT - a * 256;
-
-            var data = new byte[2];
-            data.SetValue((byte) a, 0);
-            data.SetValue((byte) b, 1);
-            udpCommandSocket.WritePulseDelay(data);
-        }
-
-        /// <summary>脉冲延时.存.按钮响应</summary>
-        void OnPulseDelaySave_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_setting_pulse_delay.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-
-            int intT = int.Parse(strT);
-            intT = intT / 5;
-            int a = intT / 256;
-            int b = intT - a * 256;
-
-            var data = new byte[2];
-            data.SetValue((byte) a, 0);
-            data.SetValue((byte) b, 1);
-            udpCommandSocket.SavePulseDelay(data);
-        }
-
-        #endregion
-
-        #region 脉冲宽度.(读/写/存).按钮响应
-
-        /// <summary>脉冲宽度.读.按钮响应</summary>
-        void OnPulseWidthRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommandSocket.ReadPulseWidth();
-        }
-
-        /// <summary>脉冲宽度.写.按钮响应</summary>
-        void OnPulseWidthWrite_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_setting_pulse_width.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-
-            int intT = int.Parse(strT);
-            intT = intT / 5;
-            int a = intT / 256;
-            int b = intT - a * 256;
-
-            var data = new byte[2];
-            data.SetValue((byte) a, 0);
-            data.SetValue((byte) b, 1);
-            udpCommandSocket.WritePulseWidth(data);
-        }
-
-        /// <summary>脉冲宽度.存.按钮响应</summary>
-        void OnPulseWidthSave_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_setting_pulse_width.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-
-            int intT = int.Parse(strT);
-            intT = intT / 5;
-            int a = intT / 256;
-            int b = intT - a * 256;
-
-            var data = new byte[2];
-            data.SetValue((byte) a, 0);
-            data.SetValue((byte) b, 1);
-            udpCommandSocket.SavePulseWidth(data);
-        }
-
-        #endregion
-
-        #region ADC偏移.(读/写/存).按钮响应
-
-        /// <summary>ADC偏移.读.按钮响应</summary>
-        void OnAdcOffsetRead_OnClick(object sender, RoutedEventArgs e) {
-            udpCommandSocket.ReadAdcOffset();
-        }
-
-        /// <summary>ADC偏移.写.按钮响应</summary>
-        void OnAdcOffsetWrite_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_setting_adc_offset.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-
-            float floatT = float.Parse(strT);
-            if (floatT > 0.5) {
-                floatT = 0.5f;
-            }
-            int tmpT = (int) ((floatT + 1.2) * 128 / 1.2);
-
-            udpCommandSocket.WriteAdcOffset((byte) tmpT);
-        }
-
-        /// <summary>ADC偏移.存.按钮响应</summary>
-        void OnAdcOffsetSave_OnClick(object sender, RoutedEventArgs e) {
-            string strT = tb_setting_adc_offset.Text;
-            if (string.IsNullOrEmpty(strT)) {
-                return;
-            }
-
-            float floatT = float.Parse(strT);
-            int tmpT = (int) ((floatT + 1.2) * 128 / 1.2);
-            udpCommandSocket.SaveAdcOffset((byte) tmpT);
-        }
-
-        #endregion
-   
 
         /// <summary>
         ///     可调整值的TextBox上滚轮动作响应(整数)
