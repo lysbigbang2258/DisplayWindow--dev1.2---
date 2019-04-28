@@ -35,7 +35,7 @@
                     Grid.Column="1"
                     FontSize="40"
                     TextAlignment="Center">
-                    HDGX水声信号分析系统
+                    HDGX光电信号分析系统
                 </TextBlock>
                 <DockPanel
                     Grid.Column="2"
