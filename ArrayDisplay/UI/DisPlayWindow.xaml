@@ -10,13 +10,16 @@
     Height="1080"
     Background="#FFE5E5E5"
     FontFamily="Microsoft YaHei"
-    FontSize="20"
+    FontSize="18"
     Loaded="DisPlayWindow_OnLoaded"
     Topmost="False"
     WindowState="Maximized"
     WindowStyle="None">
     <Window.Resources>
         <ui:IndexConver x:Key="MyIndexConverter" />
+        <Style x:Key="buttonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Foreground" Value="#999999" />
+        </Style>
     </Window.Resources>
     <Viewbox>
         <Grid Width="1920" Height="1080">
@@ -91,8 +94,8 @@
 
                     <TabItem
                         Name="delayItem"
-                        Width="120"
-                        Header="延时校准">
+                        Width="100"
+                        Header="原始数据">
                         <Grid Name="delaygrid" Background="#FFE5E5E5">
                             <StackPanel>
                                 <WrapPanel>
@@ -108,7 +111,6 @@
                                         Height="32"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
-                                        FontFamily="18"
                                         KeyUp="Tb_deleyChannel_OnKeyUp"
                                         Text="1"
                                         TextAlignment="Center"
@@ -127,6 +129,7 @@
                                         VerticalAlignment="Center"
                                         KeyUp="Tb_deleyTime_OnKeyUp"
                                         Text="200"
+                                        TextAlignment="Center"
                                         TextWrapping="Wrap" />
                                     <Label
                                         Width="100"
@@ -180,8 +183,7 @@
                                         Height="32"
                                         Margin="10,0,0,0"
                                         Click="BtnPauseWorkGraph_OnClick"
-                                        Content="暂停波形"
-                                        FontSize="18" />
+                                        Content="暂停波形" />
                                 </WrapPanel>
                                 <WrapPanel Grid.Row="0">
                                     <Label
@@ -194,7 +196,6 @@
                                         Name="tb_origFram"
                                         Width="100"
                                         Height="32"
-                                        FontFamily="18"
                                         KeyUp="Tb_origFram_OnKeyUp"
                                         Text="200"
                                         TextAlignment="Center" />
@@ -204,7 +205,6 @@
                                         Width="100"
                                         Height="32"
                                         Margin="0,0,5,0"
-                                        FontFamily="18"
                                         KeyUp="Tb_origChannel_OnKeyUp"
                                         Text="1"
                                         TextAlignment="Center" />
@@ -215,16 +215,14 @@
                                         Margin="100,0,0,0"
                                         Background="#FF66EE66"
                                         Click="OrigDataStart_OnClick"
-                                        Content="启动原始波形"
-                                        FontFamily="18" />
+                                        Content="启动原始波形" />
                                     <Button
                                         x:Name="btnPauseOrigGraph"
                                         Width="100"
                                         Height="32"
                                         Margin="15,0,0,0"
                                         Click="BtnPauseWorkGraph_OnClick"
-                                        Content="暂停波形"
-                                        FontSize="18" />
+                                        Content="暂停波形" />
 
                                     <Button
                                         x:Name="btn_origsave"
@@ -232,8 +230,8 @@
                                         Height="32"
                                         Margin="15,0,0,0"
                                         Click="SaveOrigData_OnClick"
-                                        Content="保存数据"
-                                        FontFamily="18" />
+                                        Content="保存数据" />
+
                                 </WrapPanel>
                                 <ni:Graph
                                     x:Name="delay_graph"
@@ -267,7 +265,281 @@
                             </StackPanel>
                         </Grid>
                     </TabItem>
-                    <TabItem Name="origItem" Header="原始数据">
+                    <TabItem
+                        Name="normalItem"
+                        Width="100"
+                        Header="解调数据">
+                        <Grid Background="#FFE5E5E5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Background="#FFE5E5E5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220*" />
+                                    <ColumnDefinition Width="610*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid
+                                    Grid.Row="0"
+                                    Grid.ColumnSpan="2"
+                                    Margin="0,0,0,32">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <DockPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <DockPanel HorizontalAlignment="Left">
+                                                <Label
+                                                    Width="68"
+                                                    Margin="0,0,0,0"
+                                                    VerticalContentAlignment="Center"
+                                                    Content="通道" />
+                                                <TextBox
+                                                    x:Name="tb_workChannel"
+                                                    Width="98"
+                                                    Height="32"
+                                                    Margin="0,0,0,0"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Center"
+                                                    VerticalContentAlignment="Center"
+                                                    FontSize="16"
+                                                    KeyUp="Tb_workChNum_OnKeyUp"
+                                                    Text="1"
+                                                    TextAlignment="Center" />
+
+                                                <Button
+                                                    x:Name="btn_workstart"
+                                                    Width="100"
+                                                    Height="32"
+                                                    Margin="10,0,0,0"
+                                                    HorizontalContentAlignment="Center"
+                                                    VerticalContentAlignment="Center"
+                                                    Background="#FF66EE66"
+                                                    Click="WorkDataStart_OnClick"
+                                                    Content="启动" />
+                                                <Button
+                                                    x:Name="btn_workSave"
+                                                    Width="100"
+                                                    Height="32"
+                                                    Margin="10,0,0,0"
+                                                    Click="SaveWorkData_OnClick"
+                                                    Content="保存数据" />
+                                                <Button
+                                                    x:Name="btnPauseWorkGraph"
+                                                    Width="100"
+                                                    Height="32"
+                                                    Margin="10,0,0,0"
+                                                    Click="BtnPauseWorkGraph_OnClick"
+                                                    Content="暂停波形" />
+                                                <Button
+                                                    Width="100"
+                                                    Height="32"
+                                                    Margin="15,0,0,0"
+                                                    VerticalContentAlignment="Center"
+                                                    Click="SendConfig_OnClick"
+                                                    Content="自动定标" />
+                                            </DockPanel>
+
+                                        </DockPanel>
+                                        <DockPanel Grid.Column="1" HorizontalAlignment="Right">
+                                            <Label
+                                                Height="32"
+                                                Margin="10,0,0,0"
+                                                Content="频率" />
+                                            <TextBox
+                                                x:Name="tb_frqValue"
+                                                Width="98"
+                                                Height="32"
+                                                Margin="20,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Text="5"
+                                                TextAlignment="Center" />
+                                            <Label
+                                                Height="32"
+                                                Margin="10,0,0,0"
+                                                Content="幅值" />
+                                            <TextBox
+                                                x:Name="tb_ampValue"
+                                                Width="98"
+                                                Height="32"
+                                                Margin="20,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Text="5"
+                                                TextAlignment="Center" />
+                                        </DockPanel>
+
+                                    </Grid>
+
+                                </Grid>
+                            </Grid>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="770*" />
+                                    <ColumnDefinition Width="30*" />
+                                    <ColumnDefinition Width="950*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid Name="normal_freq_grid" Grid.Column="0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Grid.Row="0">
+                                        <TextBlock Foreground="Black" TextAlignment="Center">
+                                            <Run Text="时域波形图(横坐标" /><Run Text="单位：" /><Run Text="ms 纵坐标单位：V)" />
+                                        </TextBlock>
+                                        <ni:Graph
+                                            x:Name="graph_normalTime"
+                                            Width="780"
+                                            Height="450"
+                                            Margin="5,5,0,0"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Background="{x:Null}"
+                                            Foreground="{x:Null}">
+                                            <ni:Graph.Axes>
+                                                <ni:AxisDouble
+                                                    x:Name="xScale"
+                                                    Adjuster="None"
+                                                    MinorDivisions="{x:Null}"
+                                                    Orientation="Horizontal"
+                                                    Range="0,500" />
+                                                <ni:AxisDouble
+                                                    x:Name="yScale"
+                                                    Adjuster="FitVisibleLoosely "
+                                                    MinorDivisions="{x:Null}"
+                                                    Orientation="Vertical"
+                                                    Range="-2,2">
+                                                    <ni:AxisDouble.MajorDivisions>
+                                                        <ni:RangeLabeledDivisions />
+                                                    </ni:AxisDouble.MajorDivisions>
+                                                    <ni:AxisDouble.MajorGridLines>
+                                                        <ni:GridLines />
+                                                    </ni:AxisDouble.MajorGridLines>
+                                                </ni:AxisDouble>
+                                            </ni:Graph.Axes>
+                                            <ni:Graph.Plots>
+                                                <ni:Plot>
+                                                    <ni:LinePlotRenderer Stroke="Green" />
+                                                </ni:Plot>
+
+                                            </ni:Graph.Plots>
+
+                                        </ni:Graph>
+                                    </StackPanel>
+                                    <GridSplitter
+                                        Grid.Row="1"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Stretch"
+                                        Background="Wheat" />
+                                    <StackPanel Grid.Row="2">
+                                        <TextBlock Foreground="Black" TextAlignment="Center">
+                                            <Run Text="频域波形图(纵坐标" /><Run Text="单位：" /><Run Text="dB 横坐标单位：Hz)" />
+                                        </TextBlock>
+                                        <ni:WritableGraph
+                                            x:Name="graph_normalFrequency"
+                                            Width="780"
+                                            Height="450"
+                                            Margin="5,5,0,5"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top">
+                                            <ni:WritableGraph.Children>
+                                                <ni:Cursor>
+                                                    <ni:Cursor.ValuePresenter>
+                                                        <ni:ValueFormatterGroup Background="Yellow" DefaultFormatter="0" />
+                                                    </ni:Cursor.ValuePresenter>
+                                                </ni:Cursor>
+                                            </ni:WritableGraph.Children>
+                                            <ni:WritableGraph.Axes>
+                                                <ni:AxisDouble
+                                                    x:Name="xScale1"
+                                                    Adjuster="None"
+                                                    Orientation="Horizontal"
+                                                    Range="0,5000">
+                                                    <ni:AxisDouble.MajorDivisions>
+                                                        <ni:RangeLabeledDivisions TickBrush="Black" TickSize="1, 5" />
+                                                    </ni:AxisDouble.MajorDivisions>
+                                                </ni:AxisDouble>
+                                                <ni:AxisDouble
+                                                    x:Name="yScale1"
+                                                    Adjuster="FitVisibleLoosely"
+                                                    MinorDivisions="{x:Null}"
+                                                    Orientation="Vertical"
+                                                    Range="-100,25">
+                                                    <ni:AxisDouble.MajorDivisions>
+                                                        <ni:RangeLabeledDivisions />
+                                                    </ni:AxisDouble.MajorDivisions>
+                                                    <ni:AxisDouble.MajorGridLines>
+                                                        <ni:GridLines />
+                                                    </ni:AxisDouble.MajorGridLines>
+                                                </ni:AxisDouble>
+                                            </ni:WritableGraph.Axes>
+                                            <ni:WritableGraph.Plots>
+                                                <ni:Plot>
+                                                    <ni:LinePlotRenderer Stroke="Green" />
+                                                </ni:Plot>
+                                            </ni:WritableGraph.Plots>
+
+                                        </ni:WritableGraph>
+                                    </StackPanel>
+
+                                    <GridSplitter Grid.Row="3" Height="10" />
+                                </Grid>
+                                <GridSplitter Grid.Column="1" Width="10" />
+                                <ni:Graph x:Name="graph_energyFirst" Grid.Column="2">
+                                    <ni:Graph.Axes>
+                                        <ni:AxisDouble
+                                            x:Name="xScale3"
+                                            Adjuster="None"
+                                            MinorDivisions="{x:Null}"
+                                            Orientation="Horizontal"
+                                            Range="1,64">
+                                            <ni:AxisDouble.MajorGridLines>
+                                                <ni:GridLines
+                                                    Stroke="Orange"
+                                                    StrokeDashArray="4,2"
+                                                    StrokeDashCap="Round"
+                                                    StrokeDashOffset="1"
+                                                    StrokeThickness="2" />
+                                            </ni:AxisDouble.MajorGridLines>
+                                        </ni:AxisDouble>
+                                        <ni:AxisDouble
+                                            x:Name="yScale3"
+                                            Adjuster="None"
+                                            Label="Ampliton"
+                                            MinorDivisions="{x:Null}"
+                                            Orientation="Vertical"
+                                            Range="0,50" />
+                                    </ni:Graph.Axes>
+                                    <ni:Graph.DefaultPlotRenderers>
+                                        <ni:BarPlotRenderer
+                                            BarWidth="0.5"
+                                            Fill="Purple"
+                                            Stroke="White"
+                                            StrokeThickness="0" />
+                                    </ni:Graph.DefaultPlotRenderers>
+
+                                </ni:Graph>
+
+
+                            </Grid>
+                        </Grid>
+                    </TabItem>
+                    <TabItem
+                        Name="origItem"
+                        Header="原始数据"
+                        Visibility="Hidden">
                         <Grid Name="orig_grid" Background="#FFE5E5E5">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -290,7 +562,6 @@
                                         Name="tb_dacLen"
                                         Width="100"
                                         Height="32"
-                                        FontFamily="18"
                                         Text="3000"
                                         TextAlignment="Center" />
                                     <Label Width="100" Height="40">DAC通道：</Label>
@@ -298,7 +569,6 @@
                                         Name="tb_dacChannel"
                                         Width="100"
                                         Height="32"
-                                        FontFamily="18"
                                         Text="1"
                                         TextAlignment="Center" />
                                     <Button
@@ -326,14 +596,12 @@
                                             Width="140"
                                             Height="32"
                                             Margin="5"
-                                            Content="C值DAC幅度："
-                                            FontFamily="18" />
+                                            Content="C值DAC幅度：" />
                                         <TextBox
                                             x:Name="tb_dacCvalue"
                                             Width="100"
                                             Height="32"
                                             Background="Azure"
-                                            FontFamily="18"
                                             IsReadOnly="True"
                                             TextAlignment="Center" />
                                         <Button
@@ -384,7 +652,10 @@
                             </ni:WritableGraph>
                         </Grid>
                     </TabItem>
-                    <TabItem Name="configItem" Header="自动标定">
+                    <TabItem
+                        Name="configItem"
+                        Header="自动标定"
+                        Visibility="Hidden">
                         <Grid Background="#FFE5E5E5">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -398,8 +669,7 @@
                                     Margin="5,0,5,0"
                                     VerticalContentAlignment="Center"
                                     Click="CalBvalue_OnClick"
-                                    Content="求B"
-                                    FontFamily="18" />
+                                    Content="求B" />
                                 <Button
                                     Name="btn_calPhase"
                                     Width="120"
@@ -407,8 +677,7 @@
                                     Margin="5,0,5,0"
                                     VerticalContentAlignment="Center"
                                     Click="CalPhase_OnClick"
-                                    Content="求初始相位"
-                                    FontFamily="18" />
+                                    Content="求初始相位" />
                                 <ProgressBar
                                     Name="bvaulue_pgbar"
                                     Width="100"
@@ -424,15 +693,8 @@
                                     Height="32"
                                     Margin="0,0,5,0"
                                     Click="SaveConfig_OnClick"
-                                    Content="保留参数"
-                                    FontFamily="18" />
-                                <Button
-                                    Width="100"
-                                    Height="32"
-                                    VerticalContentAlignment="Center"
-                                    Click="SendConfig_OnClick"
-                                    Content="发送参数"
-                                    FontFamily="18" />
+                                    Content="保留参数" />
+
                             </WrapPanel>
                             <WrapPanel Grid.Row="1" Grid.ColumnSpan="2">
                                 <ListView
@@ -457,287 +719,7 @@
                         </Grid>
 
                     </TabItem>
-                    <TabItem Name="normalItem" Header="正常工作">
-                        <Grid Background="#FFE5E5E5">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0" Background="#FFE5E5E5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="220*" />
-                                    <ColumnDefinition Width="610*" />
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Grid
-                                    Grid.Row="0"
-                                    Grid.ColumnSpan="2"
-                                    Margin="0,0,0,32">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <Grid Row="0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <DockPanel Grid.Column="0" VerticalAlignment="Center">
-                                            <DockPanel HorizontalAlignment="Left">
-                                                <Label
-                                                    Width="68"
-                                                    Margin="0,0,0,0"
-                                                    VerticalContentAlignment="Center"
-                                                    Content="通道"
-                                                    FontSize="18" />
-                                                <TextBox
-                                                    x:Name="tb_workChannel"
-                                                    Width="98"
-                                                    Height="32"
-                                                    Margin="0,0,0,0"
-                                                    HorizontalAlignment="Right"
-                                                    VerticalAlignment="Center"
-                                                    VerticalContentAlignment="Center"
-                                                    FontSize="16"
-                                                    KeyUp="Tb_workChNum_OnKeyUp"
-                                                    Text="1"
-                                                    TextAlignment="Center" />
 
-                                                <Button
-                                                    x:Name="btn_workstart"
-                                                    Width="100"
-                                                    Height="32"
-                                                    Margin="10,0,0,0"
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Center"
-                                                    Background="#FF66EE66"
-                                                    Click="WorkDataStart_OnClick"
-                                                    Content="启动"
-                                                    FontSize="18" />
-                                                <Button
-                                                    x:Name="btn_workSave"
-                                                    Width="100"
-                                                    Height="32"
-                                                    Margin="10,0,0,0"
-                                                    Click="SaveWorkData_OnClick"
-                                                    Content="保存数据"
-                                                    FontSize="18" />
-                                                <Button
-                                                    x:Name="btnPauseWorkGraph"
-                                                    Width="100"
-                                                    Height="32"
-                                                    Margin="10,0,0,0"
-                                                    Click="BtnPauseWorkGraph_OnClick"
-                                                    Content="暂停波形"
-                                                    FontSize="18" />
-                                                <Button
-                                                    x:Name="btn_workreplay"
-                                                    Width="100"
-                                                    Height="32"
-                                                    Margin="15,0,0,0"
-                                                    Click="ReplayWorkData_OnClick"
-                                                    Content="回放数据"
-                                                    FontFamily="18" />
-                                            </DockPanel>
-
-                                        </DockPanel>
-                                        <DockPanel Grid.Column="1" HorizontalAlignment="Right">
-                                            <Label
-                                                Height="32"
-                                                Margin="10,0,0,0"
-                                                Content="频率"
-                                                FontSize="18" />
-                                            <TextBox
-                                                x:Name="tb_frqValue"
-                                                Width="98"
-                                                Height="32"
-                                                Margin="20,0,0,0"
-                                                VerticalAlignment="Center"
-                                                FontSize="18"
-                                                Text="5"
-                                                TextAlignment="Center" />
-                                            <Label
-                                                Height="32"
-                                                Margin="10,0,0,0"
-                                                Content="幅值"
-                                                FontSize="18" />
-                                            <TextBox
-                                                x:Name="tb_ampValue"
-                                                Width="98"
-                                                Height="32"
-                                                Margin="20,0,0,0"
-                                                VerticalAlignment="Center"
-                                                FontSize="18"
-                                                Text="5"
-                                                TextAlignment="Center" />
-                                        </DockPanel>
-
-                                    </Grid>
-
-                                </Grid>
-                            </Grid>
-
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="770*" />
-                                    <ColumnDefinition Width="30*" />
-                                    <ColumnDefinition Width="950*" />
-                                </Grid.ColumnDefinitions>
-                                <Grid Name="normal_freq_grid" Grid.Column="0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <StackPanel Grid.Row="0">
-                                        <WrapPanel Grid.Row="1" Margin="30,0,0,0">
-                                            <TextBlock
-                                                Width="300"
-                                                FontSize="18"
-                                                Foreground="Black"
-                                                Text="时域波形图(横坐标单位：ms)"
-                                                TextAlignment="Left" />
-                                        </WrapPanel>
-                                        <ni:Graph
-                                            x:Name="graph_normalTime"
-                                            Width="770"
-                                            Height="400"
-                                            Margin="5,5,0,0"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Top"
-                                            Background="{x:Null}"
-                                            Foreground="{x:Null}">
-                                            <ni:Graph.Axes>
-                                                <ni:AxisDouble
-                                                    x:Name="xScale"
-                                                    Adjuster="None"
-                                                    MinorDivisions="{x:Null}"
-                                                    Orientation="Horizontal"
-                                                    Range="0,500" />
-                                                <ni:AxisDouble
-                                                    x:Name="yScale"
-                                                    Adjuster="FitVisibleLoosely "
-                                                    MinorDivisions="{x:Null}"
-                                                    Orientation="Vertical"
-                                                    Range="-2,2">
-                                                    <ni:AxisDouble.MajorDivisions>
-                                                        <ni:RangeLabeledDivisions />
-                                                    </ni:AxisDouble.MajorDivisions>
-                                                    <ni:AxisDouble.MajorGridLines>
-                                                        <ni:GridLines />
-                                                    </ni:AxisDouble.MajorGridLines>
-                                                </ni:AxisDouble>
-                                            </ni:Graph.Axes>
-                                            <ni:Graph.Plots>
-                                                <ni:Plot>
-                                                    <ni:LinePlotRenderer Stroke="Green" />
-                                                </ni:Plot>
-
-                                            </ni:Graph.Plots>
-
-                                        </ni:Graph>
-                                    </StackPanel>
-                                    <GridSplitter Grid.Row="1" Height="50" />
-                                    <StackPanel Grid.Row="2" Width="{Binding ElementName=normal_freq_grid, Path=Width}">
-                                        <TextBlock
-                                            Grid.Row="1"
-                                            Margin="30,0,0,0"
-                                            FontSize="18"
-                                            Foreground="Black"
-                                            TextAlignment="Left"><Run Text="频域波形图(纵坐标" /><Run Text="单位：" /><Run Text="dB 横坐标单位：Hz)" /></TextBlock>
-                                        <ni:WritableGraph
-                                            x:Name="graph_normalFrequency"
-                                            Width="770"
-                                            Height="400"
-                                            HorizontalAlignment="Left"
-                                            VerticalAlignment="Top">
-                                            <ni:WritableGraph.Children>
-                                                <ni:Cursor>
-                                                    <ni:Cursor.ValuePresenter>
-                                                        <ni:ValueFormatterGroup Background="Yellow" DefaultFormatter="0" />
-                                                    </ni:Cursor.ValuePresenter>
-                                                </ni:Cursor>
-                                            </ni:WritableGraph.Children>
-                                            <ni:WritableGraph.Axes>
-                                                <ni:AxisDouble
-                                                    x:Name="xScale1"
-                                                    Adjuster="None"
-                                                    Orientation="Horizontal"
-                                                    Range="0,5000">
-                                                    <ni:AxisDouble.MajorDivisions>
-                                                        <ni:RangeLabeledDivisions TickBrush="Black" TickSize="1, 5" />
-                                                    </ni:AxisDouble.MajorDivisions>
-                                                </ni:AxisDouble>
-                                                <ni:AxisDouble
-                                                    x:Name="yScale1"
-                                                    Adjuster="FitVisibleLoosely"
-                                                    MinorDivisions="{x:Null}"
-                                                    Orientation="Vertical"
-                                                    Range="-100,25">
-                                                    <ni:AxisDouble.MajorDivisions>
-                                                        <ni:RangeLabeledDivisions />
-                                                    </ni:AxisDouble.MajorDivisions>
-                                                    <ni:AxisDouble.MajorGridLines>
-                                                        <ni:GridLines />
-                                                    </ni:AxisDouble.MajorGridLines>
-                                                </ni:AxisDouble>
-                                            </ni:WritableGraph.Axes>
-                                            <ni:WritableGraph.Plots>
-                                                <ni:Plot>
-                                                    <ni:LinePlotRenderer Stroke="Green" />
-                                                </ni:Plot>
-                                            </ni:WritableGraph.Plots>
-
-                                        </ni:WritableGraph>
-                                    </StackPanel>
-
-
-                                    <GridSplitter Grid.Row="3" Height="50" />
-                                </Grid>
-                                <GridSplitter Grid.Column="1" Width="20" />
-                                <ni:Graph x:Name="graph_energyFirst" Grid.Column="2">
-                                    <ni:Graph.Axes>
-                                        <ni:AxisDouble
-                                            x:Name="xScale3"
-                                            Adjuster="None"
-                                            MinorDivisions="{x:Null}"
-                                            Orientation="Horizontal"
-                                            Range="1,64">
-                                            <ni:AxisDouble.MajorGridLines>
-                                                <ni:GridLines
-                                                    Stroke="Orange"
-                                                    StrokeDashArray="4,2"
-                                                    StrokeDashCap="Round"
-                                                    StrokeDashOffset="1"
-                                                    StrokeThickness="2" />
-                                            </ni:AxisDouble.MajorGridLines>
-                                        </ni:AxisDouble>
-                                        <ni:AxisDouble
-                                            x:Name="yScale3"
-                                            Adjuster="None"
-                                            Label="Ampliton"
-                                            MinorDivisions="{x:Null}"
-                                            Orientation="Vertical"
-                                            Range="0,50" />
-                                    </ni:Graph.Axes>
-                                    <ni:Graph.DefaultPlotRenderers>
-                                        <ni:BarPlotRenderer
-                                            BarWidth="0.5"
-                                            Fill="Purple"
-                                            Stroke="White"
-                                            StrokeThickness="0" />
-                                    </ni:Graph.DefaultPlotRenderers>
-
-                                </ni:Graph>
-
-
-                            </Grid>
-                        </Grid>
-                    </TabItem>
                 </TabControl>
 
 

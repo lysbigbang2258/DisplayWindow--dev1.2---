@@ -76,7 +76,7 @@ namespace ArrayDisplay.Net {
         /// 初始化一个Udp的Socket
         /// </summary>
         public WaveSocket() {
-            this.MSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
+            MSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram,
                                     ProtocolType.Udp);
         }
 
@@ -88,14 +88,14 @@ namespace ArrayDisplay.Net {
         public void StartCaclBvalue(IPEndPoint ip, UdpCommandSocket udpCommandSocket) {
             try
             {
-                this.UCommandSocket = udpCommandSocket;
-                this.MSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH;
+                UCommandSocket = udpCommandSocket;
+                MSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH;
            
-                this.MSocket.Bind(ip);
-                this.RcvThread = new Thread(this.RcvUdpdataToBvalue_ThreatStart) { IsBackground = true };
-                this.RcvResetEvent = new AutoResetEvent(false);
-                this.BvalueDatas = new short[64][];
-                this.RcvThread.Start();
+                MSocket.Bind(ip);
+                RcvThread = new Thread(RcvUdpdataToBvalue_ThreatStart) { IsBackground = true };
+                RcvResetEvent = new AutoResetEvent(false);
+                BvalueDatas = new short[64][];
+                RcvThread.Start();
             }
             catch (Exception e) {
                 Console.WriteLine(e);
@@ -126,14 +126,14 @@ namespace ArrayDisplay.Net {
         public void StartCaclPhase(IPEndPoint ip, UdpCommandSocket udpCommandSocket)
         {
             try {
-                this.UCommandSocket = udpCommandSocket;
-                this.MSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH;
-                this.MSocket.Bind(ip);
-                this.RcvThread = new Thread(this.RcvUdpdataToPhase_ThreatStart) { IsBackground = true };
-                this.RcvResetEvent = new AutoResetEvent(false);
-                this.RcvPhaseData = new short[8][];
-                this.PhaseFloats = new float[8];
-                this.RcvThread.Start();
+                UCommandSocket = udpCommandSocket;
+                MSocket.ReceiveBufferSize = ConstUdpArg.ORIG_FRAME_LENGTH;
+                MSocket.Bind(ip);
+                RcvThread = new Thread(RcvUdpdataToPhase_ThreatStart) { IsBackground = true };
+                RcvResetEvent = new AutoResetEvent(false);
+                RcvPhaseData = new short[8][];
+                PhaseFloats = new float[8];
+                RcvThread.Start();
             }
             catch (Exception e)
             {
@@ -154,11 +154,11 @@ namespace ArrayDisplay.Net {
             Stopwatch stopwatch = new Stopwatch();
             while (true)
             {
-                this.RcvResetEvent.WaitOne();
+                RcvResetEvent.WaitOne();
                 try
                 {
                     stopwatch.Start();
-                    ret = this.MSocket.Receive(buffer);
+                    ret = MSocket.Receive(buffer);
                     if (ret <= 0)
                     {
                         continue;
@@ -191,9 +191,9 @@ namespace ArrayDisplay.Net {
                         Console.WriteLine("Index Error！");
                     }
 
-                    this.RcvPhaseData[index] = new short[sbdata.Length];
+                    RcvPhaseData[index] = new short[sbdata.Length];
                     Console.WriteLine("通道： " + index);
-                    Array.Copy(sbdata, this.RcvPhaseData[index], sbdata.Length);    
+                    Array.Copy(sbdata, RcvPhaseData[index], sbdata.Length);    
                 }
                 catch (Exception e)
                 {
@@ -203,7 +203,7 @@ namespace ArrayDisplay.Net {
 
                 stopwatch.Stop();
                 Console.WriteLine("RCVTime:" + stopwatch.ElapsedMilliseconds);
-                this.RcvResetEvent.Reset(); // 线程继续等待
+                RcvResetEvent.Reset(); // 线程继续等待
             }
 
         }
@@ -218,10 +218,10 @@ namespace ArrayDisplay.Net {
             int ret;
             Stopwatch stopwatch = new Stopwatch();
             while(true) {
-                this.RcvResetEvent.WaitOne();
+                RcvResetEvent.WaitOne();
                 try {
                     stopwatch.Start();
-                    ret = this.MSocket.Receive(buffer);
+                    ret = MSocket.Receive(buffer);
                     if (ret <= 0)
                     {
                         continue;
@@ -249,10 +249,10 @@ namespace ArrayDisplay.Net {
                         sbdata[i] = BitConverter.ToInt16(t, 0);
                     }
 
-                    this.BvalueDatas[index] = new short[sbdata.Length];
+                    BvalueDatas[index] = new short[sbdata.Length];
                     double progressvalue = (index + 1) * 100.0 / 64; // 进度条
                     Console.WriteLine("通道： " + index);
-                    Array.Copy(sbdata, this.BvalueDatas[index], sbdata.Length);
+                    Array.Copy(sbdata, BvalueDatas[index], sbdata.Length);
                     DisPlayWindow.HMainWindow.bvaulue_pgbar.Dispatcher.Invoke(() =>
                                                                               {
                                                                                   DisPlayWindow.HMainWindow.bvaulue_pgbar.Value = progressvalue;
@@ -267,7 +267,7 @@ namespace ArrayDisplay.Net {
                 stopwatch.Stop();
                 Console.WriteLine("RCVTime:"+stopwatch.ElapsedMilliseconds);
 
-                this.RcvResetEvent.Reset();
+                RcvResetEvent.Reset();
             }
             
         }
@@ -278,7 +278,7 @@ namespace ArrayDisplay.Net {
         /// <param name="chinum">通道个数</param>
         /// <param name="timenum">时分个数</param>
         public void SendOrigSwitchCommand(int chinum, int timenum) {
-            this.UCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
+            UCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
 
             // UCommand.WriteOrigTDiv(0);
             // Console.WriteLine("发送时分0");
@@ -286,21 +286,21 @@ namespace ArrayDisplay.Net {
             // Console.WriteLine("发送通道0");
             for(int i = 0; i < timenum; i++) {
                 for(int j = 0; j < chinum; j++) {
-                    this.UCommandSocket.WriteOrigTDiv(i);
+                    UCommandSocket.WriteOrigTDiv(i);
                     Console.WriteLine("发送时分{0}", i);
-                    this.UCommandSocket.WriteOrigChannel(j);
+                    UCommandSocket.WriteOrigChannel(j);
                     Console.WriteLine("发送通道{0}", j);
                     Thread.Sleep(15);
-                    this.RcvResetEvent.Set();
+                    RcvResetEvent.Set();
                     Thread.Sleep(20);
                 }
             }
 
             Thread.Sleep(100);
-            this.UCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
-            this.UCommandSocket.WriteOrigChannel(0);
-            this.UCommandSocket.WriteOrigTDiv(0);
-            this.UCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
+            UCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
+            UCommandSocket.WriteOrigChannel(0);
+            UCommandSocket.WriteOrigTDiv(0);
+            UCommandSocket.SwitchWindow(ConstUdpArg.SwicthToStateWindow);
         }
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace ArrayDisplay.Net {
         /// </summary>
         /// <returns>各个通道相位值</returns>
         public float[] CalToPhase() {
-           return this.CalToPhase(this.RcvPhaseData);
+           return CalToPhase(RcvPhaseData);
         }
 
         /// <summary>
@@ -363,7 +363,7 @@ namespace ArrayDisplay.Net {
                 caltin[index] =art;
             }
 
-            this.PhaseFloats = caltin;
+            PhaseFloats = caltin;
             return caltin;
 
         }
@@ -490,26 +490,26 @@ namespace ArrayDisplay.Net {
         }
 
         void Dispose(bool disposing) {
-            this.ReleaseUnmanagedResources();
+            ReleaseUnmanagedResources();
             if (disposing) {
-                if (this.RcvResetEvent != null) this.RcvResetEvent.Dispose();
-                if (this.MSocket != null) {
-                    this.MSocket.Shutdown(SocketShutdown.Both);
-                    this.MSocket.Close();
-                    this.MSocket.Dispose();
+                if (RcvResetEvent != null) RcvResetEvent.Dispose();
+                if (MSocket != null) {
+                    MSocket.Shutdown(SocketShutdown.Both);
+                    MSocket.Close();
+                    MSocket.Dispose();
                 }
             }
         }
 
         /// <inheritdoc />
         public void Dispose() {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc />
         ~WaveSocket() {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         #endregion

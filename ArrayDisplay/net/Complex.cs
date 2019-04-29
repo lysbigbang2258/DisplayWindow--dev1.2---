@@ -23,8 +23,8 @@ namespace ArrayDisplay.Net {
         /// 虚部
         /// </param>
         public Complex(float r = 0, float im = 0) {
-            this.Re = r;
-            this.Im = im;
+            Re = r;
+            Im = im;
         }
 
         /// <summary>
@@ -34,8 +34,8 @@ namespace ArrayDisplay.Net {
         /// The cp.
         /// </param>
         public Complex(Complex cp) {
-            this.Re = cp.Re;
-            this.Im = cp.Im;
+            Re = cp.Re;
+            Im = cp.Im;
         }
 
         #region 属性
@@ -67,7 +67,7 @@ namespace ArrayDisplay.Net {
         /// The <see cref="float"/>.
         /// </returns>
         public float Modulus() {
-            return (float)Math.Sqrt((this.Re * this.Re) + (this.Im * this.Im));
+            return (float)Math.Sqrt((Re * Re) + (Im * Im));
         }
 
         /// <summary>
@@ -217,23 +217,23 @@ namespace ArrayDisplay.Net {
         /// </returns>
         public override string ToString() {
             string retStr;
-            if (Math.Abs(this.Im) < 0.0001) {
-                retStr = this.Re.ToString("f4");
+            if (Math.Abs(Im) < 0.0001) {
+                retStr = Re.ToString("f4");
             }
-            else if (Math.Abs(this.Re) < 0.0001) {
-                if (this.Im > 0) {
-                    retStr = "j" + this.Im.ToString("f4");
+            else if (Math.Abs(Re) < 0.0001) {
+                if (Im > 0) {
+                    retStr = "j" + Im.ToString("f4");
                 }
                 else {
-                    retStr = "-j" + (0 - this.Im).ToString("f4");
+                    retStr = "-j" + (0 - Im).ToString("f4");
                 }
             }
             else {
-                if (this.Im > 0) {
-                    retStr = this.Re.ToString("f4") + "+j" + this.Im.ToString("f4");
+                if (Im > 0) {
+                    retStr = Re.ToString("f4") + "+j" + Im.ToString("f4");
                 }
                 else {
-                    retStr = this.Re.ToString("f4") + "-j" + (0 - this.Im).ToString("f4");
+                    retStr = Re.ToString("f4") + "-j" + (0 - Im).ToString("f4");
                 }
             }
 

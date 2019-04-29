@@ -13,23 +13,23 @@ namespace ArrayDisplay.Net {
         /// Initializes a new instance of the <see cref="SystemInfo"/> class.
         /// </summary>
         public SystemInfo() {
-            this.mcId = string.Empty;
-            this.mcMac = string.Empty;
-            this.mcType = string.Empty;
-            this.pulseDelay = -1;
-            this.pulsePeriod = -1;
-            this.pulseWidth = -1;
-            this.adcNum = 1;
+            mcId = string.Empty;
+            mcMac = string.Empty;
+            mcType = string.Empty;
+            pulseDelay = -1;
+            pulsePeriod = -1;
+            pulseWidth = -1;
+            adcNum = 1;
 
-            this.adcOffset = string.Empty;
-            this.delayChannel = 1;
-            this.delayTime = 1;
+            adcOffset = string.Empty;
+            delayChannel = 1;
+            delayTime = 1;
 
-            this.daclen = 3000;
-            this.dacChannel = 2;
-            this.origFrams = 200;
-            this.origChannel = 1;
-            this.origTdiv = 1;
+            daclen = 3000;
+            dacChannel = 2;
+            origFrams = 200;
+            origChannel = 1;
+            origTdiv = 1;
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace ArrayDisplay.Net {
         [NotifyPropertyChangedInvocator]
         void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #region Field
@@ -140,14 +140,14 @@ namespace ArrayDisplay.Net {
         /// 设备类型
         /// </summary>
         public string McType {
-            get => this.mcType;
+            get => mcType;
 
             set {
-                if (value == this.mcType) {
+                if (value == mcType) {
                     return;
                 }
-                this.mcType = value;
-                this.OnPropertyChanged();
+                mcType = value;
+                OnPropertyChanged();
             }
         }
 
@@ -156,14 +156,14 @@ namespace ArrayDisplay.Net {
         /// 设备ID
         /// </summary>
         public string McId {
-            get => this.mcId;
+            get => mcId;
 
             set {
-                if (value == this.mcId) {
+                if (value == mcId) {
                     return;
                 }
-                this.mcId = value;
-                this.OnPropertyChanged();
+                mcId = value;
+                OnPropertyChanged();
             }
         }
 
@@ -172,12 +172,12 @@ namespace ArrayDisplay.Net {
         /// 设备MAC
         /// </summary>
         public string McMac {
-            get => this.mcMac;
+            get => mcMac;
 
             set {
-                if (value != this.mcMac) {
-                    this.mcMac = value;
-                    this.OnPropertyChanged();
+                if (value != mcMac) {
+                    mcMac = value;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -187,12 +187,12 @@ namespace ArrayDisplay.Net {
         /// adc偏移
         /// </summary>
         public string AdcOffset {
-            get => this.adcOffset;
+            get => adcOffset;
 
             set {
-                if (value != this.adcOffset) {
-                    this.adcOffset = value;
-                    this.OnPropertyChanged();
+                if (value != adcOffset) {
+                    adcOffset = value;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -202,12 +202,12 @@ namespace ArrayDisplay.Net {
         /// adc偏移.adcID
         /// </summary>
         public int AdcNum {
-            get => this.adcNum;
+            get => adcNum;
 
             set {
-                if (value != this.adcNum) {
-                    this.adcNum = value;
-                    this.OnPropertyChanged();
+                if (value != adcNum) {
+                    adcNum = value;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -217,12 +217,12 @@ namespace ArrayDisplay.Net {
         /// 脉冲周期
         /// </summary>
         public int PulsePeriod {
-            get => this.pulsePeriod;
+            get => pulsePeriod;
 
             set {
-                if (value != this.pulsePeriod) {
-                    this.pulsePeriod = value;
-                    this.OnPropertyChanged();
+                if (value != pulsePeriod) {
+                    pulsePeriod = value;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -232,12 +232,12 @@ namespace ArrayDisplay.Net {
         /// 脉冲延时
         /// </summary>
         public int PulseDelay {
-            get => this.pulseDelay;
+            get => pulseDelay;
 
             set {
-                if (value != this.pulseDelay) {
-                    this.pulseDelay = value;
-                    this.OnPropertyChanged();
+                if (value != pulseDelay) {
+                    pulseDelay = value;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -247,12 +247,12 @@ namespace ArrayDisplay.Net {
         /// 脉冲宽度
         /// </summary>
         public int PulseWidth {
-            get => this.pulseWidth;
+            get => pulseWidth;
 
             set {
-                if (value != this.pulseWidth) {
-                    this.pulseWidth = value;
-                    this.OnPropertyChanged();
+                if (value != pulseWidth) {
+                    pulseWidth = value;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -262,11 +262,11 @@ namespace ArrayDisplay.Net {
         /// 延时通道
         /// </summary>
         public int DelayChannel {
-            get => this.delayChannel;
+            get => delayChannel;
 
             set {
-                this.delayChannel = value;
-                this.OnPropertyChanged();
+                delayChannel = value;
+                OnPropertyChanged();
             }
         }
 
@@ -275,11 +275,11 @@ namespace ArrayDisplay.Net {
         /// 延时时间量
         /// </summary>
         public int DelayTime {
-            get => this.delayTime;
+            get => delayTime;
 
             set {
-                this.delayTime = value;
-                this.OnPropertyChanged();
+                delayTime = value;
+                OnPropertyChanged();
             }
         }
 
@@ -288,11 +288,11 @@ namespace ArrayDisplay.Net {
         /// 工作通道
         /// </summary>
         public int WorkChannel {
-            get => this.workChannel;
+            get => workChannel;
 
             set {
-                this.workChannel = value;
-                this.OnPropertyChanged();
+                workChannel = value;
+                OnPropertyChanged();
             }
         }
 
@@ -301,11 +301,11 @@ namespace ArrayDisplay.Net {
         /// DAC长度
         /// </summary>
         public int DacLenth {
-            get => this.daclen;
+            get => daclen;
 
             set {
-                this.daclen = value;
-                this.OnPropertyChanged();
+                daclen = value;
+                OnPropertyChanged();
             }
         }
         
@@ -314,11 +314,11 @@ namespace ArrayDisplay.Net {
         /// Dac通道
         /// </summary>
         public int DacChannel {
-            get => this.dacChannel;
+            get => dacChannel;
 
             set {
-                this.dacChannel = value;
-                this.OnPropertyChanged();
+                dacChannel = value;
+                OnPropertyChanged();
             }
         }
 
@@ -327,11 +327,11 @@ namespace ArrayDisplay.Net {
         /// 原始数据帧数
         /// </summary>
         public int OrigFramNums {
-            get => this.origFrams;
+            get => origFrams;
 
             set {
-                this.origFrams = value;
-                this.OnPropertyChanged();
+                origFrams = value;
+                OnPropertyChanged();
             }
         }
 
@@ -340,9 +340,9 @@ namespace ArrayDisplay.Net {
         /// // 原始通道
         /// </summary>
         public int OrigChannel {
-            get => this.origChannel;
+            get => origChannel;
 
-            set => this.origChannel = value;
+            set => origChannel = value;
         }
 
         /// <summary>
@@ -350,9 +350,9 @@ namespace ArrayDisplay.Net {
         /// 原始时分
         /// </summary>
         public int OrigTdiv {
-            get => this.origTdiv;
+            get => origTdiv;
 
-            set => this.origTdiv = value;
+            set => origTdiv = value;
         }
         #endregion
     }

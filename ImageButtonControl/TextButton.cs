@@ -109,9 +109,9 @@ namespace ImageButtonControl
             //获取资源文件信息
             ResourceDictionary rd = new ResourceDictionary();
             rd.Source = new Uri("/ImageButtonControl;component/Themes/Style.xaml", UriKind.Relative);
-            this.Resources.MergedDictionaries.Add(rd);
+            Resources.MergedDictionaries.Add(rd);
             //设置样式
-            this.Style = this.FindResource("SimpleTextButton") as Style;
+            Style = FindResource("SimpleTextButton") as Style;
         }
         #endregion
     }
