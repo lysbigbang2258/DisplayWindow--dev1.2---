@@ -17,9 +17,6 @@
     WindowStyle="None">
     <Window.Resources>
         <ui:IndexConver x:Key="MyIndexConverter" />
-        <Style x:Key="buttonStyle" TargetType="{x:Type Button}">
-            <Setter Property="Foreground" Value="#999999" />
-        </Style>
     </Window.Resources>
     <Viewbox>
         <Grid Width="1920" Height="1080">
@@ -371,8 +368,7 @@
                                                 x:Name="tb_ampValue"
                                                 Width="98"
                                                 Height="32"
-                                                Margin="20,0,0,0"
-                                                VerticalAlignment="Center"
+                                                Margin="20,0,20,0"
                                                 Text="5"
                                                 TextAlignment="Center" />
                                         </DockPanel>

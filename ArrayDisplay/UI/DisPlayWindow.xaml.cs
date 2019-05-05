@@ -759,7 +759,7 @@
                         int chl = num % 8; // 通道数
                         int tdiv = num / 8; // 时分数
 
-                        if (chl == 0 && tdiv > 0) {
+                        if (chl == 0 && tdiv != 0) {
                             chl = 8;
                         }
                         OrigChannel = chl - 1;

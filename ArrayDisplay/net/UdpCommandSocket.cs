@@ -66,24 +66,28 @@ namespace ArrayDisplay.Net {
                 return true;
             }
             catch(Exception) {
-                MessageBox.Show(@"网络连接失败");
+                MessageBox.Show(@"Socket初始化失败");
             }
             return false;
         }
 
         /// <summary>
-        ///     The test connect.
+        /// The test connect.
         /// </summary>
-        /// <returns>
-        ///     The <see cref="bool" />.
-        ///     IsConnected true
-        /// </returns>
-        public bool TestConnect() {
+        public void TestConnect() {
             sedsocket.SendTo(ConstUdpArg.SwicthToOriginalWindow, ConstUdpArg.Dst_ComMsgIp);
             var testBuffer = new byte[18];
             EndPoint testRemote = new IPEndPoint(IPAddress.Any, 0);
-            int ret = sedsocket.ReceiveFrom(testBuffer, 0, testBuffer.Length - 0, SocketFlags.None, ref testRemote);
-            return ret > 0;
+            try
+            {
+                int ret = this.sedsocket.ReceiveFrom(testBuffer, 0, testBuffer.Length, SocketFlags.None, ref testRemote);
+                this.IsSocketConnect = true;
+            }
+            catch (Exception)
+            {
+                Console.WriteLine(@"网络连接失败");
+                this.IsSocketConnect = false;
+            }
         }
 
         /// <summary>///切换功能窗口（波形或命令）/// </summary>
