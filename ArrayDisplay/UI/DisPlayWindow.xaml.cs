@@ -5,6 +5,7 @@
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Net.NetworkInformation;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
@@ -260,15 +261,14 @@
             udpCommandSocket = new UdpCommandSocket();
 
             if (udpCommandSocket.Init()) {
-              udpCommandSocket.TestConnect();
+                udpCommandSocket.TestConnect();
             }
+
             observableCollection = new ObservableCollection<UIBValue>();
             blistview.ItemsSource = observableCollection;
 
             ControlsSetBinding();
         }
-
-       
 
         /// <summary>
         ///     给控件添加绑定
@@ -282,7 +282,7 @@
             tb_origFram.SetBinding(TextBox.TextProperty, new Binding("OrigFramNums") { Source = Info });
             tb_dacLen.SetBinding(TextBox.TextProperty, new Binding("DacLenth") { Source = Info });
             tb_dacChannel.SetBinding(TextBox.TextProperty, new Binding("DacChannel") { Source = Info });
-            tb_origChannel.SetBinding(TextBox.TextProperty, new Binding("OrigChannel") { Source = Info });
+            tb_origTotalChannel.SetBinding(TextBox.TextProperty, new Binding("OrigTotalChannel") { Source = Info });
 
             // 正常工作
             tb_workChannel.SetBinding(TextBox.TextProperty, new Binding("WorkChannel") { Source = Info, Mode = BindingMode.TwoWay });
@@ -308,7 +308,7 @@
         }
 
         /// <summary>
-        /// The init graphe state.
+        ///     The init graphe state.
         /// </summary>
         void InitGrapheState() {
             IsGraphPause = false;
@@ -411,21 +411,33 @@
         #region 延时数据功能
 
         /// <summary>
-        ///     开启DelayWave工作
+        ///     The delay data start_ on click.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
         void DelayDataStart_OnClick(object sender, RoutedEventArgs e) {
             Task.Run(
                      () => {
                          try {
-                             InitGrapheState();
+                             if (OrigWaveData != null) {
+                                 InitGrapheState();
+                                 btn_origstart.Dispatcher.InvokeAsync(
+                                                                      () => {
+                                                                          btn_origstart.Content = "启动原始波形";
+                                                                      });
+                             }
+
                              udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToDeleyWindow);
                              if (DelayWaveData == null) {
                                  DelayWaveData = new UdpWaveData();
                                  if (!DelayWaveData.StartReceiveData(ConstUdpArg.Src_DelayWaveIp)) {
                                      return;
                                  }
+
                                  btn_delaystart.Dispatcher.InvokeAsync(
                                                                        () => {
                                                                            btn_delaystart.Content = "停止";
@@ -436,7 +448,7 @@
                                  InitGrapheState();
                                  btn_delaystart.Dispatcher.InvokeAsync(
                                                                        () => {
-                                                                           btn_delaystart.Content = "启动";
+                                                                           btn_delaystart.Content = "启动延时波形";
                                                                        });
                                  delay_graph.Dispatcher.InvokeAsync(
                                                                     () => {
@@ -444,7 +456,7 @@
                                                                         delay_graph.Refresh();
                                                                     });
                              }
-                             else if (DelayWaveData.IsBuilded && !DelayWaveData.IsRcving) {
+                             else if (DelayWaveData.IsBuilded) {
                                  DelayWaveData.StartRcvEvent.Set();
                                  btn_delaystart.Dispatcher.InvokeAsync(
                                                                        () => {
@@ -658,21 +670,32 @@
         #region 原始数据与自动定标功能
 
         /// <summary>
-        ///     原始数据图像
+        ///     The orig data start on click.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">
+        ///     The sender.
+        /// </param>
+        /// <param name="e">
+        ///     The e.
+        /// </param>
         void OrigDataStart_OnClick(object sender, RoutedEventArgs e) {
             try {
-                if (OrigWaveData == null) {
+                if (DelayWaveData != null) {
                     InitGrapheState();
+                    btn_delaystart.Dispatcher.InvokeAsync(
+                                                          () => {
+                                                              btn_delaystart.Content = "启动延时波形";
+                                                          });
+                }
+
+                if (OrigWaveData == null) {
                     udpCommandSocket.SwitchWindow(ConstUdpArg.SwicthToOriginalWindow);
                     OrigWaveData = new UdpWaveData();
 
                     if (!OrigWaveData.StartReceiveData(ConstUdpArg.Src_OrigWaveIp)) {
                         return;
                     }
-                    
+
                     udpCommandSocket.WriteOrigChannel(OrigChannel);
                     udpCommandSocket.WriteOrigTDiv(OrigTiv);
                     btn_origstart.Content = "停止";
@@ -680,14 +703,13 @@
                 }
                 else if (OrigWaveData != null || OrigWaveData.IsBuilded) {
                     InitGrapheState();
-                    btn_origstart.Content = "启动";
+                    btn_origstart.Content = "启动原始波形";
 
-                    orige_graph.Dispatcher.InvokeAsync(
+                    delay_graph.Dispatcher.InvokeAsync(
                                                        () => {
-                                                           orige_graph.DataSource = 0;
-                                                           orige_graph.Refresh();
+                                                           delay_graph.DataSource = 0;
+                                                           delay_graph.Refresh();
                                                        });
-                    orige_graph.Refresh();
                 }
             }
             catch {
@@ -695,10 +717,8 @@
             }
         }
 
-        
-
         void SaveOrigData_OnClick(object sender, RoutedEventArgs e) {
-            if (OrigWaveData == null || !OrigWaveData.IsRcving) {
+            if (OrigWaveData == null) {
                 MessageBox.Show("请采集原始波形数据");
                 return;
             }
@@ -732,16 +752,97 @@
         }
 
         /// <summary>
-        /// The tb_orig channel_ on key up.
-        /// 改变数值，先时分后空分
+        ///     The tb_orig channel_ on key up.
+        ///     改变数值，先时分后空分
         /// </summary>
         /// <param name="sender">
-        /// The sender.
+        ///     The sender.
         /// </param>
         /// <param name="e">
-        /// The e.
+        ///     The e.
         /// </param>
         void Tb_origChannel_OnKeyUp(object sender, KeyEventArgs e) {
+            TextBox tb = sender as TextBox;
+            int num = 1;
+            if (!int.TryParse(tb.Text, out num)) {
+                return;
+            }
+
+            int imax = ConstUdpArg.ORIG_CHANNEL_NUMS * ConstUdpArg.ORIG_TIME_NUMS;
+            int imin = 1;
+            switch(e.Key) {
+                case Key.Enter: {
+                    // 回车更改
+                    try {
+                        if (num < imin || num > imax) {
+                            num = imin;
+                            tb.Text = "1";
+                        }
+
+                        int chl = num % 8; // 通道数
+                        int tdiv = num / 8; // 时分数
+
+                        if (chl == 0 && tdiv != 0) {
+                            chl = 8;
+                        }
+
+                        OrigChannel = chl - 1;
+                        OrigTiv = tdiv - 1;
+                        Info.OrigTotalChannel = num;
+
+                        udpCommandSocket.WriteOrigChannel(OrigChannel); // 0起始方式
+                        udpCommandSocket.WriteOrigTDiv(OrigTiv); // 0起始方式
+
+                        Debug.Assert(btn_origstart.Content != null, "btn_origstart.Content != null");
+                        if ((string)btn_origstart.Content == "停止") {
+                            Task.Run(
+                                     () => {
+                                         OrigDataStart_OnClick(null, null); // 开启波形
+                                         Thread.SpinWait(1000);
+                                         OrigDataStart_OnClick(null, null); // 开启波形
+                                     });
+                        }
+                        else {
+                            OrigDataStart_OnClick(null, null); // 关闭波形
+                        }
+                    }
+                    catch(Exception exception) {
+                        Console.WriteLine(exception);
+                    }
+
+                    break;
+                }
+
+                case Key.Up: {
+                    // 上方向键增加数值
+                    if (num + 1 > imax) {
+                        return;
+                    }
+
+                    tb.Text = (num + 1).ToString();
+                    break;
+                }
+
+                case Key.Down: {
+                    // 下方向键减少数值
+                    if (num - 1 < imin) {
+                        return;
+                    }
+
+                    tb.Text = (num - 1).ToString();
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Tb_origTdiv的按键更改响应
+        ///     回车：数值发送
+        ///     上下方向键：更改数值
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Tb_origTdiv_KeyUp(object sender, KeyEventArgs e) {
             TextBox tb = sender as TextBox;
             int num = 1;
             if (!int.TryParse(tb.Text, out num)) {
@@ -752,20 +853,11 @@
                 case Key.Enter: {
                     // 回车更改
                     try {
-                        if (num < 1 || num > ConstUdpArg.ORIG_CHANNEL_NUMS * ConstUdpArg.ORIG_TIME_NUMS) {
+                        if (num < 1 || num > ConstUdpArg.ORIG_TIME_NUMS) {
                             num = 1;
-                            tb.Text = "1";
                         }
-                        int chl = num % 8; // 通道数
-                        int tdiv = num / 8; // 时分数
 
-                        if (chl == 0 && tdiv != 0) {
-                            chl = 8;
-                        }
-                        OrigChannel = chl - 1;
-                        OrigTiv = tdiv - 1;
-
-                        udpCommandSocket.WriteOrigChannel(OrigChannel); // 0起始方式
+                        OrigTiv = num - 1;
                         udpCommandSocket.WriteOrigTDiv(OrigTiv); // 0起始方式
                         OrigDataStart_OnClick(null, null); // 关闭波形
                         OrigDataStart_OnClick(null, null); // 开启波形
@@ -779,7 +871,7 @@
 
                 case Key.Up: {
                     // 上方向键增加数值
-                    if (num + 1 > ConstUdpArg.ORIG_CHANNEL_NUMS) {
+                    if (num + 1 > ConstUdpArg.ORIG_TIME_NUMS) {
                         return;
                     }
 
@@ -795,77 +887,8 @@
                     }
 
                     tb.Text = (num - 1).ToString();
-
                     break;
                 }
-            }
-        }
-
-        /// <summary>
-        ///     Tb_origTdiv的按键更改响应
-        ///     回车：数值发送
-        ///     上下方向键：更改数值
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void Tb_origTdiv_KeyUp(object sender, KeyEventArgs e)
-        {
-            TextBox tb = sender as TextBox;
-            int num = 1;
-            if (!int.TryParse(tb.Text, out num))
-            {
-                return;
-            }
-
-            switch (e.Key)
-            {
-                case Key.Enter:
-                    {
-                        // 回车更改
-                        try
-                        {
-                            if (num < 1 || num > ConstUdpArg.ORIG_TIME_NUMS)
-                            {
-                                num = 1;
-                            }
-
-                            OrigTiv = num - 1;
-                            udpCommandSocket.WriteOrigTDiv(OrigTiv); // 0起始方式
-                            OrigDataStart_OnClick(null, null); // 关闭波形
-                            OrigDataStart_OnClick(null, null); // 开启波形
-                        }
-                        catch (Exception exception)
-                        {
-                            Console.WriteLine(exception);
-                        }
-
-                        break;
-                    }
-
-                case Key.Up:
-                    {
-                        // 上方向键增加数值
-                        if (num + 1 > ConstUdpArg.ORIG_TIME_NUMS)
-                        {
-                            return;
-                        }
-
-                        tb.Text = (num + 1).ToString();
-
-                        break;
-                    }
-
-                case Key.Down:
-                    {
-                        // 下方向键减少数值
-                        if (num - 1 < 1)
-                        {
-                            return;
-                        }
-
-                        tb.Text = (num - 1).ToString();
-                        break;
-                    }
             }
         }
 
@@ -1185,7 +1208,7 @@
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void SaveWorkData_OnClick(object sender, RoutedEventArgs e) {
-            if (NormWaveData == null || !NormWaveData.IsRcving) {
+            if (NormWaveData == null) {
                 MessageBox.Show("请采集原始波形数据");
                 btn_workSave.Content = "保存数据";
                 return;
@@ -1402,10 +1425,10 @@
                 return;
             }
 
-            orige_graph.Dispatcher.Invoke(
+            delay_graph.Dispatcher.Invoke(
                                           () => {
-                                              orige_graph.Refresh();
-                                              orige_graph.DataSource = e;
+                                              delay_graph.Refresh();
+                                              delay_graph.DataSource = e;
                                           });
         }
 

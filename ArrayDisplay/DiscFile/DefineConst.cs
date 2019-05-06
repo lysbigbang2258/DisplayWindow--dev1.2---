@@ -756,7 +756,8 @@ namespace ArrayDisplay.DataFile {
     public struct StPulseTimeFrequencySpectrum {
         public uint uPTFS_FieldHead;
         public uint uPTFS_FieldLength;
-        public unsafe fixed float daPTFS_TimeFreqSpec [DefineConst.NUM_FRQA_PDT * DefineConst.NUM_TSEG_PDT]; //长度可变?
+        // public unsafe fixed float daPTFS_TimeFreqSpec [DefineConst.NUM_FRQA_PDT * DefineConst.NUM_TSEG_PDT];  
+
         public unsafe fixed float daPTFS_TimeFreqAngle [DefineConst.NUM_FRQA_PDT * DefineConst.NUM_TSEG_PDT];
         public unsafe fixed float iPTFS_TimeRange [2];
         public unsafe fixed float fPTFS_FreqRange [2];

@@ -198,7 +198,7 @@
                                         TextAlignment="Center" />
                                     <Label Width="100" Height="40">测试通道：</Label>
                                     <TextBox
-                                        Name="tb_origChannel"
+                                        Name="tb_origTotalChannel"
                                         Width="100"
                                         Height="32"
                                         Margin="0,0,5,0"

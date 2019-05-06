@@ -358,8 +358,12 @@ namespace ArrayDisplay.DiscFile {
 
         /// <inheritdoc />
         public void Dispose() {
-            origResetEvent?.Dispose();
-            workResetEvent?.Dispose();
+            if (origResetEvent != null) {
+                origResetEvent.Dispose();
+            }
+            if (workResetEvent != null) {
+                workResetEvent.Dispose();
+            }
         }
 
         #endregion

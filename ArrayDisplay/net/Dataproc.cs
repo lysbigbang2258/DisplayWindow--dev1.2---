@@ -315,7 +315,9 @@ namespace ArrayDisplay.Net {
                     }
                 }
 
-                DelayThread?.Abort();
+                if (DelayThread != null) {
+                    DelayThread.Abort();
+                }
 
                 if (WorkThread != null) {
                     WorkThread.Abort();
@@ -324,19 +326,33 @@ namespace ArrayDisplay.Net {
                     }
                 }
 
-                EnergyThread?.Abort();
+                if (EnergyThread != null) {
+                    EnergyThread.Abort();
+                }
 
-                FreqThread?.Abort();
+                if (FreqThread != null) {
+                    FreqThread.Abort();
+                }
 
-                WorkBytesEvent?.Dispose();
+                if (WorkBytesEvent != null) {
+                    WorkBytesEvent.Dispose();
+                }
 
-                OrigBytesEvent?.Dispose();
+                if (OrigBytesEvent != null) {
+                    OrigBytesEvent.Dispose();
+                }
 
-                DelayBytesEvent?.Dispose();
+                if (DelayBytesEvent != null) {
+                    DelayBytesEvent.Dispose();
+                }
 
-                WorkEnergyEvent?.Dispose();
+                if (WorkEnergyEvent != null) {
+                    WorkEnergyEvent.Dispose();
+                }
 
-                FreqWaveEvent?.Dispose();
+                if (FreqWaveEvent != null) {
+                    // FreqWaveEvent.Dispose();
+                }
             }
         }
 
@@ -471,6 +487,7 @@ namespace ArrayDisplay.Net {
         void ThreadOrigWaveStart() {
             while(true) {
                 OrigBytesEvent.WaitOne();
+                object lockobj = new object();
                 var r = new byte[2];
                 for(int i = 0; i < ConstUdpArg.ORIG_DETECT_LENGTH; i++) {
                     for(int j = 0; j < (OrigWaveBytes[0].Length / 2) - 1; j++) {
@@ -481,12 +498,12 @@ namespace ArrayDisplay.Net {
                         OrigWaveFloats[i][j] = a / 8192.0f;
                     }
                 }
-
-                if (OrigGraphEventHandler != null) {
+                lock(lockobj) {
                     string sender = "OrigNet";
-                    int index = DisPlayWindow.Info.OrigChannel - 1 + ((DisPlayWindow.Info.OrigTdiv - 1) * 8);
+                    int index = DisPlayWindow.Info.OrigTotalChannel - 1;
                     OrigGraphEventHandler.Invoke(sender, OrigWaveFloats[index]);
                 }
+                
             }
         }
 
@@ -561,7 +578,7 @@ namespace ArrayDisplay.Net {
                     }
                 }
 
-                int offset = ConstUdpArg.offsetArrayTwo[DisPlayWindow.Info.WorkChannel - 1];
+                int offset = ConstUdpArg.offsetArrayTwo[DisPlayWindow.Info.WorkChannel-1];
                 WorkWavefdatas = WorkWaveFloats[offset - 1];
                 WorkEnergyEvent.Set();
                 FreqWaveEvent.Set();
