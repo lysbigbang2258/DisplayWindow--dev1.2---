@@ -5,7 +5,6 @@
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Net.NetworkInformation;
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
@@ -696,9 +695,21 @@
                         return;
                     }
 
-                    udpCommandSocket.WriteOrigChannel(OrigChannel);
-                    udpCommandSocket.WriteOrigTDiv(OrigTiv);
-                    btn_origstart.Content = "停止";
+                    int num = Info.OrigTotalChannel;
+                    int chl = num % 8; // 通道数
+                    int tdiv = num / 8; // 时分数
+                    if (chl == 0 && tdiv != 0) {
+                        chl = 8;
+                    }
+
+                    udpCommandSocket.WriteOrigChannel(chl - 1);
+                    udpCommandSocket.WriteOrigTDiv(tdiv);
+
+                    btn_origstart.Dispatcher.InvokeAsync(
+                                                         () => {
+                                                             btn_origstart.Content = "停止";
+                                                         });
+
                     OrigWaveData.StartRcvEvent.Set();
                 }
                 else if (OrigWaveData != null || OrigWaveData.IsBuilded) {
@@ -712,7 +723,8 @@
                                                        });
                 }
             }
-            catch {
+            catch(Exception exception) {
+                Console.WriteLine(exception);
                 Console.WriteLine(@"网络地址错误...");
             }
         }
@@ -787,7 +799,7 @@
                         }
 
                         OrigChannel = chl - 1;
-                        OrigTiv = tdiv - 1;
+                        OrigTiv = tdiv;
                         Info.OrigTotalChannel = num;
 
                         udpCommandSocket.WriteOrigChannel(OrigChannel); // 0起始方式
@@ -798,7 +810,7 @@
                             Task.Run(
                                      () => {
                                          OrigDataStart_OnClick(null, null); // 开启波形
-                                         Thread.SpinWait(1000);
+                                         Thread.Sleep(1000);
                                          OrigDataStart_OnClick(null, null); // 开启波形
                                      });
                         }
