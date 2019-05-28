@@ -30,8 +30,16 @@ namespace ArrayDisplay.Net {
             DelayBytesEvent = new AutoResetEvent(false);
             OrigBytesEvent = new AutoResetEvent(false);
             WorkBytesEvent = new AutoResetEvent(false);
+            UdpWaveData.WorkDataEventHandler += GetWorkData;
         }
 
+        
+        void GetWorkData(object sender, byte[][] e) {
+            if (WorkWaveBytes != null) {
+                e.CopyTo(WorkWaveBytes, 0);
+            }
+            Console.WriteLine();
+        }
         /// <summary>
         ///     Gets or sets the sound event handler.
         /// </summary>
@@ -218,13 +226,14 @@ namespace ArrayDisplay.Net {
         }
 
         /// <summary>
-        ///     Gets or sets the freq wave one.
+        ///     Gets or sets the work Freqfdatas.
         /// </summary>
-        float[] FreqWavefData {
+        float[] WorkFreqfdatas {
             get;
             set;
         }
 
+      
         /// <summary>
         ///     Gets or sets the delay wave floats.
         /// </summary>
@@ -289,7 +298,6 @@ namespace ArrayDisplay.Net {
             get;
             set;
         }
-
         #region IDisposable
 
         /// <summary>
@@ -423,16 +431,17 @@ namespace ArrayDisplay.Net {
             WorkWaveBytes = new byte[ArrayNums][];
             PlayWaveBytes = new byte[ArrayNums][];
 
-            int frameNum = ConstUdpArg.WORK_FRAME_NUMS * 4; // 工作数据帧数
+            int frameNum = DisPlayWindow.Info.WorkFramNums * 4; // 工作数据帧数
 
             // int frameNum = 2000 * ConstUdpArg.WORK_FRAME_LENGTH; //工作数据帧数
             for(int i = 0; i < ArrayNums; i++) {
-                WorkWaveBytes[i] = new byte[frameNum * 4]; // 避免数据为null
-                WorkWaveFloats[i] = new float[frameNum]; // 避免数据为null 
-                PlayWaveBytes[i] = new byte[frameNum * 2]; // 避免数据为null 
+                WorkWaveBytes[i] = new byte[frameNum]; // 避免数据为null
+                WorkWaveFloats[i] = new float[frameNum / 4]; // 避免数据为null 
+                PlayWaveBytes[i] = new byte[frameNum / 2]; // 避免数据为null 
             }
 
             WorkWavefdatas = new float[frameNum]; // 工作波形
+            WorkFreqfdatas = new float[frameNum * 2];
             EnergyFloats = new float[ArrayNums];
             ListenCoefficent = (float)Math.Pow(10, 50 / 20.0F) * 100; // 31622.78; //听音强度
 
@@ -507,6 +516,8 @@ namespace ArrayDisplay.Net {
             }
         }
 
+
+
         /// <summary>
         ///     线程处理函数：能量数据处理
         /// </summary>
@@ -517,13 +528,13 @@ namespace ArrayDisplay.Net {
                 for(int i = 0; i < WorkWaveFloats.Length; i++) {
                     float f = WorkWaveFloats[i].Max();
                     ftemp = Math.Abs(f);
-                    EnergyFloats[i] = (float)ftemp;
+                    int offset = ConstUdpArg.offsetArrayTwo[i] - 1;
+                    EnergyFloats[offset] = (float)ftemp;
                 }
 
-                float max = EnergyFloats.Max();
                 for(int i = 0; i < EnergyFloats.Length; i++) {
-                    if (Math.Abs(max) > float.Epsilon) {
-                        EnergyFloats[i] = EnergyFloats[i] / max;
+                    if (EnergyFloats[i] > float.Epsilon) {
+                        EnergyFloats[i] = (float)Math.Pow(EnergyFloats[i], 2) / 2;
                     }
                     else {
                         EnergyFloats[i] = 0;
@@ -541,6 +552,8 @@ namespace ArrayDisplay.Net {
             }
         }
 
+
+
         /// <summary>
         ///     The thread work wave start.
         /// </summary>
@@ -549,7 +562,7 @@ namespace ArrayDisplay.Net {
                 WorkBytesEvent.WaitOne();
                 var r = new byte[4];
                 for(int i = 0; i < ConstUdpArg.ARRAY_NUM; i++) {
-                    for(int j = 0; j < ConstUdpArg.WORK_FRAME_NUMS; j++) {
+                    for(int j = 0; j < DisPlayWindow.Info.WorkFramNums; j++) {
                         r[0] = WorkWaveBytes[i][(j * 4) + 3];
                         r[1] = WorkWaveBytes[i][(j * 4) + 2];
                         r[2] = WorkWaveBytes[i][(j * 4) + 1];
@@ -599,12 +612,31 @@ namespace ArrayDisplay.Net {
         ///     The thread freq wave start.
         /// </summary>
         void ThreadFreqWaveStart() {
+
+            List<float[]> fredatalist = new List<float[]>();
             while(true) {
                 FreqWaveEvent.WaitOne();
-                FreqWavefData = TransFormFft.FFT(WorkWavefdatas);
-                var dataPoints = NewFFT.Start(WorkWavefdatas, 1024 * 16); // 用前1024 * 16个点
-
-                FrapPointGraphEventHandler?.Invoke(null, dataPoints);
+                fredatalist.Add(WorkWavefdatas);
+                if (fredatalist.Count < 2) {
+                    continue;
+                }
+                else {
+                    List<float> list = new List<float>();
+                    foreach(float[] floats in fredatalist) {
+                        list.AddRange(floats);
+                    }
+                    var dataPoints = NewFFT.Start(list.ToArray(), 8192 * 2 * 2); // 用前8192个点
+                    var tmpPoints = new Point[dataPoints.Length / 2];
+                    for(int i = 0; i < dataPoints.Length; i++) {
+                        if (i % 2 == 0) {
+                            tmpPoints[i / 2] = dataPoints[i]; 
+                        }
+                    }
+                    fredatalist.Clear();
+                    if (FrapPointGraphEventHandler != null) {
+                        FrapPointGraphEventHandler.Invoke(null, tmpPoints);
+                    }
+                }
             }
         }
     }

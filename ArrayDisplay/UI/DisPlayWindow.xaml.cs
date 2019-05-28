@@ -262,7 +262,7 @@
             if (udpCommandSocket.Init()) {
                 udpCommandSocket.TestConnect();
             }
-
+            LoadSystemMessage();
             observableCollection = new ObservableCollection<UIBValue>();
             blistview.ItemsSource = observableCollection;
 
@@ -285,6 +285,8 @@
 
             // 正常工作
             tb_workChannel.SetBinding(TextBox.TextProperty, new Binding("WorkChannel") { Source = Info, Mode = BindingMode.TwoWay });
+            tb_workSaveTime.SetBinding(TextBox.TextProperty, new Binding("WorkSaveTime") { Source = Info,Mode = BindingMode.TwoWay });
+            tb_workFram.SetBinding(TextBox.TextProperty, new Binding("WorkFramNums") {Source = Info,Mode = BindingMode.TwoWay});
         }
 
         /// <summary>
@@ -742,9 +744,11 @@
                 dataFile.EnableOrigSaveFile();
             }
             else {
+                dataFile = new DataFile();
                 btn_origsave.Content = "保存数据";
                 dataFile.IsStartFlag = false;
                 dataFile.DisableSaveFile();
+                dataFile.Dispose();
             }
         }
 
@@ -1228,7 +1232,8 @@
 
             IsworkSaveFlag = !IsworkSaveFlag;
             if (IsworkSaveFlag) {
-                btn_workSave.Content = "开始保存";
+                dataFile = new DataFile();
+                btn_workSave.Content = "停止保存";
                 dataFile.EnableWorkSaveFile();
                 dataFile.IsStartFlag = true;
             }
@@ -1236,6 +1241,7 @@
                 btn_workSave.Content = "保存数据";
                 dataFile.DisableSaveFile();
                 dataFile.IsStartFlag = true;
+                dataFile.Dispose();
             }
         }
 
@@ -1360,6 +1366,63 @@
             }
         }
 
+        /// <summary>
+        ///     Tb_workFram的按键更改响应
+        ///     回车：数值发送
+        ///     上下方向键：更改数值
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void Tb_workFram_OnKeyUp(object sender, KeyEventArgs e) {
+            TextBox tb = sender as TextBox;
+            int num = 3125;
+            if (!int.TryParse(tb.Text, out num)) {
+                return;
+            }
+
+            switch(e.Key) {
+                case Key.Enter: {
+                    // 回车更改
+                    try {
+                        if (num < 0 || num > ConstUdpArg.WORK_FRAME_NUMS * 5) {
+                            num = 3125;
+                            tb.Text = "3125";
+                        }
+
+                        WorkDataStart_OnClick(null, null); // 关闭波形
+                        Info.WorkFramNums = num;
+                        WorkDataStart_OnClick(null, null); // 开启波形
+                    }
+                    catch(Exception exception) {
+                        Console.WriteLine(exception);
+                    }
+
+                    break;
+                }
+
+                case Key.Up: {
+                    // 上方向键增加数值
+                    if (num * 10 > ConstUdpArg.ORIG_FRAME_NUMS * 10) {
+                        return;
+                    }
+
+                    tb.Text = (num * 10).ToString();
+
+                    break;
+                }
+
+                case Key.Down: {
+                    // 下方向键减少数值
+                    if (num / 10 < 1) {
+                        return;
+                    }
+
+                    tb.Text = (num / 10).ToString();
+
+                    break;
+                }
+            }
+        }
         #endregion
 
         #region 读取波形数据
@@ -1379,16 +1442,6 @@
             var graphdata = new float[len];
 
             Array.Copy(e, 0, graphdata, 0, len);
-
-            for(int i = 0; i < len; i++) {
-                if (Math.Abs(graphdata[i]) < 0.00001F) {
-                    graphdata[i] = 0;
-                }
-                else {
-                    // graphdata[i] = 20 + 20 * (float)Math.Log10(Math.Abs(graphdata[i]));
-                    graphdata[i] = 50 * graphdata[i];
-                }
-            }
 
             var xnums = new int[len];
             var dataPoints1 = new Point[len];
@@ -1596,5 +1649,7 @@
         }
 
         #endregion
+
+        
     }
 }

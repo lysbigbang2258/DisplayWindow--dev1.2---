@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{77C14530-C873-4836-B79C-B4F8350266D7}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ArrayDisplay</RootNamespace>
     <AssemblyName>ArrayDisplay</AssemblyName>
@@ -48,7 +48,6 @@
     <Reference Include="NationalInstruments.Analysis.Enterprise, Version=15.0.45.49153, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.Common, Version=17.5.40.49153, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.Controls, Version=15.0.45.3898, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
-    <Reference Include="NationalInstruments.Controls.Booleans, Version=15.0.45.3898, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
     <Reference Include="NationalInstruments.Controls.Graphs, Version=15.0.45.3898, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL" />
     <Reference Include="SlimDX">
       <HintPath>dll\debug\SlimDX.dll</HintPath>
@@ -273,12 +272,6 @@
     <Resource Include="Icon\静音.png" />
     <Resource Include="Icon\频谱.png" />
     <Resource Include="Icon\鼠标.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ImageButtonControl\UserControl.csproj">
-      <Project>{13ff71db-6bb2-4a25-a862-ba8ab2d0b97d}</Project>
-      <Name>UserControl</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">

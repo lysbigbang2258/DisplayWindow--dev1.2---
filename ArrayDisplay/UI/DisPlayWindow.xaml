@@ -255,7 +255,7 @@
                                     </ni:Graph.Axes>
                                     <ni:Graph.Plots>
                                         <ni:Plot>
-                                            <ni:LinePlotRenderer Stroke="Green" />
+                                            <ni:LinePlotRenderer Stroke="Green" StrokeThickness="2" />
                                         </ni:Plot>
                                     </ni:Graph.Plots>
                                 </ni:Graph>
@@ -272,10 +272,6 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <Grid Grid.Row="0" Background="#FFE5E5E5">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="220*" />
-                                    <ColumnDefinition Width="610*" />
-                                </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
@@ -290,7 +286,7 @@
                                     </Grid.RowDefinitions>
                                     <Grid Row="0">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
                                         <DockPanel Grid.Column="0" VerticalAlignment="Center">
@@ -312,7 +308,19 @@
                                                     KeyUp="Tb_workChNum_OnKeyUp"
                                                     Text="1"
                                                     TextAlignment="Center" />
-
+                                                <Label
+                                                    Width="100"
+                                                    Height="40"
+                                                    HorizontalContentAlignment="Center"
+                                                    Content="帧数：" />
+                                                <TextBox
+                                                    x:Name="tb_workFram"
+                                                    Width="100"
+                                                    Height="32"
+                                                    FontFamily="18"
+                                                    KeyUp="Tb_workFram_OnKeyUp"
+                                                    Text="0"
+                                                    TextAlignment="Center" />
                                                 <Button
                                                     x:Name="btn_workstart"
                                                     Width="100"
@@ -323,6 +331,23 @@
                                                     Background="#FF66EE66"
                                                     Click="WorkDataStart_OnClick"
                                                     Content="启动" />
+                                                <TextBox
+                                                    x:Name="tb_workSaveTime"
+                                                    Width="98"
+                                                    Height="32"
+                                                    Margin="20,0,0,0"
+                                                    HorizontalAlignment="Right"
+                                                    VerticalAlignment="Center"
+                                                    VerticalContentAlignment="Center"
+                                                    KeyUp="Tb_workChNum_OnKeyUp"
+                                                    Text="1"
+                                                    TextAlignment="Center" />
+                                                <Label
+                                                    Width="40"
+                                                    Margin="0,0,0,0"
+                                                    HorizontalContentAlignment="Center"
+                                                    VerticalContentAlignment="Center"
+                                                    Content="s" />
                                                 <Button
                                                     x:Name="btn_workSave"
                                                     Width="100"
@@ -413,7 +438,7 @@
                                                     Range="0,500" />
                                                 <ni:AxisDouble
                                                     x:Name="yScale"
-                                                    Adjuster="FitVisibleLoosely "
+                                                    Adjuster="None"
                                                     MinorDivisions="{x:Null}"
                                                     Orientation="Vertical"
                                                     Range="-2,2">
@@ -429,7 +454,6 @@
                                                 <ni:Plot>
                                                     <ni:LinePlotRenderer Stroke="Green" />
                                                 </ni:Plot>
-
                                             </ni:Graph.Plots>
 
                                         </ni:Graph>
@@ -493,40 +517,56 @@
                                     <GridSplitter Grid.Row="3" Height="10" />
                                 </Grid>
                                 <GridSplitter Grid.Column="1" Width="10" />
-                                <ni:Graph x:Name="graph_energyFirst" Grid.Column="2">
-                                    <ni:Graph.Axes>
-                                        <ni:AxisDouble
-                                            x:Name="xScale3"
-                                            Adjuster="None"
-                                            MinorDivisions="{x:Null}"
-                                            Orientation="Horizontal"
-                                            Range="1,64">
-                                            <ni:AxisDouble.MajorGridLines>
-                                                <ni:GridLines
-                                                    Stroke="Orange"
-                                                    StrokeDashArray="4,2"
-                                                    StrokeDashCap="Round"
-                                                    StrokeDashOffset="1"
-                                                    StrokeThickness="2" />
-                                            </ni:AxisDouble.MajorGridLines>
-                                        </ni:AxisDouble>
-                                        <ni:AxisDouble
-                                            x:Name="yScale3"
-                                            Adjuster="None"
-                                            Label="Ampliton"
-                                            MinorDivisions="{x:Null}"
-                                            Orientation="Vertical"
-                                            Range="0,50" />
-                                    </ni:Graph.Axes>
-                                    <ni:Graph.DefaultPlotRenderers>
-                                        <ni:BarPlotRenderer
-                                            BarWidth="0.5"
-                                            Fill="Purple"
-                                            Stroke="White"
-                                            StrokeThickness="0" />
-                                    </ni:Graph.DefaultPlotRenderers>
+                                <Grid Name="energystackPanel" Grid.Column="2">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        Foreground="Black"
+                                        TextAlignment="Center">
+                                        <Run Text="基元能量图（横坐标：基元号" /> <Run Text="纵坐标：归一化能量）" />
+                                    </TextBlock>
+                                    <ni:Graph
+                                        x:Name="graph_energyFirst"
+                                        Grid.Row="1"
+                                        Width="{Binding ElementName=energystackPanel, Path=Width}">
 
-                                </ni:Graph>
+                                        <ni:Graph.Axes>
+                                            <ni:AxisDouble
+                                                x:Name="xScale3"
+                                                Adjuster="None"
+                                                MinorDivisions="{x:Null}"
+                                                Orientation="Horizontal"
+                                                Range="1,64">
+                                                <ni:AxisDouble.MajorGridLines>
+                                                    <ni:GridLines
+                                                        Stroke="Orange"
+                                                        StrokeDashArray="4,2"
+                                                        StrokeDashCap="Round"
+                                                        StrokeDashOffset="1"
+                                                        StrokeThickness="2" />
+                                                </ni:AxisDouble.MajorGridLines>
+                                            </ni:AxisDouble>
+                                            <ni:AxisDouble
+                                                x:Name="yScale3"
+                                                Adjuster="None"
+                                                Label="Ampliton"
+                                                MinorDivisions="{x:Null}"
+                                                Orientation="Vertical"
+                                                Range="0,2" />
+                                        </ni:Graph.Axes>
+                                        <ni:Graph.DefaultPlotRenderers>
+                                            <ni:BarPlotRenderer
+                                                BarWidth="1"
+                                                Fill="LawnGreen"
+                                                Stroke="White"
+                                                StrokeThickness="1" />
+                                        </ni:Graph.DefaultPlotRenderers>
+
+                                    </ni:Graph>
+                                </Grid>
 
 
                             </Grid>

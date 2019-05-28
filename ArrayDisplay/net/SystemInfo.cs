@@ -32,6 +32,8 @@ namespace ArrayDisplay.Net {
             origTdiv = 1;
             workChannel = 1;
             origTotalChannel = 1;
+            workSaveTime = 3;
+            WorkFramNums = 3125;
         }
 
         /// <summary>
@@ -136,6 +138,13 @@ namespace ArrayDisplay.Net {
         /// The orig  Total channel.
         /// </summary>
         int origTotalChannel;
+
+        /// <summary>
+        /// The work Save Time.
+        /// </summary>
+        int workSaveTime;
+
+        int workFramNums;
 
         #endregion
 
@@ -408,6 +417,33 @@ namespace ArrayDisplay.Net {
 
             set {
                 origTdiv = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the save packs.
+        /// </summary>
+        public int WorkSaveTime {
+            get {
+                return workSaveTime;
+                
+            }
+            set {
+                workSaveTime = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the work fram nums.
+        /// </summary>
+        public int WorkFramNums {
+            get {
+                return workFramNums;
+            }
+            set {
+                workFramNums = value;
                 OnPropertyChanged();
             }
         }
