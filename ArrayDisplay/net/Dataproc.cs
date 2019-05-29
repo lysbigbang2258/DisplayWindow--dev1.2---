@@ -617,7 +617,7 @@ namespace ArrayDisplay.Net {
             while(true) {
                 FreqWaveEvent.WaitOne();
                 fredatalist.Add(WorkWavefdatas);
-                if (fredatalist.Count < 2) {
+                if (fredatalist.Count < 3) {
                     continue;
                 }
                 else {

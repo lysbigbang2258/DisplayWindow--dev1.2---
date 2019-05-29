@@ -125,7 +125,7 @@ namespace ArrayDisplay.Net {
                     break;
                 }
 
-                PutDelayData(rcvBuf); // Todo 测试代码是否无错误
+                PutDelayData(rcvBuf);
                 WaveDataproc.DelayBytesEvent.Set();
                 StartRcvEvent.Set();
             }

@@ -739,12 +739,12 @@
 
             IsorigSaveFlag = !IsorigSaveFlag;
             if (IsorigSaveFlag) {
+                dataFile = new DataFile();
                 btn_origsave.Content = "正在保存";
                 dataFile.IsStartFlag = true;
                 dataFile.EnableOrigSaveFile();
             }
-            else {
-                dataFile = new DataFile();
+            else{
                 btn_origsave.Content = "保存数据";
                 dataFile.IsStartFlag = false;
                 dataFile.DisableSaveFile();
@@ -1227,6 +1227,9 @@
             if (NormWaveData == null) {
                 MessageBox.Show("请采集原始波形数据");
                 btn_workSave.Content = "保存数据";
+                dataFile.DisableSaveFile();
+                dataFile.IsStartFlag = true;
+                dataFile.Dispose();
                 return;
             }
 
@@ -1570,7 +1573,7 @@
                 return;
             }
 
-            Point maxPoint = new Point(0, 0);
+            Point maxPoint = new Point(-10000, -1000);//不赋0，有可能是负数
             foreach(Point dPoint in e) {
                 if (maxPoint.Y < dPoint.Y) {
                     maxPoint = dPoint;
@@ -1650,6 +1653,5 @@
 
         #endregion
 
-        
     }
 }
