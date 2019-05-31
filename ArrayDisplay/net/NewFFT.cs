@@ -27,7 +27,7 @@ namespace ArrayDisplay.Net {
             //waveform data size
             int datasize = length;
             //number of samples for FFT data
-            int fftnumofSamples = datasize;
+            int fftnumofSamples = datasize / 2;
             // Get the magnitudes and phases of FFT array..
             ComplexDouble.DecomposeArrayPolar(fftValue, out magnitudes, out phases);
             double[] xwaveform = new double[fftnumofSamples];
@@ -45,7 +45,7 @@ namespace ArrayDisplay.Net {
                 // Generating xwaveform with respect to which magnitude and phase will be plotted.
                 xwaveform[i] = deltaFreq * i;
                 //                subsetOfMagnitudes[i] = magnitudes[i] * scalingFactor * Math.Sqrt(2.0); // Storing only half the magnitudes array.
-                subsetOfMagnitudes[i] = magnitudes[i] * scalingFactor; // Storing only half the magnitudes array.
+                subsetOfMagnitudes[i] = magnitudes[i] * scalingFactor * 2; // Storing only half the magnitudes array.
                 subsetOfPhases[i] = phases[i]; // Storing only half of the phases array.
 
             }
@@ -54,7 +54,7 @@ namespace ArrayDisplay.Net {
                     logMagnitudes[i] = 0;
                 }
                 else {
-                    logMagnitudes[i] = 10 * Math.Log10(subsetOfMagnitudes[i]);
+                    logMagnitudes[i] = 20 * Math.Log10(subsetOfMagnitudes[i]);
                 }
                 resultPoints[i] = new Point(xwaveform[i], logMagnitudes[i]);
             }

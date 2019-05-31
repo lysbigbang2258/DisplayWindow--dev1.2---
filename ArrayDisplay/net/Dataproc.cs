@@ -614,10 +614,11 @@ namespace ArrayDisplay.Net {
         void ThreadFreqWaveStart() {
 
             List<float[]> fredatalist = new List<float[]>();
-            while(true) {
+            while(true)
+            {
                 FreqWaveEvent.WaitOne();
                 fredatalist.Add(WorkWavefdatas);
-                if (fredatalist.Count < 3) {
+                if (fredatalist.Count < 10) {
                     continue;
                 }
                 else {
@@ -625,16 +626,14 @@ namespace ArrayDisplay.Net {
                     foreach(float[] floats in fredatalist) {
                         list.AddRange(floats);
                     }
-                    var dataPoints = NewFFT.Start(list.ToArray(), 8192 * 2 * 2); // 用前8192个点
-                    var tmpPoints = new Point[dataPoints.Length / 2];
-                    for(int i = 0; i < dataPoints.Length; i++) {
-                        if (i % 2 == 0) {
-                            tmpPoints[i / 2] = dataPoints[i]; 
-                        }
-                    }
+                    
+                    // var dataPoints = NewFFT.Start(list.ToArray() ,3130); // 用前8192个点
+                    
+                    var dataPoints = NewFFT.Start(list.ToArray(),3125); // 用前8192个点
+                    
                     fredatalist.Clear();
                     if (FrapPointGraphEventHandler != null) {
-                        FrapPointGraphEventHandler.Invoke(null, tmpPoints);
+                        FrapPointGraphEventHandler.Invoke(null, dataPoints);
                     }
                 }
             }
